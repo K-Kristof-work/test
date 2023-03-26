@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class GridClickHandler : MonoBehaviour
 {
@@ -6,8 +7,10 @@ public class GridClickHandler : MonoBehaviour
 	private bool isDragging = false;
 	private Vector3 dragStartWorldPosition;
 	private Vector3 dragEndWorldPosition;
+	[HideInInspector]
+	public bool ZoneButtonSelected = false;
 
-	public ZoneType SelectedZoneType { get; set; } = ZoneType.Residential; // Set the default selected zone type
+	public ZoneType SelectedZoneType { get; set; }
 	public GridSystem gridSystem; // Drag and drop the GridManager object to this field in the Inspector
 
 	public SelectionBox selectionBox; // Drag and drop the Image GameObject to this field in the Inspector
@@ -21,43 +24,50 @@ public class GridClickHandler : MonoBehaviour
 
 	void Update()
 	{
-		if (Input.GetMouseButtonDown(0)) // Left mouse button down
+		if (ZoneButtonSelected)
 		{
-			RaycastHit hit;
-			Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+			if (EventSystem.current.IsPointerOverGameObject()) return;
 
-			if (Physics.Raycast(ray, out hit))
+			if (Input.GetMouseButtonDown(0)) // Left mouse button down
 			{
-				dragStartWorldPosition = hit.point;
-				isDragging = true;
-				selectionBox.SetVisible(true);
+				RaycastHit hit;
+				Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+
+				if (Physics.Raycast(ray, out hit))
+				{
+					dragStartWorldPosition = hit.point;
+					isDragging = true;
+					selectionBox.SetVisible(true);
+				}
 			}
-		}
-		else if (Input.GetMouseButtonUp(0) && isDragging) // Left mouse button released
-		{
-			RaycastHit hit;
-			Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
-
-			if (Physics.Raycast(ray, out hit))
+			else if (Input.GetMouseButtonUp(0) && isDragging) // Left mouse button released
 			{
-				dragEndWorldPosition = hit.point;
+				RaycastHit hit;
+				Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+
+				if (Physics.Raycast(ray, out hit))
+				{
+					dragEndWorldPosition = hit.point;
+					gridSystem.SetZoneRectangle(dragStartWorldPosition, dragEndWorldPosition, SelectedZoneType);
+				}
 				isDragging = false;
 				selectionBox.SetVisible(false);
-				gridSystem.SetZoneRectangle(dragStartWorldPosition, dragEndWorldPosition, SelectedZoneType);
+				GetComponent<ZoneTypeSelector>().DisableTypeSelector();
 			}
-		}
 
-		if (isDragging)
-		{
-			RaycastHit hit;
-			Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
-
-			if (Physics.Raycast(ray, out hit))
+			if (isDragging)
 			{
-				Vector3 endWorldPosition = hit.point;
-				selectionBox.UpdateSelectionBox(dragStartWorldPosition, endWorldPosition);
+				RaycastHit hit;
+				Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+
+				if (Physics.Raycast(ray, out hit))
+				{
+					Vector3 endWorldPosition = hit.point;
+					selectionBox.UpdateSelectionBox(dragStartWorldPosition, endWorldPosition);
+				}
 			}
 		}
+		
 	}
 
 
