@@ -1346,7 +1346,7 @@ MonoBehaviour:
   extraMotionFactor: 2
   zoomSpeed: 10
   minZoom: 0
-  maxZoom: 18
+  maxZoom: 20
   rotationSpeed: 2
   minXRotation: 20
   maxXRotation: 80
@@ -1388,6 +1388,33 @@ MonoBehaviour:
   gridHeight: 50
   cellPrefab: {fileID: 8847815840032135080, guid: c6a3c1c40c55f304983a4296b5bb95cd, type: 3}
   gridParent: {fileID: 1039642949}
+  roadMeshPrefab: {fileID: 8847815840032135080, guid: 811e06e9d01cb9e4e97cd4a82d528eb2, type: 3}
+  StraightRoad:
+  - {fileID: 505481861235893634, guid: bad2cfaa4eeaea647b849a54072b135f, type: 3}
+  - {fileID: 2033445771561420275, guid: bad2cfaa4eeaea647b849a54072b135f, type: 3}
+  - {fileID: -4070890409184295443, guid: bad2cfaa4eeaea647b849a54072b135f, type: 3}
+  - {fileID: 2033445771561420275, guid: bad2cfaa4eeaea647b849a54072b135f, type: 3}
+  - {fileID: 2033445771561420275, guid: bad2cfaa4eeaea647b849a54072b135f, type: 3}
+  - {fileID: 2033445771561420275, guid: bad2cfaa4eeaea647b849a54072b135f, type: 3}
+  - {fileID: 2033445771561420275, guid: bad2cfaa4eeaea647b849a54072b135f, type: 3}
+  - {fileID: 2033445771561420275, guid: bad2cfaa4eeaea647b849a54072b135f, type: 3}
+  CornerRoad:
+  - {fileID: 3654015292391369891, guid: bad2cfaa4eeaea647b849a54072b135f, type: 3}
+  - {fileID: -1281343688705066598, guid: bad2cfaa4eeaea647b849a54072b135f, type: 3}
+  - {fileID: 3654015292391369891, guid: bad2cfaa4eeaea647b849a54072b135f, type: 3}
+  - {fileID: 3654015292391369891, guid: bad2cfaa4eeaea647b849a54072b135f, type: 3}
+  - {fileID: 3654015292391369891, guid: bad2cfaa4eeaea647b849a54072b135f, type: 3}
+  - {fileID: 3654015292391369891, guid: bad2cfaa4eeaea647b849a54072b135f, type: 3}
+  TIntersectionRoad:
+  - {fileID: 6882353422711940309, guid: bad2cfaa4eeaea647b849a54072b135f, type: 3}
+  - {fileID: 3390507409051214917, guid: bad2cfaa4eeaea647b849a54072b135f, type: 3}
+  - {fileID: -5356681838370779435, guid: bad2cfaa4eeaea647b849a54072b135f, type: 3}
+  - {fileID: 3390507409051214917, guid: bad2cfaa4eeaea647b849a54072b135f, type: 3}
+  - {fileID: 3390507409051214917, guid: bad2cfaa4eeaea647b849a54072b135f, type: 3}
+  - {fileID: 3390507409051214917, guid: bad2cfaa4eeaea647b849a54072b135f, type: 3}
+  - {fileID: 3390507409051214917, guid: bad2cfaa4eeaea647b849a54072b135f, type: 3}
+  CrossRoad:
+  - {fileID: -7727235475562856354, guid: bad2cfaa4eeaea647b849a54072b135f, type: 3}
 --- !u!4 &1039642949
 Transform:
   m_ObjectHideFlags: 0

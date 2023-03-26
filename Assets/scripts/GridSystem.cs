@@ -242,7 +242,6 @@ public class GridSystem : MonoBehaviour
 			return null;
 		}
 
-		//make a random number between 0 and the roadMeshes[meshNum].lenght
         int randomNum = Random.Range(0, roadMeshes[meshNum].Count);
 
 		//give back a random mesh
