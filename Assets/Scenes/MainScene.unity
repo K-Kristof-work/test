@@ -1418,9 +1418,11 @@ MonoBehaviour:
   buildInterval: 0.5
   residentialBuildingPrefabs:
   - {fileID: 4943409745116572213, guid: fdd9eb84d0b409347af38b31f94b7fb2, type: 3}
-  - {fileID: 4943409745116572213, guid: e60206e8e14ca2e459e7b0c653cb5ba3, type: 3}
-  - {fileID: 4943409745116572213, guid: f856b48db3ab4eb44a9f367a5e4cda43, type: 3}
-  - {fileID: 4943409745116572213, guid: 39a2582b604a53343a695f6051fb932e, type: 3}
+  - {fileID: 6957366184061848230, guid: 7438a8886b0e7b24e8de1f2eedefb4ad, type: 3}
+  - {fileID: 6890206010892417007, guid: 978197c4e10d9e94c8a412e3e7e567aa, type: 3}
+  - {fileID: 3407920376676595426, guid: 0aeaa67adc7a3fc41944849aa9251671, type: 3}
+  - {fileID: 6440012233239438561, guid: fbef3e8dc771f5143838cdf977368995, type: 3}
+  - {fileID: 7718472527847421920, guid: 112a119faeba5b84cb9f15c0346129bf, type: 3}
   commercialBuildingPrefabs:
   - {fileID: 2005169312455111544, guid: 51f3233a79375fb4caf37552a8eba27a, type: 3}
   industrialBuildingPrefabs:
