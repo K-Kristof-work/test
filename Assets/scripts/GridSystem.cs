@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
+
 
 public class GridSystem : MonoBehaviour
 {
@@ -21,6 +23,12 @@ public class GridSystem : MonoBehaviour
 
 	public Dictionary<int,List<Mesh>> roadMeshes;
 
+	public float buildInterval = 0.5f;
+	public List<GameObject> residentialBuildingPrefabs;
+	public List<GameObject> commercialBuildingPrefabs;
+	public List<GameObject> industrialBuildingPrefabs;
+	private Dictionary<ZoneType, List<GameObject>> zoneTypeToBuildingPrefabs;
+
 	//public List<List<Mesh>>  roadMeshes;
 	private ZoneMaterials zoneMaterials;
 	private bool isroadupdating = false;
@@ -39,11 +47,21 @@ public class GridSystem : MonoBehaviour
 			{2, TIntersectionRoad},
 			{3, CrossRoad},
 		};
+
+		zoneTypeToBuildingPrefabs = new Dictionary<ZoneType, List<GameObject>>
+		{
+			{ZoneType.Residential,  residentialBuildingPrefabs},
+			{ZoneType.Commercial, commercialBuildingPrefabs},
+			{ZoneType.Industrial, industrialBuildingPrefabs}
+
+		};
+
 	}
 	void Start()
 	{
 		SetUpGrid();
 		zoneMaterials = GetComponent<ZoneMaterials>();
+		StartCoroutine(PlaceBuildingsOverTime());
 	}
 	public void SetUpGrid()
 	{
@@ -79,15 +97,6 @@ public class GridSystem : MonoBehaviour
 					renderer.material = zoneMaterial;
 				}
 
-				// Instantiate the road mesh prefab as a child of the cell
-				GameObject roadMeshInstance = Instantiate(roadMeshPrefab, cell.Position, Quaternion.identity, cellInstance.transform);
-				roadMeshInstance.transform.localScale = roadMeshPrefab.transform.localScale;
-				roadMeshInstance.name = "RoadMesh";
-				MeshRenderer roadMeshRenderer = roadMeshInstance.GetComponent<MeshRenderer>();
-				roadMeshRenderer.enabled = false;
-
-				// Store the instantiated road mesh renderer in the GridCell
-				cell.RoadMeshRenderer = roadMeshRenderer;
 			}
 		}
 	}
@@ -144,7 +153,7 @@ public class GridSystem : MonoBehaviour
 
 		grid[x][z].ZoneType = zoneType;
 
-		if (zoneType == ZoneType.Road)
+		if (zoneType == ZoneType.Road && grid[x][z].Building == null)
 		{
 			// Check if there is an existing road mesh and destroy it
 			if (grid[x][z].RoadMeshRenderer != null)
@@ -167,10 +176,17 @@ public class GridSystem : MonoBehaviour
 		else
 		{
 			// Check if the GridCell.Building is a road mesh and destroy it if so
-			if (grid[x][z].Building != null && grid[x][z].Building.name == "RoadMesh")
+			if (grid[x][z].Building != null)
 			{
-				Destroy(grid[x][z].Building);
-				grid[x][z].Building = null;
+				if(grid[x][z].Building.name == "RoadMesh")
+				{
+					Destroy(grid[x][z].Building);
+					grid[x][z].Building = null;
+				}
+				else
+				{
+					return;
+				}
 			}
 
 			
@@ -348,6 +364,183 @@ public class GridSystem : MonoBehaviour
 
 		return false;
 	}
+
+	private IEnumerator PlaceBuildingsOverTime()
+	{
+		WaitForSeconds wait = new WaitForSeconds(buildInterval);
+		List<Vector2Int> buildablePositions = new List<Vector2Int>();
+		int checkingFrequency = 10; // bigger is fewer checks
+		int counter = 0;
+		while (true)
+		{
+
+
+			if (checkingFrequency == counter)
+			{
+				buildablePositions = new List<Vector2Int>();
+				counter = 0;
+				for (int x = 0; x < GridWidth; x++)
+				{
+					for (int z = 0; z < GridHeight; z++)
+					{
+						if (grid[x][z].ZoneType != ZoneType.Empty && grid[x][z].ZoneType != ZoneType.Road && grid[x][z].Building == null)
+						{
+							// Check if there's a road in the vicinity
+							if (IsRoad(x - 1, z) || IsRoad(x + 1, z) || IsRoad(x, z - 1) || IsRoad(x, z + 1))
+							{
+									buildablePositions.Add(new Vector2Int(x, z));
+							}
+						}
+
+						
+					}
+				}
+			}
+			counter++;
+			Debug.Log(buildablePositions.Count);
+			if (buildablePositions.Count > 0)
+			{
+				// Choose a random buildable position
+				Vector2Int randomPosition = buildablePositions[Random.Range(0, buildablePositions.Count)];
+
+				// Place a building at the random position
+				PlaceBuilding(randomPosition.x, randomPosition.y, grid[randomPosition.x][randomPosition.y].ZoneType);
+			}
+
+			yield return wait;
+		}
+	}
+
+
+	private void PlaceBuilding(int x, int z, ZoneType zoneType)
+	{
+		// Check if a building is already placed
+		if (grid[x][z].Building != null) return;
+
+		// Determine the largest possible building size for the given position
+		int maxSize = GetMaxSize(x, z, zoneType);
+
+		// Get a random building prefab of the appropriate size for the zone type
+		List<GameObject> suitablePrefabs = zoneTypeToBuildingPrefabs[zoneType].Where(prefab =>
+		{
+			BuildingPrefab prefabScript = prefab.GetComponent<BuildingPrefab>();
+			return prefabScript.BuildingSize.x <= maxSize && prefabScript.BuildingSize.y <= maxSize;
+		}).ToList(); 
+		GameObject buildingPrefab = suitablePrefabs[Random.Range(0, suitablePrefabs.Count)];
+
+		// Instantiate the building
+		BuildingPrefab prefabScript = buildingPrefab.GetComponent<BuildingPrefab>();
+		int buildingSizeX = prefabScript.BuildingSize.x;
+		int buildingSizeZ = prefabScript.BuildingSize.y;
+		int chosenQuadrant = -1;
+		Vector3 centerPosition = GetCenterPosition(x, z, maxSize, buildingSizeX, buildingSizeZ, zoneType, ref chosenQuadrant); GameObject buildingInstance = Instantiate(buildingPrefab, centerPosition, buildingPrefab.transform.rotation, grid[x][z].CellObject.transform);
+		//buildingInstance.transform.localScale = new Vector3(buildingSizeX * 250, buildingPrefab.transform.localScale.y, buildingSizeZ * 250);
+		grid[x][z].Building = buildingInstance;
+
+		// Update the other grid cells that the building spawns on top of
+		for (int offsetX = 0; offsetX < buildingSizeX; offsetX++)
+		{
+			for (int offsetZ = 0; offsetZ < buildingSizeZ; offsetZ++)
+			{
+				if (offsetX == 0 && offsetZ == 0) continue; // Skip the original grid cell
+
+				int affectedX = x + (chosenQuadrant == 1 || chosenQuadrant == 3 ? -offsetX : offsetX);
+				int affectedZ = z + (chosenQuadrant == 2 || chosenQuadrant == 3 ? -offsetZ : offsetZ);
+
+				if (affectedX >= 0 && affectedZ >= 0 && affectedX < GridWidth && affectedZ < GridHeight)
+				{
+					grid[affectedX][affectedZ].Building = buildingInstance;
+				}
+			}
+		}
+
+	}
+
+	private int GetMaxSize(int x, int z, ZoneType zoneType)
+	{
+		int maxSize = 1;
+
+		for (int size = 2; size <= 6; size++)
+		{
+			int quadrantSizes = 0;
+			bool anyQuadrantSucceeded = false;
+
+			for (int quadrant = 0; quadrant < 4; quadrant++)
+			{
+				bool canPlace = true;
+				for (int offsetX = 0; offsetX < size; offsetX++)
+				{
+					for (int offsetZ = 0; offsetZ < size; offsetZ++)
+					{
+						int adjustedX = x + (quadrant == 1 || quadrant == 3 ? -offsetX : offsetX);
+						int adjustedZ = z + (quadrant == 2 || quadrant == 3 ? -offsetZ : offsetZ);
+
+						if (adjustedX < 0 || adjustedZ < 0 || adjustedX >= GridWidth || adjustedZ >= GridHeight || grid[adjustedX][adjustedZ].ZoneType != zoneType || grid[adjustedX][adjustedZ].Building != null)
+						{
+							canPlace = false;
+							break;
+						}
+					}
+					if (!canPlace) break;
+				}
+
+				if (canPlace)
+				{
+					quadrantSizes = size;
+					anyQuadrantSucceeded = true;
+				}
+			}
+
+			if (anyQuadrantSucceeded)
+			{
+				maxSize = quadrantSizes;
+			}
+			else
+			{
+				break;
+			}
+		}
+
+		return maxSize;
+	}
+
+
+	private Vector3 GetCenterPosition(int x, int z, int maxSize, int buildingSizeX, int buildingSizeZ, ZoneType zoneType, ref int chosenQuadrant)
+	{
+		for (int quadrant = 0; quadrant < 6; quadrant++)
+		{
+			bool canPlace = true;
+			for (int offsetX = 0; offsetX < maxSize; offsetX++)
+			{
+				for (int offsetZ = 0; offsetZ < maxSize; offsetZ++)
+				{
+					int adjustedX = x + (quadrant == 1 || quadrant == 3 ? -offsetX : offsetX);
+					int adjustedZ = z + (quadrant == 2 || quadrant == 3 ? -offsetZ : offsetZ);
+
+					if (adjustedX < 0 || adjustedZ < 0 || adjustedX >= GridWidth || adjustedZ >= GridHeight || grid[adjustedX][adjustedZ].ZoneType != zoneType || grid[adjustedX][adjustedZ].Building != null)
+					{
+						canPlace = false;
+						break;
+					}
+				}
+				if (!canPlace) break;
+			}
+
+			if (canPlace)
+			{
+				float xOffset = ((buildingSizeX - 1) / 2f) * (quadrant == 1 || quadrant == 3 ? -1 : 1);
+				float zOffset = ((buildingSizeZ - 1) / 2f) * (quadrant == 2 || quadrant == 3 ? -1 : 1);
+				chosenQuadrant = quadrant;
+				return grid[x][z].Position + new Vector3(xOffset, 0, zOffset);
+			}
+		}
+
+		return grid[x][z].Position;
+	}
+
+
+
+
 }
 
 public class GridCell

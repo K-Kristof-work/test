@@ -1415,6 +1415,16 @@ MonoBehaviour:
   - {fileID: 3390507409051214917, guid: bad2cfaa4eeaea647b849a54072b135f, type: 3}
   CrossRoad:
   - {fileID: -7727235475562856354, guid: bad2cfaa4eeaea647b849a54072b135f, type: 3}
+  buildInterval: 0.5
+  residentialBuildingPrefabs:
+  - {fileID: 4943409745116572213, guid: fdd9eb84d0b409347af38b31f94b7fb2, type: 3}
+  - {fileID: 4943409745116572213, guid: e60206e8e14ca2e459e7b0c653cb5ba3, type: 3}
+  - {fileID: 4943409745116572213, guid: f856b48db3ab4eb44a9f367a5e4cda43, type: 3}
+  - {fileID: 4943409745116572213, guid: 39a2582b604a53343a695f6051fb932e, type: 3}
+  commercialBuildingPrefabs:
+  - {fileID: 2005169312455111544, guid: 51f3233a79375fb4caf37552a8eba27a, type: 3}
+  industrialBuildingPrefabs:
+  - {fileID: 2550523065354267995, guid: 5a5cb0c304a49714b9451c32f274c5fb, type: 3}
 --- !u!4 &1039642949
 Transform:
   m_ObjectHideFlags: 0
@@ -1493,8 +1503,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gridClickHandler: {fileID: 1039642951}
   residentialButton: {fileID: 755522707}
-  commercialButton: {fileID: 839294180}
-  industrialButton: {fileID: 826350600}
+  commercialButton: {fileID: 826350600}
+  industrialButton: {fileID: 839294180}
   roadButton: {fileID: 1632734710}
   emptyButton: {fileID: 931194744}
   normalColor: {r: 1, g: 1, b: 1, a: 1}
