@@ -432,8 +432,10 @@ public class GridSystem : MonoBehaviour
 		BuildingPrefab prefabScript = buildingPrefab.GetComponent<BuildingPrefab>();
 		int buildingSizeX = prefabScript.BuildingSize.x;
 		int buildingSizeZ = prefabScript.BuildingSize.y;
+		float buildingPosY = buildingPrefab.transform.position.y;
 		int chosenQuadrant = -1;
-		Vector3 centerPosition = GetCenterPosition(x, z, maxSize, buildingSizeX, buildingSizeZ, zoneType, ref chosenQuadrant); GameObject buildingInstance = Instantiate(buildingPrefab, centerPosition, buildingPrefab.transform.rotation, grid[x][z].CellObject.transform);
+		Vector3 centerPosition = GetCenterPosition(x, z, maxSize, buildingSizeX, buildingSizeZ, buildingPosY, zoneType, ref chosenQuadrant); 
+		GameObject buildingInstance = Instantiate(buildingPrefab, centerPosition, buildingPrefab.transform.rotation, grid[x][z].CellObject.transform);
 		//buildingInstance.transform.localScale = new Vector3(buildingSizeX * 250, buildingPrefab.transform.localScale.y, buildingSizeZ * 250);
 		grid[x][z].Building = buildingInstance;
 
@@ -505,7 +507,7 @@ public class GridSystem : MonoBehaviour
 	}
 
 
-	private Vector3 GetCenterPosition(int x, int z, int maxSize, int buildingSizeX, int buildingSizeZ, ZoneType zoneType, ref int chosenQuadrant)
+	private Vector3 GetCenterPosition(int x, int z, int maxSize, int buildingSizeX, int buildingSizeZ, float buildingPosY, ZoneType zoneType, ref int chosenQuadrant)
 	{
 		for (int quadrant = 0; quadrant < 6; quadrant++)
 		{
@@ -531,11 +533,11 @@ public class GridSystem : MonoBehaviour
 				float xOffset = ((buildingSizeX - 1) / 2f) * (quadrant == 1 || quadrant == 3 ? -1 : 1);
 				float zOffset = ((buildingSizeZ - 1) / 2f) * (quadrant == 2 || quadrant == 3 ? -1 : 1);
 				chosenQuadrant = quadrant;
-				return grid[x][z].Position + new Vector3(xOffset, 0, zOffset);
+				return grid[x][z].Position + new Vector3(xOffset, buildingPosY/10, zOffset); // divide per 10 to make it work dont know why just dont touch it
 			}
 		}
 
-		return grid[x][z].Position;
+		return new Vector3(grid[x][z].Position.x,buildingPosY, grid[x][z].Position.z);
 	}
 
 
