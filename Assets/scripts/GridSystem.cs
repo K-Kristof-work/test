@@ -308,7 +308,7 @@ public class GridSystem : MonoBehaviour
 		if (cellObject != null)
 		{
 			//make a debug log that give information on cell
-            Debug.Log("Cell position : " + cell.Position + " Cell ZoneType : " + cell.ZoneType + " Cell Building : " + cell.Building);
+
 			Material zoneMaterial = zoneMaterials.GetRandomMaterial(cell.ZoneType);
 
 
@@ -504,7 +504,6 @@ public class GridSystem : MonoBehaviour
 				}
 			}
 			counter++;
-			Debug.Log(buildablePositions.Count);
 			if (buildablePositions.Count > 0)
 			{
 				// Choose a random buildable position

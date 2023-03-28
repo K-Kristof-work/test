@@ -28,7 +28,6 @@ public class ZoneMaterials : MonoBehaviour
 	public Material GetRandomMaterial(ZoneType zoneType)
 	{
 		//make a detailed debug log
-		Debug.Log(zoneType);
 		List<Material> materials = Materials[zoneType];
 		//make a detailed debug log
 		
