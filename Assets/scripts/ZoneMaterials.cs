@@ -7,7 +7,7 @@ public class ZoneMaterials : MonoBehaviour
 	public List<Material> residentialMaterials;
 	public List<Material> commercialMaterials;
 	public List<Material> industrialMaterials;
-	public List<Material> roadMaterials;
+	public List<Material> TransperentMaterials;
 
 	public Dictionary<ZoneType, List<Material>> Materials { get; private set; }
 
@@ -19,20 +19,25 @@ public class ZoneMaterials : MonoBehaviour
 			{ ZoneType.Residential, residentialMaterials },
 			{ ZoneType.Commercial, commercialMaterials },
 			{ ZoneType.Industrial, industrialMaterials },
-			{ ZoneType.Road, roadMaterials }
+			{ ZoneType.Road, TransperentMaterials },
+			{ ZoneType.IncomingRoad, TransperentMaterials },
+			{ ZoneType.Water, TransperentMaterials }
 		};
 	}
 
 	public Material GetRandomMaterial(ZoneType zoneType)
 	{
+		//make a detailed debug log
 		List<Material> materials = Materials[zoneType];
-
+		//make a detailed debug log
+		
 		if (materials.Count > 0)
 		{
 			int randomIndex = UnityEngine.Random.Range(0, materials.Count);
 			return materials[randomIndex];
 		}
-
+		//make a detailed debug log
+		Debug.Log("No materials found for zone type " + zoneType);
 		return null;
 	}
 }
@@ -43,5 +48,7 @@ public enum ZoneType
 	Residential,
 	Commercial,
 	Industrial,
-	Road
+	Road,
+	IncomingRoad,
+	Water
 }

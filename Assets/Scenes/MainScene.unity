@@ -1426,6 +1426,12 @@ MonoBehaviour:
   commercialBuildingPrefabs:
   - {fileID: 2005169312455111544, guid: 51f3233a79375fb4caf37552a8eba27a, type: 3}
   industrialBuildingPrefabs:
+  - {fileID: 8003284536229462275, guid: d888dcd566b074d4fbbd9f2fc15dbf97, type: 3}
+  - {fileID: 2689789227319338813, guid: ff501f6620659584592af0a3e3f4b03a, type: 3}
+  - {fileID: 5830729996756270671, guid: 310a9186974fb3a489f159ecb749746f, type: 3}
+  - {fileID: 908029228946817100, guid: 7b1bcbd77096be04d986c3874439a00c, type: 3}
+  - {fileID: 113233378154089179, guid: 1c78bcc43e559984cb38e70e04bdff95, type: 3}
+  - {fileID: 7588828341164985064, guid: 22cd19a324bb6ff4c8420621b722eb9e, type: 3}
   - {fileID: 2550523065354267995, guid: 5a5cb0c304a49714b9451c32f274c5fb, type: 3}
 --- !u!4 &1039642949
 Transform:

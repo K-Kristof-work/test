@@ -28,6 +28,21 @@ public class GridClickHandler : MonoBehaviour
 		{
 			if (EventSystem.current.IsPointerOverGameObject()) return;
 
+			if (SelectedZoneType == ZoneType.Road)
+			{
+				if (Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) // Left mouse button down or held down
+				{
+					RaycastHit hit;
+					Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+
+					if (Physics.Raycast(ray, out hit))
+					{
+						gridSystem.SetZone(hit.point, SelectedZoneType);
+						return;
+					}
+				}
+			}
+
 			if (Input.GetMouseButtonDown(0)) // Left mouse button down
 			{
 				RaycastHit hit;

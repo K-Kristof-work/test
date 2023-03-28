@@ -2,10 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
-
+using System.Runtime.CompilerServices;
+using Unity.VisualScripting;
 
 public class GridSystem : MonoBehaviour
 {
+	#region public variables
+
 	public List<List<GridCell>> grid = new List<List<GridCell>>();
 	public float cellWidth; // Set the desired cell width.
 	public float cellHeight; // Set the desired cell height.
@@ -14,7 +17,9 @@ public class GridSystem : MonoBehaviour
 	public GameObject cellPrefab;
 	public Transform gridParent; // Drag and drop the "GridSystem" GameObject to this field in the Inspector
 	public GameObject roadMeshPrefab;
-	
+	public GameObject IncomingRoadMeshPrefab;
+	public GameObject WaterMeshPrefab;
+
 	//make list for all of the road meshes
 	public List<Mesh> StraightRoad = new List<Mesh>();
 	public List<Mesh> CornerRoad = new List<Mesh>();
@@ -23,21 +28,34 @@ public class GridSystem : MonoBehaviour
 
 	public Dictionary<int,List<Mesh>> roadMeshes;
 
+
 	public float buildInterval = 0.5f;
 	public List<GameObject> residentialBuildingPrefabs;
 	public List<GameObject> commercialBuildingPrefabs;
 	public List<GameObject> industrialBuildingPrefabs;
+
+	#endregion
+
+	#region private variables
+
 	private Dictionary<ZoneType, List<GameObject>> zoneTypeToBuildingPrefabs;
 
 	//public List<List<Mesh>>  roadMeshes;
 	private ZoneMaterials zoneMaterials;
 	private bool isroadupdating = false;
 
+	#endregion
+
+	#region public properties
+
 	public int GridWidth { get { return gridWidth; } }
 	public int GridHeight { get { return gridHeight; } }
 	public float CellWidth { get { return cellWidth; } }
 	public float CellHeight { get { return cellHeight;   } }
 
+	#endregion
+
+	#region unity methods
 	public void Awake()
 	{
 		roadMeshes = new Dictionary<int, List<Mesh>>
@@ -59,12 +77,22 @@ public class GridSystem : MonoBehaviour
 	}
 	void Start()
 	{
-		SetUpGrid();
 		zoneMaterials = GetComponent<ZoneMaterials>();
+		SetUpGrid();
 		StartCoroutine(PlaceBuildingsOverTime());
 	}
+
+	#endregion
+
+	#region methods for grid creation and zone managment
+
+	#region grid creation
 	public void SetUpGrid()
 	{
+		// Create a random Incoming road at the edge of the grid
+		int randomSide = Random.Range(0, 4);
+		int randomPosition = Random.Range(1, Mathf.Min(gridWidth, gridHeight)-1);
+
 		for (int i = 0; i < gridWidth; i++)
 		{
 			grid.Add(new List<GridCell>());
@@ -99,79 +127,98 @@ public class GridSystem : MonoBehaviour
 
 			}
 		}
+
+		// Set the zone type to IncomingRoad for the random road position
+
+		if(randomSide == 0)
+		{
+			ChangeZoneType(randomPosition, 0, ZoneType.IncomingRoad);
+			ChangeZoneType(randomPosition + 1, 0, ZoneType.Water);
+			ChangeZoneType(randomPosition - 1, 0, ZoneType.Water);
+		}
+		else if(randomSide == 1)
+		{
+			ChangeZoneType(gridWidth - 1, randomPosition, ZoneType.IncomingRoad);
+			ChangeZoneType(gridWidth - 1, randomPosition -1, ZoneType.Water);
+			ChangeZoneType(gridWidth - 1, randomPosition + 1, ZoneType.Water);
+		}
+		else if(randomSide == 2)
+		{
+			ChangeZoneType(randomPosition, gridHeight - 1, ZoneType.IncomingRoad);
+			ChangeZoneType(randomPosition + 1, gridHeight - 1, ZoneType.Water);
+			ChangeZoneType(randomPosition - 1, gridHeight - 1, ZoneType.Water);
+		}
+		else if(randomSide == 3)
+		{
+			ChangeZoneType(0, randomPosition, ZoneType.IncomingRoad);
+			ChangeZoneType(0, randomPosition - 1, ZoneType.Water);
+			ChangeZoneType(0, randomPosition + 1, ZoneType.Water);
+		}
 	}
+	#endregion
 
-
-
-	public Vector3 GetNearestCellPosition(Vector3 worldPosition)
-	{
-		int xIndex = Mathf.RoundToInt(worldPosition.x / cellWidth);
-		int zIndex = Mathf.RoundToInt(worldPosition.z / cellHeight);
-
-		xIndex = Mathf.Clamp(xIndex, 0, gridWidth - 1);
-		zIndex = Mathf.Clamp(zIndex, 0, gridHeight - 1);
-
-		return grid[xIndex][zIndex].Position;
-	}
-
-	public bool IsCellEmpty(Vector3 worldPosition)
-	{
-		int xIndex = Mathf.RoundToInt(worldPosition.x / cellWidth);
-		int zIndex = Mathf.RoundToInt(worldPosition.z / cellHeight);
-
-		xIndex = Mathf.Clamp(xIndex, 0, gridWidth - 1);
-		zIndex = Mathf.Clamp(zIndex, 0, gridHeight - 1);
-
-		return grid[xIndex][zIndex].Building == null;
-	}
-
-    public void PlaceBuilding(GameObject building, Vector3 worldPosition)
-	{
-		Vector3 cellPosition = GetNearestCellPosition(worldPosition);
-
-		int xIndex = Mathf.RoundToInt(cellPosition.x / cellWidth);
-		int zIndex = Mathf.RoundToInt(cellPosition.z / cellHeight);
-
-		grid[xIndex][zIndex].Building = building;
-	}
-
-	public void RemoveBuilding(Vector3 worldPosition)
-	{
-		Vector3 cellPosition = GetNearestCellPosition(worldPosition);
-
-		int xIndex = Mathf.RoundToInt(cellPosition.x / cellWidth);
-		int zIndex = Mathf.RoundToInt(cellPosition.z / cellHeight);
-
-		grid[xIndex][zIndex].Building = null;
-	}
+	#region zone managment
 
 	public void ChangeZoneType(int x, int z, ZoneType zoneType)
 	{
-		if (x < 0 || x >= GridWidth || z < 0 || z >= GridHeight) return;
+		if (!CheckGrid(x, z)) return;
 
-		if (grid[x][z].ZoneType == zoneType) return;
+		if (zoneType == ZoneType.IncomingRoad)
+		{
+
+			// Instantiate the roadMeshPrefab
+			GameObject roadMeshObject = Instantiate(IncomingRoadMeshPrefab, grid[x][z].Position, IncomingRoadMeshPrefab.transform.rotation, grid[x][z].CellObject.transform);
+			roadMeshObject.name = "IncomingRoadMesh";
+			grid[x][z].ZoneType = zoneType;
+
+			// Store the road mesh game object in the GridCell.Building variable
+			grid[x][z].Building = roadMeshObject;
+			if (z == 0 || z == gridWidth - 1)
+			{
+				grid[x][z].Building.transform.rotation = Quaternion.Euler(-90,
+																		  grid[x][z].Building.transform.rotation.y + 90,
+																		  grid[x][z].Building.transform.rotation.z);
+			}
+
+			UpdateCell(x, z);
+		}
+
+		if (zoneType == ZoneType.Water)
+		{
+			// Instantiate the roadMeshPrefab
+			GameObject WaterObject = Instantiate(WaterMeshPrefab, grid[x][z].Position, IncomingRoadMeshPrefab.transform.rotation, grid[x][z].CellObject.transform);
+			WaterObject.name = "WaterMesh";
+			grid[x][z].ZoneType = zoneType;
+
+			// Store the road mesh game object in the GridCell.Building variable
+			grid[x][z].Building = WaterObject;
+
+			//set the rotation
+			SetWaterRotation(x, z);
+			UpdateCell(x, z);
+		}
+
+		if (grid[x][z].ZoneType == zoneType || 
+			grid[x][z].ZoneType == ZoneType.Road || 
+			grid[x][z].ZoneType == ZoneType.IncomingRoad || 
+			grid[x][z].ZoneType == ZoneType.Water) 
+				return;
 
 		grid[x][z].ZoneType = zoneType;
 
 		if (zoneType == ZoneType.Road && grid[x][z].Building == null)
 		{
-			// Check if there is an existing road mesh and destroy it
-			if (grid[x][z].RoadMeshRenderer != null)
-			{
-				Destroy(grid[x][z].RoadMeshRenderer.gameObject);
-			}
 
-			// Instantiate the roadMeshPrefab instead of creating a new GameObject
+			// Instantiate the roadMeshPrefab
 			GameObject roadMeshObject = Instantiate(roadMeshPrefab,grid[x][z].Position, roadMeshPrefab.transform.rotation, grid[x][z].CellObject.transform);
 			roadMeshObject.name = "RoadMesh";
-			MeshRenderer meshRenderer = roadMeshObject.GetComponent<MeshRenderer>();
-			grid[x][z].RoadMeshRenderer = meshRenderer;
 
 			// Store the road mesh game object in the GridCell.Building variable
 			grid[x][z].Building = roadMeshObject;
 
 			UpdateRoadMesh(x, z);
 			updateRoadsAround(x, z);
+			UpdateRoadConnectivity(x ,z);
 		}
 		else
 		{
@@ -195,17 +242,76 @@ public class GridSystem : MonoBehaviour
 		UpdateCell(x, z);
 	}
 
-
-	public void updateRoadsAround(int x,int z)
+	public bool CheckGrid(int x, int z)
 	{
-		UpdateRoadMesh(x - 1, z);
-		UpdateRoadMesh(x + 1, z);
-		UpdateRoadMesh(x, z - 1);
-		UpdateRoadMesh(x, z + 1);
+		if (x < 0 || x >= GridWidth || z < 0 || z >= GridHeight)
+			return false;
+		return true;
 	}
 
-
-
+	public void SetWaterRotation(int x, int z)
+	{
+		if (x == 0)
+		{
+			if (grid[x][z + 1].ZoneType == ZoneType.IncomingRoad)
+			{
+				grid[x][z].Building.transform.rotation = Quaternion.Euler(-90,
+																	  grid[x][z].Building.transform.rotation.y - 90,
+																	  grid[x][z].Building.transform.rotation.z);
+			}
+			else
+			{
+				grid[x][z].Building.transform.rotation = Quaternion.Euler(-90,
+																	  grid[x][z].Building.transform.rotation.y + 180,
+																	  grid[x][z].Building.transform.rotation.z);
+			}
+		}
+		else if (z == 0)
+		{
+			if (grid[x + 1][z].ZoneType == ZoneType.IncomingRoad)
+			{
+				grid[x][z].Building.transform.rotation = Quaternion.Euler(-90,
+																	  grid[x][z].Building.transform.rotation.y + 90,
+																	  grid[x][z].Building.transform.rotation.z);
+			}
+			else
+			{
+				grid[x][z].Building.transform.rotation = Quaternion.Euler(-90,
+																	  grid[x][z].Building.transform.rotation.y + 180,
+																	  grid[x][z].Building.transform.rotation.z);
+			}
+		}
+		else if (z == gridWidth - 1)
+		{
+			if (grid[x + 1][z].ZoneType == ZoneType.IncomingRoad)
+			{
+				grid[x][z].Building.transform.rotation = Quaternion.Euler(-90,
+																	  grid[x][z].Building.transform.rotation.y,
+																	  grid[x][z].Building.transform.rotation.z);
+			}
+			else
+			{
+				grid[x][z].Building.transform.rotation = Quaternion.Euler(-90,
+																	  grid[x][z].Building.transform.rotation.y - 90,
+																	  grid[x][z].Building.transform.rotation.z);
+			}
+		}
+		else
+		{
+			if (grid[x][z + 1].ZoneType == ZoneType.IncomingRoad)
+			{
+				grid[x][z].Building.transform.rotation = Quaternion.Euler(-90,
+																	  grid[x][z].Building.transform.rotation.y,
+																	  grid[x][z].Building.transform.rotation.z);
+			}
+			else
+			{
+				grid[x][z].Building.transform.rotation = Quaternion.Euler(-90,
+																	  grid[x][z].Building.transform.rotation.y + 90,
+																	  grid[x][z].Building.transform.rotation.z);
+			}
+		}
+	}
 
 	public void UpdateCell(int xIndex, int zIndex)
 	{
@@ -214,7 +320,12 @@ public class GridSystem : MonoBehaviour
 		GameObject cellObject = cell.CellObject;
 		if (cellObject != null)
 		{
+			//make a debug log that give information on cell
+
 			Material zoneMaterial = zoneMaterials.GetRandomMaterial(cell.ZoneType);
+
+
+
 			MeshRenderer renderer = cellObject.GetComponent<MeshRenderer>();
 			if (renderer != null)
 			{
@@ -223,6 +334,13 @@ public class GridSystem : MonoBehaviour
 		}
 	}
 
+	public void SetZone(Vector3 worldPosition, ZoneType SelectedZoneType)
+	{
+		int x = Mathf.FloorToInt((worldPosition.x - transform.position.x) / CellWidth + CellWidth/2);
+		int z = Mathf.FloorToInt((worldPosition.z - transform.position.z) / CellHeight + CellHeight/2);
+		ChangeZoneType(x, z, SelectedZoneType);
+
+	}
 
 	public void SetZoneRectangle(Vector3 start, Vector3 end, ZoneType SelectedZoneType)
 	{
@@ -250,6 +368,17 @@ public class GridSystem : MonoBehaviour
 		ChangeZoneType(xIndex, zIndex, newZoneType);
 	}
 
+	#endregion
+
+	#region road managment
+	public void updateRoadsAround(int x, int z)
+	{
+		UpdateRoadMesh(x - 1, z);
+		UpdateRoadMesh(x + 1, z);
+		UpdateRoadMesh(x, z - 1);
+		UpdateRoadMesh(x, z + 1);
+	}
+
 	Mesh GetRoadMesh(int meshNum)
 	{
 		//make sure the meshNum is within the range of the roadMeshes array
@@ -268,6 +397,8 @@ public class GridSystem : MonoBehaviour
 
 	private void UpdateRoadMesh(int x, int z)
 	{
+		if (!CheckGrid(x, z)) return;
+		
 		if (grid[x][z].ZoneType== ZoneType.Road && !isroadupdating)
 		{
 			isroadupdating = true;
@@ -283,7 +414,6 @@ public class GridSystem : MonoBehaviour
 			// Get the road mesh based on the roadMask value
 			Mesh roadMesh = null;
 			float rotationY = 0;
-
 			switch (roadMask)
 			{
 				case 0:
@@ -317,15 +447,16 @@ public class GridSystem : MonoBehaviour
 			}
 
 			// Set the road mesh
-			MeshFilter roadMeshFilter = cell.RoadMeshRenderer.GetComponent<MeshFilter>();
+			MeshRenderer meshrenderer = cell.Building.GetComponent<MeshRenderer>();
+
+			MeshFilter roadMeshFilter = meshrenderer.GetComponent<MeshFilter>();
 			roadMeshFilter.mesh = roadMesh;
 
 			// Set the road mesh rotation
-			cell.RoadMeshRenderer.transform.rotation = Quaternion.Euler(-90, rotationY, 0);
+			meshrenderer.transform.rotation = Quaternion.Euler(-90, rotationY, 0);
 
 			// Enable the road mesh renderer if the zone type is Road
-			cell.RoadMeshRenderer.enabled = true;
-
+			meshrenderer.enabled = true;
 			isroadupdating = false;
 		}
 		
@@ -351,19 +482,61 @@ public class GridSystem : MonoBehaviour
 		{
 			roadMask += 8;
 		}
-
 		return roadMask;
 	}
 
 	private bool IsRoad(int x, int z)
 	{
-		if (x >= 0 && x < gridWidth && z >= 0 && z < gridHeight)
+		if (CheckGrid(x, z))
 		{
-			return grid[x][z].ZoneType == ZoneType.Road;
+			return (grid[x][z].ZoneType == ZoneType.Road || grid[x][z].ZoneType == ZoneType.IncomingRoad);
 		}
 
 		return false;
 	}
+
+	private void UpdateRoadConnectivity(int x, int z)
+	{
+		//cant remove connection yet!!!
+
+		if (!CheckGrid(x,z)) return;
+
+		if (ZoneType.Road != grid[x][z].ZoneType || grid[x][z].IsConnectedToIncomingRoad) return;
+
+		//check if any of the 4 adjacent cells are road with connection
+		if (IsConnectedRoad(x - 1, z) || IsConnectedRoad(x + 1, z) || IsConnectedRoad(x, z - 1) || IsConnectedRoad(x, z + 1))
+		{
+			grid[x][z].IsConnectedToIncomingRoad = true;
+
+			UpdateRoadConnectivity(x - 1, z);
+			UpdateRoadConnectivity(x + 1, z);
+			UpdateRoadConnectivity(x, z - 1);
+			UpdateRoadConnectivity(x, z + 1);
+		}
+		else
+		{
+			grid[x][z].IsConnectedToIncomingRoad = false;
+		}
+
+
+	}
+
+	private bool IsConnectedRoad(int x, int z)
+	{
+		if (!CheckGrid(x, z) && IsRoad(x, z)) 
+			return false;
+		if (grid[x][z].IsConnectedToIncomingRoad)
+			return true;
+		if (grid[x][z].ZoneType == ZoneType.IncomingRoad)
+			return true;
+		return false;
+	}
+
+	#endregion
+
+	#endregion
+
+	#region methods for buildings
 
 	private IEnumerator PlaceBuildingsOverTime()
 	{
@@ -386,7 +559,7 @@ public class GridSystem : MonoBehaviour
 						if (grid[x][z].ZoneType != ZoneType.Empty && grid[x][z].ZoneType != ZoneType.Road && grid[x][z].Building == null)
 						{
 							// Check if there's a road in the vicinity
-							if (IsRoad(x - 1, z) || IsRoad(x + 1, z) || IsRoad(x, z - 1) || IsRoad(x, z + 1))
+							if (IsConnectedRoad(x - 1, z) || IsConnectedRoad(x + 1, z) || IsConnectedRoad(x, z - 1) || IsConnectedRoad(x, z + 1))
 							{
 									buildablePositions.Add(new Vector2Int(x, z));
 							}
@@ -397,7 +570,6 @@ public class GridSystem : MonoBehaviour
 				}
 			}
 			counter++;
-			Debug.Log(buildablePositions.Count);
 			if (buildablePositions.Count > 0)
 			{
 				// Choose a random buildable position
@@ -428,14 +600,50 @@ public class GridSystem : MonoBehaviour
 		}).ToList(); 
 		GameObject buildingPrefab = suitablePrefabs[Random.Range(0, suitablePrefabs.Count)];
 
-		// Instantiate the building
+		// Get road direction
+		int roadDirection = GetRoadDirection(x, z);
+
+
+		// Set building rotation to face the road
 		BuildingPrefab prefabScript = buildingPrefab.GetComponent<BuildingPrefab>();
-		int buildingSizeX = prefabScript.BuildingSize.x;
-		int buildingSizeZ = prefabScript.BuildingSize.y;
+		prefabScript.rotationdirection = roadDirection;
+		Quaternion buildingRotation;
+		if (roadDirection != -1)
+		{
+			if (roadDirection % 2 == 0)
+				roadDirection += 2;
+			buildingRotation = Quaternion.Euler(prefabScript.rotationInMeshOnX, -90 + (roadDirection + 1) * 90, 0);
+		}
+		else
+		{
+			buildingRotation = buildingPrefab.transform.rotation;
+		}
+
+		// Instantiate the building
+		int buildingSizeX;
+		int buildingSizeZ;
+
+		if (roadDirection % 2 == 1)
+		{
+			buildingSizeX = prefabScript.BuildingSize.y;
+			buildingSizeZ = prefabScript.BuildingSize.x;
+		}
+		else
+		{
+			buildingSizeX = prefabScript.BuildingSize.x;
+			buildingSizeZ = prefabScript.BuildingSize.y;
+		}
+
+		float buildingPosY = buildingPrefab.transform.position.y;
 		int chosenQuadrant = -1;
-		Vector3 centerPosition = GetCenterPosition(x, z, maxSize, buildingSizeX, buildingSizeZ, zoneType, ref chosenQuadrant); GameObject buildingInstance = Instantiate(buildingPrefab, centerPosition, buildingPrefab.transform.rotation, grid[x][z].CellObject.transform);
-		//buildingInstance.transform.localScale = new Vector3(buildingSizeX * 250, buildingPrefab.transform.localScale.y, buildingSizeZ * 250);
+		Vector3 centerPosition = GetCenterPosition(x, z, maxSize, buildingSizeX, buildingSizeZ, buildingPosY, zoneType, ref chosenQuadrant);
+
+
+
+		GameObject buildingInstance = Instantiate(buildingPrefab, centerPosition, buildingRotation, grid[x][z].CellObject.transform);
 		grid[x][z].Building = buildingInstance;
+		grid[x][z].Building.GetComponent<BuildingPrefab>().BuildingSize.x = buildingSizeX;
+		grid[x][z].Building.GetComponent<BuildingPrefab>().BuildingSize.y = buildingSizeZ;
 
 		// Update the other grid cells that the building spawns on top of
 		for (int offsetX = 0; offsetX < buildingSizeX; offsetX++)
@@ -454,6 +662,26 @@ public class GridSystem : MonoBehaviour
 			}
 		}
 
+
+	}
+
+	private int GetRoadDirection(int x, int z)
+	{
+		int[] dx = { 1, 0, -1, 0 };
+		int[] dz = { 0, 1, 0, -1 };
+
+		for (int dir = 0; dir < 4; dir++)
+		{
+			int newX = x + dx[dir];
+			int newZ = z + dz[dir];
+
+			if (newX >= 0 && newZ >= 0 && newX < GridWidth && newZ < GridHeight && grid[newX][newZ].ZoneType == ZoneType.Road)
+			{
+				return dir;
+			}
+		}
+
+		return -1;
 	}
 
 	private int GetMaxSize(int x, int z, ZoneType zoneType)
@@ -505,7 +733,7 @@ public class GridSystem : MonoBehaviour
 	}
 
 
-	private Vector3 GetCenterPosition(int x, int z, int maxSize, int buildingSizeX, int buildingSizeZ, ZoneType zoneType, ref int chosenQuadrant)
+	private Vector3 GetCenterPosition(int x, int z, int maxSize, int buildingSizeX, int buildingSizeZ, float buildingPosY, ZoneType zoneType, ref int chosenQuadrant)
 	{
 		for (int quadrant = 0; quadrant < 6; quadrant++)
 		{
@@ -531,24 +759,27 @@ public class GridSystem : MonoBehaviour
 				float xOffset = ((buildingSizeX - 1) / 2f) * (quadrant == 1 || quadrant == 3 ? -1 : 1);
 				float zOffset = ((buildingSizeZ - 1) / 2f) * (quadrant == 2 || quadrant == 3 ? -1 : 1);
 				chosenQuadrant = quadrant;
-				return grid[x][z].Position + new Vector3(xOffset, 0, zOffset);
+				return grid[x][z].Position + new Vector3(xOffset, buildingPosY/10, zOffset); // divide per 10 to make it work dont kn ow why just dont touch it
 			}
 		}
 
-		return grid[x][z].Position;
+		return new Vector3(grid[x][z].Position.x,buildingPosY, grid[x][z].Position.z);
 	}
 
-
-
-
+	#endregion
 }
 
 public class GridCell
 {
+	#region variables
+
 	public Vector3 Position { get; set; }
 	public Vector3 Size { get; set; }
 	public GameObject Building { get; set; }
 	public ZoneType ZoneType { get; set; }
 	public GameObject CellObject { get; set; }
-	public MeshRenderer RoadMeshRenderer { get; set; }
+	public bool IsConnectedToIncomingRoad = false;
+
+	#endregion
 }
+
