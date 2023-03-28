@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 7699700268218862670}
   - component: {fileID: 6947401518927419903}
   - component: {fileID: 4306499318823930723}
-  - component: {fileID: 3640544851441126603}
   - component: {fileID: -7313270411701718312}
   m_Layer: 0
   m_Name: home_living_modern.004
@@ -85,20 +84,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &3640544851441126603
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 64875692197280567}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 4
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 1248640446833140240, guid: bad2cfaa4eeaea647b849a54072b135f, type: 3}
 --- !u!114 &-7313270411701718312
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -111,4 +96,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 453a19e1863ca0743bbcb2dfcdd14196, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buildingSize: 1
+  BuildingSize: {x: 1, y: 1}
+  rotationInMeshOnX: -90

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 
 public class GridSystem : MonoBehaviour
@@ -101,55 +102,11 @@ public class GridSystem : MonoBehaviour
 		}
 	}
 
-
-
-	public Vector3 GetNearestCellPosition(Vector3 worldPosition)
-	{
-		int xIndex = Mathf.RoundToInt(worldPosition.x / cellWidth);
-		int zIndex = Mathf.RoundToInt(worldPosition.z / cellHeight);
-
-		xIndex = Mathf.Clamp(xIndex, 0, gridWidth - 1);
-		zIndex = Mathf.Clamp(zIndex, 0, gridHeight - 1);
-
-		return grid[xIndex][zIndex].Position;
-	}
-
-	public bool IsCellEmpty(Vector3 worldPosition)
-	{
-		int xIndex = Mathf.RoundToInt(worldPosition.x / cellWidth);
-		int zIndex = Mathf.RoundToInt(worldPosition.z / cellHeight);
-
-		xIndex = Mathf.Clamp(xIndex, 0, gridWidth - 1);
-		zIndex = Mathf.Clamp(zIndex, 0, gridHeight - 1);
-
-		return grid[xIndex][zIndex].Building == null;
-	}
-
-    public void PlaceBuilding(GameObject building, Vector3 worldPosition)
-	{
-		Vector3 cellPosition = GetNearestCellPosition(worldPosition);
-
-		int xIndex = Mathf.RoundToInt(cellPosition.x / cellWidth);
-		int zIndex = Mathf.RoundToInt(cellPosition.z / cellHeight);
-
-		grid[xIndex][zIndex].Building = building;
-	}
-
-	public void RemoveBuilding(Vector3 worldPosition)
-	{
-		Vector3 cellPosition = GetNearestCellPosition(worldPosition);
-
-		int xIndex = Mathf.RoundToInt(cellPosition.x / cellWidth);
-		int zIndex = Mathf.RoundToInt(cellPosition.z / cellHeight);
-
-		grid[xIndex][zIndex].Building = null;
-	}
-
 	public void ChangeZoneType(int x, int z, ZoneType zoneType)
 	{
 		if (x < 0 || x >= GridWidth || z < 0 || z >= GridHeight) return;
 
-		if (grid[x][z].ZoneType == zoneType) return;
+		if (grid[x][z].ZoneType == zoneType || grid[x][z].ZoneType == ZoneType.Road) return;
 
 		grid[x][z].ZoneType = zoneType;
 
@@ -223,6 +180,13 @@ public class GridSystem : MonoBehaviour
 		}
 	}
 
+	public void SetZone(Vector3 worldPosition, ZoneType SelectedZoneType)
+	{
+		int x = Mathf.FloorToInt((worldPosition.x - transform.position.x) / CellWidth + CellWidth/2);
+		int z = Mathf.FloorToInt((worldPosition.z - transform.position.z) / CellHeight + CellHeight/2);
+		ChangeZoneType(x, z, SelectedZoneType);
+
+	}
 
 	public void SetZoneRectangle(Vector3 start, Vector3 end, ZoneType SelectedZoneType)
 	{
@@ -268,6 +232,8 @@ public class GridSystem : MonoBehaviour
 
 	private void UpdateRoadMesh(int x, int z)
 	{
+		if (x < 0 || x >= GridWidth || z < 0 || z >= GridHeight) return;
+
 		if (grid[x][z].ZoneType== ZoneType.Road && !isroadupdating)
 		{
 			isroadupdating = true;
@@ -428,15 +394,47 @@ public class GridSystem : MonoBehaviour
 		}).ToList(); 
 		GameObject buildingPrefab = suitablePrefabs[Random.Range(0, suitablePrefabs.Count)];
 
-		// Instantiate the building
+		// Get road direction
+		int roadDirection = GetRoadDirection(x, z);
+
+
+		// Set building rotation to face the road
 		BuildingPrefab prefabScript = buildingPrefab.GetComponent<BuildingPrefab>();
-		int buildingSizeX = prefabScript.BuildingSize.x;
-		int buildingSizeZ = prefabScript.BuildingSize.y;
+		prefabScript.rotationdirection = roadDirection;
+		Quaternion buildingRotation;
+		if (roadDirection != -1)
+		{
+			if (roadDirection % 2 == 0)
+				roadDirection += 2;
+			buildingRotation = Quaternion.Euler(prefabScript.rotationInMeshOnX, -90 + (roadDirection + 1) * 90, 0);
+		}
+		else
+		{
+			buildingRotation = buildingPrefab.transform.rotation;
+		}
+
+		// Instantiate the building
+		int buildingSizeX;
+		int buildingSizeZ;
+
+		if (roadDirection % 2 == 1)
+		{
+			buildingSizeX = prefabScript.BuildingSize.y;
+			buildingSizeZ = prefabScript.BuildingSize.x;
+		}
+		else
+		{
+			buildingSizeX = prefabScript.BuildingSize.x;
+			buildingSizeZ = prefabScript.BuildingSize.y;
+		}
+
 		float buildingPosY = buildingPrefab.transform.position.y;
 		int chosenQuadrant = -1;
-		Vector3 centerPosition = GetCenterPosition(x, z, maxSize, buildingSizeX, buildingSizeZ, buildingPosY, zoneType, ref chosenQuadrant); 
-		GameObject buildingInstance = Instantiate(buildingPrefab, centerPosition, buildingPrefab.transform.rotation, grid[x][z].CellObject.transform);
-		//buildingInstance.transform.localScale = new Vector3(buildingSizeX * 250, buildingPrefab.transform.localScale.y, buildingSizeZ * 250);
+		Vector3 centerPosition = GetCenterPosition(x, z, maxSize, buildingSizeX, buildingSizeZ, buildingPosY, zoneType, ref chosenQuadrant);
+
+
+
+		GameObject buildingInstance = Instantiate(buildingPrefab, centerPosition, buildingRotation, grid[x][z].CellObject.transform);
 		grid[x][z].Building = buildingInstance;
 
 		// Update the other grid cells that the building spawns on top of
@@ -456,6 +454,26 @@ public class GridSystem : MonoBehaviour
 			}
 		}
 
+
+	}
+
+	private int GetRoadDirection(int x, int z)
+	{
+		int[] dx = { 1, 0, -1, 0 };
+		int[] dz = { 0, 1, 0, -1 };
+
+		for (int dir = 0; dir < 4; dir++)
+		{
+			int newX = x + dx[dir];
+			int newZ = z + dz[dir];
+
+			if (newX >= 0 && newZ >= 0 && newX < GridWidth && newZ < GridHeight && grid[newX][newZ].ZoneType == ZoneType.Road)
+			{
+				return dir;
+			}
+		}
+
+		return -1;
 	}
 
 	private int GetMaxSize(int x, int z, ZoneType zoneType)
@@ -533,7 +551,7 @@ public class GridSystem : MonoBehaviour
 				float xOffset = ((buildingSizeX - 1) / 2f) * (quadrant == 1 || quadrant == 3 ? -1 : 1);
 				float zOffset = ((buildingSizeZ - 1) / 2f) * (quadrant == 2 || quadrant == 3 ? -1 : 1);
 				chosenQuadrant = quadrant;
-				return grid[x][z].Position + new Vector3(xOffset, buildingPosY/10, zOffset); // divide per 10 to make it work dont know why just dont touch it
+				return grid[x][z].Position + new Vector3(xOffset, buildingPosY/10, zOffset); // divide per 10 to make it work dont kn ow why just dont touch it
 			}
 		}
 

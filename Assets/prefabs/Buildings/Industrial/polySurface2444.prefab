@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 7077246838938648390}
   - component: {fileID: 1902986072627800411}
   - component: {fileID: 914698835202465255}
-  - component: {fileID: 5811221608318463220}
   - component: {fileID: 6048248098937374909}
   m_Layer: 0
   m_Name: polySurface2444
@@ -85,20 +84,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &5811221608318463220
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 113233378154089179}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 4
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: -8661862688355252577, guid: bad2cfaa4eeaea647b849a54072b135f, type: 3}
 --- !u!114 &6048248098937374909
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -112,3 +97,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   BuildingSize: {x: 1, y: 1}
+  rotationInMeshOnX: 0

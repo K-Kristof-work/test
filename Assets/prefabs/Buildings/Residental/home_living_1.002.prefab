@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 2298985751767280373}
   - component: {fileID: 8341346364494663026}
   - component: {fileID: 5636450219727440169}
-  - component: {fileID: 6810014506287840307}
   - component: {fileID: 2501945695882458158}
   m_Layer: 0
   m_Name: home_living_1.002
@@ -85,20 +84,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &6810014506287840307
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6890206010892417007}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 4
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 7818412020052597855, guid: bad2cfaa4eeaea647b849a54072b135f, type: 3}
 --- !u!114 &2501945695882458158
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -112,3 +97,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   BuildingSize: {x: 2, y: 2}
+  rotationInMeshOnX: -90

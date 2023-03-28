@@ -6,4 +6,6 @@ using UnityEngine;
 public class BuildingPrefab : MonoBehaviour
 {
     public Vector2Int BuildingSize =new Vector2Int (1,1);
+    public int rotationInMeshOnX = 0;
+    public int rotationdirection;
 }

@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 5137299189422089373}
   - component: {fileID: 2805890721422800806}
   - component: {fileID: 5670152730453301308}
-  - component: {fileID: 1933256513911594783}
   - component: {fileID: -2126394199435043871}
   m_Layer: 0
   m_Name: home_high.005
@@ -85,20 +84,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &1933256513911594783
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7718472527847421920}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 4
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: -8945114899812972009, guid: bad2cfaa4eeaea647b849a54072b135f, type: 3}
 --- !u!114 &-2126394199435043871
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -112,3 +97,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   BuildingSize: {x: 3, y: 3}
+  rotationInMeshOnX: -90
