@@ -7,8 +7,6 @@ public class BuildAnimationController : MonoBehaviour
 {
     public int numSphereMasks = 10; // The number of SphereMasks to create
     public GameObject maskContainerPrefab; // The prefab for the MaskContainer object
-    public GameObject sphereMaskPrefab; // The prefab for the SphereMask object
-    public GameObject squareMaskPrefab; // The prefab for the SquareMask object
 
     private int buildingX;
     private int buildingY;
@@ -32,15 +30,6 @@ public class BuildAnimationController : MonoBehaviour
         cellY = gridSystem.cellWidth;
         // Instantiate the MaskContainer object from the prefab
         maskContainer = Instantiate(maskContainerPrefab, transform.position, Quaternion.identity);
-        GameObject squareMask = Instantiate(squareMaskPrefab, transform.position, Quaternion.identity);
-        squareMask.transform.SetParent(maskContainer.transform);
-        // Fill the MaskContainer with SphereMask objects
-        for (int i = 0; i < numSphereMasks; i++)
-        {
-            // Instantiate the SphereMask object from the prefab
-            GameObject sphereMask = Instantiate(sphereMaskPrefab, maskContainer.transform);
-            maskContainer.transform.SetParent(maskContainer.transform);
-        }
         StartCoroutine(MoveContainerUpward());
     }
 
