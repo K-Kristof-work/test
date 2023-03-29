@@ -393,6 +393,61 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 246274778}
   m_CullTransparentMesh: 1
+--- !u!1 &467848538
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 467848540}
+  - component: {fileID: 467848539}
+  m_Layer: 0
+  m_Name: AnimationController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &467848539
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 467848538}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e99ad275f336f847b74b69ab7f5d556, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sphereMask: {fileID: 101272669805877358, guid: 54f99da242792c44b9da8e2fa66eee11, type: 3}
+  cubeMask: {fileID: 3563779530006815698, guid: 6f47e7dc3a9bb9c43bcd83ed75fe9c0f, type: 3}
+  maskContainer: {fileID: 7801994666385222901, guid: 81945cd90fa8333408b6af4cf093b8b9, type: 3}
+  howManyMaskSpheres: 1
+  minRadius: 0.2
+  maxRadius: 0.4
+  minSpeed: 0
+  maxSpeed: 0
+  boxHeight: 10
+  animationTime: 30
+  animationSpeed: 10
+--- !u!4 &467848540
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 467848538}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 28.236256, y: -12.658031, z: -4.3661118}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 6
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &522075275
 GameObject:
   m_ObjectHideFlags: 0
@@ -1389,6 +1444,8 @@ MonoBehaviour:
   cellPrefab: {fileID: 8847815840032135080, guid: c6a3c1c40c55f304983a4296b5bb95cd, type: 3}
   gridParent: {fileID: 1039642949}
   roadMeshPrefab: {fileID: 8847815840032135080, guid: 811e06e9d01cb9e4e97cd4a82d528eb2, type: 3}
+  IncomingRoadMeshPrefab: {fileID: 8495522905646548407, guid: 5f5c97d47c152d7459c49adcf11f3279, type: 3}
+  WaterMeshPrefab: {fileID: 8495522905646548407, guid: 47342541bc4c3734b90ee09565f0d61e, type: 3}
   StraightRoad:
   - {fileID: 505481861235893634, guid: bad2cfaa4eeaea647b849a54072b135f, type: 3}
   - {fileID: 2033445771561420275, guid: bad2cfaa4eeaea647b849a54072b135f, type: 3}
@@ -1480,7 +1537,7 @@ MonoBehaviour:
   - {fileID: 2100000, guid: 2c08778c98b5b854084af4ba2a70a482, type: 2}
   - {fileID: 2100000, guid: 56b42d1ff8dca6f438b8980dcb703d84, type: 2}
   - {fileID: 2100000, guid: 2380f5cd897c15047971ad76793b1fb6, type: 2}
-  roadMaterials:
+  TransperentMaterials:
   - {fileID: 2100000, guid: ef14ce7da5ea7e0419e8e0653017cca4, type: 2}
 --- !u!114 &1039642951
 MonoBehaviour:
