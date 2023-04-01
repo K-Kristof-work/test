@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.18028334, g: 0.2257134, b: 0.30692226, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -620,7 +620,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
 --- !u!1 &755522705
 GameObject:
@@ -1389,6 +1389,8 @@ MonoBehaviour:
   cellPrefab: {fileID: 8847815840032135080, guid: c6a3c1c40c55f304983a4296b5bb95cd, type: 3}
   gridParent: {fileID: 1039642949}
   roadMeshPrefab: {fileID: 8847815840032135080, guid: 811e06e9d01cb9e4e97cd4a82d528eb2, type: 3}
+  IncomingRoadMeshPrefab: {fileID: 0}
+  WaterMeshPrefab: {fileID: 0}
   StraightRoad:
   - {fileID: 505481861235893634, guid: bad2cfaa4eeaea647b849a54072b135f, type: 3}
   - {fileID: 2033445771561420275, guid: bad2cfaa4eeaea647b849a54072b135f, type: 3}
@@ -1446,7 +1448,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1039642950
 MonoBehaviour:
@@ -1480,8 +1482,7 @@ MonoBehaviour:
   - {fileID: 2100000, guid: 2c08778c98b5b854084af4ba2a70a482, type: 2}
   - {fileID: 2100000, guid: 56b42d1ff8dca6f438b8980dcb703d84, type: 2}
   - {fileID: 2100000, guid: 2380f5cd897c15047971ad76793b1fb6, type: 2}
-  roadMaterials:
-  - {fileID: 2100000, guid: ef14ce7da5ea7e0419e8e0653017cca4, type: 2}
+  TransperentMaterials: []
 --- !u!114 &1039642951
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1723,7 +1724,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1607832769
 GameObject:
@@ -1982,6 +1983,37 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1632734708}
   m_CullTransparentMesh: 1
+--- !u!1 &1770678411
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1770678412}
+  m_Layer: 0
+  m_Name: GameModel
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1770678412
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1770678411}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1770768172
 GameObject:
   m_ObjectHideFlags: 0
@@ -2025,7 +2057,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!120 &1770768175
 LineRenderer:
@@ -2225,7 +2257,7 @@ RectTransform:
   - {fileID: 931194743}
   - {fileID: 1180128606}
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
