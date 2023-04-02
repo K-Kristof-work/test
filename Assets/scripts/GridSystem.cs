@@ -661,7 +661,8 @@ public class GridSystem : MonoBehaviour
 				}
 			}
 		}
-
+		// Attaching the BuildingAnimationController script to the building will play the animation
+		// buildingInstance.AddComponent<BuildAnimationController>();
 
 	}
 
