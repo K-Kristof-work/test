@@ -5,7 +5,60 @@ using UnityEngine;
 
 public class BuildAnimationController : MonoBehaviour
 {
-    public int numSphereMasks; // The number of SphereMasks to create
+    // The amount to move the object downward when the script starts
+    public float fallDistance = 5.0f;
+
+    // The speed at which the object returns to its original position
+    public float returnSpeed = 0.5f;
+
+    // The original position of the object
+    private Vector3 originalPosition;
+
+    // A flag to indicate whether the object is falling or returning
+    private bool isFalling = true;
+
+    void Start()
+    {
+        // Store the object's original position
+        originalPosition = transform.position;
+
+        // Move the object downward by the specified distance
+        transform.position -= Vector3.up * fallDistance;
+    }
+
+    void Update()
+    {
+        if (isFalling)
+        {
+            // If the object is falling, check if it has reached its target position
+            if (transform.position.y >= originalPosition.y)
+            {
+                // If the object has reached its target position, stop falling
+                isFalling = false;
+            }
+            else
+            {
+                // If the object hasn't reached its target position, continue falling
+                transform.position += Vector3.up * returnSpeed * Time.deltaTime;
+            }
+        }
+        else
+        {
+            // If the object is returning, check if it has reached its original position
+            if (transform.position.y <= originalPosition.y)
+            {
+                // If the object has reached its original position, stop returning
+                isFalling = true;
+            }
+            else
+            {
+                // If the object hasn't reached its original position, continue returning
+                transform.position -= Vector3.up * returnSpeed * Time.deltaTime;
+            }
+        }
+    }
+
+    /*public int numSphereMasks; // The number of SphereMasks to create
     private GameObject maskContainerPrefab; // The prefab for the MaskContainer object
     private GameObject sphereMaskPrefab; // The prefab for the SphereMask object
     private GameObject boxMaskPrefab; // The prefab for the BoxMask object
@@ -106,5 +159,5 @@ public class BuildAnimationController : MonoBehaviour
         }
 
         Destroy(maskContainer); // Destroy the MaskContainer object
-    }
+    }*/
 }
