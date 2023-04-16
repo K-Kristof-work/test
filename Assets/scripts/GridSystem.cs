@@ -201,12 +201,13 @@ public class GridSystem : MonoBehaviour
 		if (grid[x][z].ZoneType == zoneType || 
 			grid[x][z].ZoneType == ZoneType.Road || 
 			grid[x][z].ZoneType == ZoneType.IncomingRoad || 
-			grid[x][z].ZoneType == ZoneType.Water) 
+			grid[x][z].ZoneType == ZoneType.Water ||
+			grid[x][z].Building != null) 
 				return;
 
 		grid[x][z].ZoneType = zoneType;
 
-		if (zoneType == ZoneType.Road && grid[x][z].Building == null)
+		if (zoneType == ZoneType.Road)
 		{
 
 			// Instantiate the roadMeshPrefab
@@ -219,24 +220,6 @@ public class GridSystem : MonoBehaviour
 			UpdateRoadMesh(x, z);
 			updateRoadsAround(x, z);
 			UpdateRoadConnectivity(x ,z);
-		}
-		else
-		{
-			// Check if the GridCell.Building is a road mesh and destroy it if so
-			if (grid[x][z].Building != null)
-			{
-				if(grid[x][z].Building.name == "RoadMesh")
-				{
-					Destroy(grid[x][z].Building);
-					grid[x][z].Building = null;
-				}
-				else
-				{
-					return;
-				}
-			}
-
-			
 		}
 
 		UpdateCell(x, z);
@@ -523,7 +506,9 @@ public class GridSystem : MonoBehaviour
 
 	private bool IsConnectedRoad(int x, int z)
 	{
-		if (!CheckGrid(x, z) && IsRoad(x, z)) 
+		if (!CheckGrid(x, z)) 
+			return false;
+		if (!IsRoad(x, z))
 			return false;
 		if (grid[x][z].IsConnectedToIncomingRoad)
 			return true;
@@ -662,7 +647,7 @@ public class GridSystem : MonoBehaviour
 			}
 		}
 		// Attaching the BuildingAnimationController script to the building will play the animation
-		// buildingInstance.AddComponent<BuildAnimationController>();
+		buildingInstance.AddComponent<BuildAnimationController>();
 
 	}
 
