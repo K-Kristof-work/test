@@ -11,6 +11,7 @@ public class ZoneTypeSelector : MonoBehaviour
 	public Button emptyButton;
 	public Color normalColor = Color.white;
 	public Color selectedColor = Color.green;
+	public Sidebar sidebar;
 	private ZoneType selectedZoneType;
 
 	void Start()
@@ -27,14 +28,34 @@ public class ZoneTypeSelector : MonoBehaviour
 		if(selectedZoneType == zoneType && gridClickHandler.ZoneButtonSelected == true)
 		{
 			DisableTypeSelector();
+			sidebar.Close();
 			return;
 		}
 		gridClickHandler.ZoneButtonSelected = true;
 		gridClickHandler.SelectedZoneType = zoneType;
 		selectedZoneType = zoneType;
 		UpdateButtonColors();
-		
+		OpenSidebar(zoneType);
 	}
+
+	private void OpenSidebar(ZoneType zoneType)
+    {
+        switch (zoneType)
+        {
+			case ZoneType.Road:
+				sidebar.Open(SidebarPanel.Road);
+				break;
+			case ZoneType.Residential:
+				sidebar.Open(SidebarPanel.ResidentialZone);
+				break;
+			case ZoneType.Industrial:
+				sidebar.Open(SidebarPanel.IndustrialZone);
+				break;
+			case ZoneType.Commercial:
+				sidebar.Open(SidebarPanel.CommercialZone);
+				break;
+		}
+    }
 
 	public void DisableTypeSelector()
 	{
