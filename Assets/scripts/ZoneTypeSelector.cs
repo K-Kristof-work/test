@@ -60,6 +60,7 @@ public class ZoneTypeSelector : MonoBehaviour
 	public void DisableTypeSelector()
 	{
 		gridClickHandler.ZoneButtonSelected = false;
+		sidebar.Close();
 		UpdateButtonColors();
 	}
 
