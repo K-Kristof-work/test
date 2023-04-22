@@ -6,6 +6,8 @@ using TMPro;
 public class Sidebar : MonoBehaviour
 {
     public TextMeshProUGUI title;
+    public List<string> titleList;
+    public List<SidebarContent> contentList;
     private Animator anim;
 
     // Start is called before the first frame update
@@ -23,6 +25,7 @@ public class Sidebar : MonoBehaviour
     public void Open(SidebarPanel panel)
     {
         SetTitle(panel);
+        DisplayContent(panel);
         anim.Play("Slide");
     }
 
@@ -33,21 +36,17 @@ public class Sidebar : MonoBehaviour
 
     private void SetTitle(SidebarPanel panel)
     {
-        switch (panel)
+        title.SetText(titleList[(int)panel]);
+    }
+
+    private void DisplayContent(SidebarPanel panel)
+    {
+        foreach (var item in contentList)
         {
-            case SidebarPanel.Road:
-                title.SetText("Utak");
-                break;
-            case SidebarPanel.ResidentialZone:
-                title.SetText("Lakó zóna");
-                break;
-            case SidebarPanel.IndustrialZone:
-                title.SetText("Ipari zóna");
-                break;
-            case SidebarPanel.CommercialZone:
-                title.SetText("Szolgáltatás zóna");
-                break;
+            item.Hide();
         }
+
+        contentList[(int)panel].Show();
     }
 }
 
