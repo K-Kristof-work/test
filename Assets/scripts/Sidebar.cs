@@ -39,7 +39,7 @@ public class Sidebar : MonoBehaviour
                 title.SetText("Utak");
                 break;
             case SidebarPanel.ResidentialZone:
-                title.SetText("Lakózóna");
+                title.SetText("Lakó zóna");
                 break;
             case SidebarPanel.IndustrialZone:
                 title.SetText("Ipari zóna");
