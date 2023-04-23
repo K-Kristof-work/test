@@ -9,6 +9,7 @@ public class Sidebar : MonoBehaviour
     public List<string> titleList;
     public List<SidebarContent> contentList;
     private Animator anim;
+    private bool visible = false;
 
     // Start is called before the first frame update
     void Start()
@@ -27,10 +28,14 @@ public class Sidebar : MonoBehaviour
         SetTitle(panel);
         DisplayContent(panel);
         anim.Play("Slide");
+        visible = true;
     }
 
     public void Close()
     {
+        if (!visible) return;
+
+        visible = false;
         anim.Play("SlideBack");
     }
 
