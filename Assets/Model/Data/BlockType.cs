@@ -8,6 +8,6 @@ namespace Assets.Model.Data
 {
     public enum BlockType
     {
-        Empty, Road, House, Shop, Factory, PoliceStation, Stadium, School, University, Forest, PowerPlant, PowerLine, Godzilla
+        Empty, House, Shop, Factory, PoliceStation, Stadium, School, University, Forest, PowerPlant, PowerLine, Godzilla
     }
 }

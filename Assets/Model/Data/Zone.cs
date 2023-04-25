@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Assets.Model.Data
 {
-    class Zone : Field
+    class Zone
     {
-        public ZoneType type;
-        public int lvl;
+        //public ZoneType type;
+        //public int lvl;
     }
 }
