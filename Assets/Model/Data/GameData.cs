@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -30,7 +31,10 @@ namespace Assets.Model.Data
 			gridWidth = _gridWith;
             gridHeight = _gridHeight;
 
-            if (gridHeight < 10 || gridWidth < 10)
+			grid = new List<List<Field>>();
+
+
+			if (gridHeight < 10 || gridWidth < 10)
             {
 				throw new Exception("Grid size too small");
 			}
@@ -104,6 +108,7 @@ namespace Assets.Model.Data
 			if (_zoneType == ZoneType.Water || _zoneType == ZoneType.IncomingRoad)
 			{
 				grid[x][z].zoneType = _zoneType;
+				OnZoneTypeChanged?.Invoke(x, z, _zoneType);
 			}
 
 			if (grid[x][z].zoneType == _zoneType ||
@@ -116,6 +121,7 @@ namespace Assets.Model.Data
 			grid[x][z].zoneType = _zoneType;
 			//raise zonetype change event
 			OnZoneTypeChanged?.Invoke(x, z, _zoneType);
+			Debug.WriteLine(grid[x][z].zoneType + " " + x + " " + z);
 		}
 
 		public bool IsRoad(int x, int z)
