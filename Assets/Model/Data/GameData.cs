@@ -18,6 +18,13 @@ namespace Assets.Model.Data
         public Time time;
 		private Dictionary<ZoneType, List<Vec2>> availableBuildingSizes;
 
+		public delegate void ZoneTypeChangedEventHandler(int x, int z, ZoneType newZoneType);
+		public delegate void BuildingPlacedEventHandler(int x, int z, Block buildingInstance);
+
+		public event ZoneTypeChangedEventHandler OnZoneTypeChanged;
+		public event BuildingPlacedEventHandler OnBuildingPlaced;
+
+
 		public void SetUpGrid(int _gridWith, int _gridHeight)
 		{
 			gridWidth = _gridWith;
@@ -107,6 +114,8 @@ namespace Assets.Model.Data
 				return;
 
 			grid[x][z].zoneType = _zoneType;
+			//raise zonetype change event
+			OnZoneTypeChanged?.Invoke(x, z, _zoneType);
 		}
 
 		public bool IsRoad(int x, int z)
@@ -218,6 +227,8 @@ namespace Assets.Model.Data
 				}
 			}
 
+			//raise place building event
+			OnBuildingPlaced?.Invoke(x, z, buildingInstance);
 		}
 
 		private int GetMaxSize(int x, int z, ZoneType zoneType)
