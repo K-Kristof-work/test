@@ -17,7 +17,8 @@ namespace Assets.Model.Data
 		public int gridHeight;
         public List<Citizen> citizens;
         public Time time;
-		private Dictionary<ZoneType, List<Vec2>> availableBuildingSizes;
+		public BuildingPlacer buildingPlacer;
+		public Dictionary<ZoneType, List<Vec2>> availableBuildingSizes;
 
 		public delegate void ZoneTypeChangedEventHandler(int x, int z, ZoneType newZoneType);
 		public delegate void BuildingPlacedEventHandler(int x, int z, Block buildingInstance);
@@ -25,6 +26,10 @@ namespace Assets.Model.Data
 		public event ZoneTypeChangedEventHandler OnZoneTypeChanged;
 		public event BuildingPlacedEventHandler OnBuildingPlaced;
 
+		public GameData()
+		{
+			buildingPlacer = new BuildingPlacer(this, availableBuildingSizes);
+		}
 
 		public void SetUpGrid(int _gridWith, int _gridHeight)
 		{
@@ -121,7 +126,6 @@ namespace Assets.Model.Data
 			grid[x][z].zoneType = _zoneType;
 			//raise zonetype change event
 			OnZoneTypeChanged?.Invoke(x, z, _zoneType);
-			Debug.WriteLine(grid[x][z].zoneType + " " + x + " " + z);
 		}
 
 		public bool IsRoad(int x, int z)
@@ -160,7 +164,7 @@ namespace Assets.Model.Data
 
 		}
 
-		private bool IsConnectedRoad(int x, int z)
+		public bool IsConnectedRoad(int x, int z)
 		{
 			if (!isFieldValid(x, z))
 				return false;
@@ -173,165 +177,13 @@ namespace Assets.Model.Data
 			return false;
 		}
 
-		private void PlaceBuilding(int x, int z, ZoneType zoneType)
+		public void BuildingPlaced(int x, int z, Block buildingInstance)
 		{
-			// Check if a building is already placed
-			if (grid[x][z].block != null) return;
-
-			// Determine the largest possible building size for the given position
-			int maxSize = GetMaxSize(x, z, zoneType);
-
-			// Get a random building prefab of the appropriate size for the zone type
-			List<Vec2> suitableSizes = availableBuildingSizes[zoneType].Where(block =>
-			{
-				return block.x <= maxSize && block.y <= maxSize;
-			}).ToList();
-			Random rand = new Random();
-			Vec2 buildingPrefab = suitableSizes[rand.Next(0, suitableSizes.Count)];
-
-			// Get road direction
-			int roadDirection = GetRoadDirection(x, z);
-
-			// Instantiate the building
-			int buildingSizeX;
-			int buildingSizeZ;
-
-			if (roadDirection % 2 == 1)
-			{
-				buildingSizeX = (int)buildingPrefab.y;
-				buildingSizeZ = (int)buildingPrefab.x;
-			}
-			else
-			{
-				buildingSizeX = (int)buildingPrefab.x;
-				buildingSizeZ = (int)buildingPrefab.y;
-			}
-
-			int chosenQuadrant = GetQuadrant(x, z, maxSize, zoneType);
-
-
-
-			Block buildingInstance = new Block();
-			grid[x][z].block = buildingInstance;
-			grid[x][z].block.blockSize.x = (uint)buildingSizeX;
-			grid[x][z].block.blockSize.y = (uint)buildingSizeZ;
-
-			// Update the other grid cells that the building spawns on top of
-			for (int offsetX = 0; offsetX < buildingSizeX; offsetX++)
-			{
-				for (int offsetZ = 0; offsetZ < buildingSizeZ; offsetZ++)
-				{
-					if (offsetX == 0 && offsetZ == 0) continue; // Skip the original grid cell
-
-					int affectedX = x + (chosenQuadrant == 1 || chosenQuadrant == 3 ? -offsetX : offsetX);
-					int affectedZ = z + (chosenQuadrant == 2 || chosenQuadrant == 3 ? -offsetZ : offsetZ);
-
-					if (affectedX >= 0 && affectedZ >= 0 && affectedX < gridWidth && affectedZ < gridHeight)
-					{
-						grid[affectedX][affectedZ].block = buildingInstance;
-					}
-				}
-			}
-
-			//raise place building event
+			//fire event
 			OnBuildingPlaced?.Invoke(x, z, buildingInstance);
 		}
 
-		private int GetMaxSize(int x, int z, ZoneType zoneType)
-		{
-			int maxSize = 1;
-
-			for (int size = 2; size <= 6; size++)
-			{
-				int quadrantSizes = 0;
-				bool anyQuadrantSucceeded = false;
-
-				for (int quadrant = 0; quadrant < 4; quadrant++)
-				{
-					bool canPlace = true;
-					for (int offsetX = 0; offsetX < size; offsetX++)
-					{
-						for (int offsetZ = 0; offsetZ < size; offsetZ++)
-						{
-							int adjustedX = x + (quadrant == 1 || quadrant == 3 ? -offsetX : offsetX);
-							int adjustedZ = z + (quadrant == 2 || quadrant == 3 ? -offsetZ : offsetZ);
-
-							if (adjustedX < 0 || adjustedZ < 0 || adjustedX >= gridWidth || adjustedZ >= gridHeight || grid[adjustedX][adjustedZ].zoneType != zoneType || grid[adjustedX][adjustedZ].block != null)
-							{
-								canPlace = false;
-								break;
-							}
-						}
-						if (!canPlace) break;
-					}
-
-					if (canPlace)
-					{
-						quadrantSizes = size;
-						anyQuadrantSucceeded = true;
-					}
-				}
-
-				if (anyQuadrantSucceeded)
-				{
-					maxSize = quadrantSizes;
-				}
-				else
-				{
-					break;
-				}
-			}
-
-			return maxSize;
-		}
-
-		private int GetRoadDirection(int x, int z)
-		{
-			int[] dx = { 1, 0, -1, 0 };
-			int[] dz = { 0, 1, 0, -1 };
-
-			for (int dir = 0; dir < 4; dir++)
-			{
-				int newX = x + dx[dir];
-				int newZ = z + dz[dir];
-
-				if (newX >= 0 && newZ >= 0 && newX < gridWidth && newZ < gridHeight && grid[newX][newZ].zoneType == ZoneType.Road)
-				{
-					return dir;
-				}
-			}
-
-			return -1;
-		}
-
-		private int GetQuadrant(int x, int z, int maxSize, ZoneType zoneType)
-		{
-			for (int quadrant = 0; quadrant < 6; quadrant++)
-			{
-				bool canPlace = true;
-				for (int offsetX = 0; offsetX < maxSize; offsetX++)
-				{
-					for (int offsetZ = 0; offsetZ < maxSize; offsetZ++)
-					{
-						int adjustedX = x + (quadrant == 1 || quadrant == 3 ? -offsetX : offsetX);
-						int adjustedZ = z + (quadrant == 2 || quadrant == 3 ? -offsetZ : offsetZ);
-
-						if (adjustedX < 0 || adjustedZ < 0 || adjustedX >= gridWidth || adjustedZ >= gridHeight || grid[adjustedX][adjustedZ].zoneType != zoneType || grid[adjustedX][adjustedZ].block != null)
-						{
-							canPlace = false;
-							break;
-						}
-					}
-					if (!canPlace) break;
-				}
-
-				if (canPlace)
-				{
-					return quadrant;								}
-			}
-
-			return -1;
-		}
+		
 
 		/*public List<Block> GetBuildings()
 		{
