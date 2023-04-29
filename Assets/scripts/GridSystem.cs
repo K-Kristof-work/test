@@ -40,7 +40,7 @@ public class GridSystem : MonoBehaviour
 
 	#region private variables
 
-	private Dictionary<ZoneType, List<GameObject>> zoneTypeToBuildingPrefabs;
+	private Dictionary<BlockType, List<GameObject>> zoneTypeToBuildingPrefabs;
 
 	//public List<List<Mesh>>  roadMeshes;
 	private ZoneMaterials zoneMaterials;
@@ -69,21 +69,30 @@ public class GridSystem : MonoBehaviour
 			{3, CrossRoad},
 		};
 
-		zoneTypeToBuildingPrefabs = new Dictionary<ZoneType, List<GameObject>>
+		zoneTypeToBuildingPrefabs = new Dictionary<BlockType, List<GameObject>>
 		{
-			{ZoneType.Residential,  residentialBuildingPrefabs},
-			{ZoneType.Commercial, commercialBuildingPrefabs},
-			{ZoneType.Industrial, industrialBuildingPrefabs}
+			{BlockType.House,  residentialBuildingPrefabs},
+			{BlockType.Shop, commercialBuildingPrefabs},
+			{BlockType.Factory, industrialBuildingPrefabs}
 
 		};
 		gameData = new GameData();
 
 		gameData.OnZoneTypeChanged += HandleZoneTypeChanged;
-		//gameData.OnBuildingPlaced += HandleBuildingPlaced;
+		gameData.OnBuildingPlaced += HandleBuildingPlaced;
+		gameData.OnDebug += HandleDebug;
 
-
+		UnityThread.initUnityThread();
 
 	}
+
+
+
+	public void HandleDebug(string message)
+	{
+		Debug.Log(message);
+	}
+
 	void Start()
 	{
 		zoneMaterials = GetComponent<ZoneMaterials>();
@@ -92,7 +101,15 @@ public class GridSystem : MonoBehaviour
 		gameData.SetUpGrid(gridWidth, gridHeight);
 
 
-		StartCoroutine(PlaceBuildingsOverTime());
+		//StartCoroutine(PlaceBuildingsOverTime());
+	}
+
+	private void OnApplicationQuit()
+	{
+		gameData.OnApplicationExit();
+		gameData.OnZoneTypeChanged -= HandleZoneTypeChanged;
+		gameData.OnBuildingPlaced -= HandleBuildingPlaced;
+		gameData.OnDebug -= HandleDebug;
 	}
 
 	#endregion
@@ -277,11 +294,8 @@ public class GridSystem : MonoBehaviour
 		GameObject cellObject = cell.CellObject;
 		if (cellObject != null)
 		{
-			//make a debug log that give information on cell
 
 			Material zoneMaterial = zoneMaterials.GetRandomMaterial(zonetype);
-
-
 
 			MeshRenderer renderer = cellObject.GetComponent<MeshRenderer>();
 			if (renderer != null)
@@ -535,29 +549,41 @@ public class GridSystem : MonoBehaviour
 				Vector2Int randomPosition = buildablePositions[Random.Range(0, buildablePositions.Count)];
 
 				// Place a building at the random position
-				PlaceBuilding(randomPosition.x, randomPosition.y, gameData.grid[randomPosition.x][randomPosition.y].zoneType);
+				//PlaceBuilding(randomPosition.x, randomPosition.y, gameData.grid[randomPosition.x][randomPosition.y].zoneType);
 			}
 
 			yield return wait;
 		}
 	}
 
-
-	private void PlaceBuilding(int x, int z, ZoneType zoneType)
+	private void HandleBuildingPlaced(int x, int z, Block block)
 	{
-		// Check if a building is already placed
-		if (grid[x][z].Building != null) return;
+		HandleDebug("building placement on main thread starting");
+		UnityThread.executeInUpdate(() =>
+		{
+			Placebuilding(x, z, block);
+		});
+	}
 
-		// Determine the largest possible building size for the given position
-		int maxSize = GetMaxSize(x, z, zoneType);
+	private void Placebuilding(int x, int z, Block block)
+	{
+
+		HandleDebug("building placment starting in view");
 
 		// Get a random building prefab of the appropriate size for the zone type
-		List<GameObject> suitablePrefabs = zoneTypeToBuildingPrefabs[zoneType].Where(prefab =>
+		List<GameObject> suitablePrefabs = zoneTypeToBuildingPrefabs[block.type].Where(prefab =>
 		{
 			BuildingPrefab prefabScript = prefab.GetComponent<BuildingPrefab>();
-			return prefabScript.BuildingSize.x <= maxSize && prefabScript.BuildingSize.y <= maxSize;
+			return prefabScript.BuildingSize.x == block.blockSize.x && prefabScript.BuildingSize.y == block.blockSize.y;
 		}).ToList(); 
+		if(suitablePrefabs.Count == 0)
+		{
+			HandleDebug("no suitable prefab found");
+			return;
+		}
 		GameObject buildingPrefab = suitablePrefabs[Random.Range(0, suitablePrefabs.Count)];
+
+		HandleDebug("random prefab selected");
 
 		// Get road direction
 		int roadDirection = GetRoadDirection(x, z);
@@ -578,36 +604,25 @@ public class GridSystem : MonoBehaviour
 			buildingRotation = buildingPrefab.transform.rotation;
 		}
 
-		// Instantiate the building
-		int buildingSizeX;
-		int buildingSizeZ;
-
-		if (roadDirection % 2 == 1)
-		{
-			buildingSizeX = prefabScript.BuildingSize.y;
-			buildingSizeZ = prefabScript.BuildingSize.x;
-		}
-		else
-		{
-			buildingSizeX = prefabScript.BuildingSize.x;
-			buildingSizeZ = prefabScript.BuildingSize.y;
-		}
+		HandleDebug("prefab looks at the road");
 
 		float buildingPosY = buildingPrefab.transform.position.y;
 		int chosenQuadrant = -1;
-		Vector3 centerPosition = GetCenterPosition(x, z, maxSize, buildingSizeX, buildingSizeZ, buildingPosY, zoneType, ref chosenQuadrant);
+		Vector3 centerPosition = GetCenterPosition(x, z, (int)block.blockSize.x,(int)block.blockSize.y, buildingPosY, ref chosenQuadrant);
 
-
+		HandleDebug("prefab center position calculated");
 
 		GameObject buildingInstance = Instantiate(buildingPrefab, centerPosition, buildingRotation, grid[x][z].CellObject.transform);
 		grid[x][z].Building = buildingInstance;
-		grid[x][z].Building.GetComponent<BuildingPrefab>().BuildingSize.x = buildingSizeX;
-		grid[x][z].Building.GetComponent<BuildingPrefab>().BuildingSize.y = buildingSizeZ;
+		grid[x][z].Building.GetComponent<BuildingPrefab>().BuildingSize.x = (int)block.blockSize.x;
+		grid[x][z].Building.GetComponent<BuildingPrefab>().BuildingSize.y = (int)block.blockSize.y;
+
+		HandleDebug("prefab added to grid");
 
 		// Update the other grid cells that the building spawns on top of
-		for (int offsetX = 0; offsetX < buildingSizeX; offsetX++)
+		for (int offsetX = 0; offsetX < block.blockSize.x; offsetX++)
 		{
-			for (int offsetZ = 0; offsetZ < buildingSizeZ; offsetZ++)
+			for (int offsetZ = 0; offsetZ < block.blockSize.y; offsetZ++)
 			{
 				if (offsetX == 0 && offsetZ == 0) continue; // Skip the original grid cell
 
@@ -620,9 +635,13 @@ public class GridSystem : MonoBehaviour
 				}
 			}
 		}
+
+		HandleDebug("other cells have been allocated for the building");
+
 		// Attaching the BuildingAnimationController script to the building will play the animation
 		buildingInstance.AddComponent<BuildAnimationController>();
 
+		HandleDebug("placeing builidng is finished");
 	}
 
 	private int GetRoadDirection(int x, int z)
@@ -644,57 +663,12 @@ public class GridSystem : MonoBehaviour
 		return -1;
 	}
 
-	private int GetMaxSize(int x, int z, ZoneType zoneType)
+
+	private Vector3 GetCenterPosition(int x, int z, int buildingSizeX, int buildingSizeZ, float buildingPosY, ref int chosenQuadrant)
 	{
-		int maxSize = 1;
-
-		for (int size = 2; size <= 6; size++)
-		{
-			int quadrantSizes = 0;
-			bool anyQuadrantSucceeded = false;
-
-			for (int quadrant = 0; quadrant < 4; quadrant++)
-			{
-				bool canPlace = true;
-				for (int offsetX = 0; offsetX < size; offsetX++)
-				{
-					for (int offsetZ = 0; offsetZ < size; offsetZ++)
-					{
-						int adjustedX = x + (quadrant == 1 || quadrant == 3 ? -offsetX : offsetX);
-						int adjustedZ = z + (quadrant == 2 || quadrant == 3 ? -offsetZ : offsetZ);
-
-						if (adjustedX < 0 || adjustedZ < 0 || adjustedX >= GridWidth || adjustedZ >= GridHeight || gameData.grid[adjustedX][adjustedZ].zoneType != zoneType || grid[adjustedX][adjustedZ].Building != null)
-						{
-							canPlace = false;
-							break;
-						}
-					}
-					if (!canPlace) break;
-				}
-
-				if (canPlace)
-				{
-					quadrantSizes = size;
-					anyQuadrantSucceeded = true;
-				}
-			}
-
-			if (anyQuadrantSucceeded)
-			{
-				maxSize = quadrantSizes;
-			}
-			else
-			{
-				break;
-			}
-		}
-
-		return maxSize;
-	}
+		int maxSize = Mathf.Max(buildingSizeX, buildingSizeZ);
 
 
-	private Vector3 GetCenterPosition(int x, int z, int maxSize, int buildingSizeX, int buildingSizeZ, float buildingPosY, ZoneType zoneType, ref int chosenQuadrant)
-	{
 		for (int quadrant = 0; quadrant < 6; quadrant++)
 		{
 			bool canPlace = true;
@@ -705,7 +679,7 @@ public class GridSystem : MonoBehaviour
 					int adjustedX = x + (quadrant == 1 || quadrant == 3 ? -offsetX : offsetX);
 					int adjustedZ = z + (quadrant == 2 || quadrant == 3 ? -offsetZ : offsetZ);
 
-					if (adjustedX < 0 || adjustedZ < 0 || adjustedX >= GridWidth || adjustedZ >= GridHeight || gameData.grid[adjustedX][adjustedZ].zoneType != zoneType || grid[adjustedX][adjustedZ].Building != null)
+					if (adjustedX < 0 || adjustedZ < 0 || adjustedX >= GridWidth || adjustedZ >= GridHeight || gameData.grid[adjustedX][adjustedZ].zoneType != gameData.grid[x][z].zoneType || grid[adjustedX][adjustedZ].Building != null)
 					{
 						canPlace = false;
 						break;

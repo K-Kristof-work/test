@@ -22,13 +22,20 @@ namespace Assets.Model.Data
 
 		public delegate void ZoneTypeChangedEventHandler(int x, int z, ZoneType newZoneType);
 		public delegate void BuildingPlacedEventHandler(int x, int z, Block buildingInstance);
+		public delegate void DebugEventHandler(string message);
 
 		public event ZoneTypeChangedEventHandler OnZoneTypeChanged;
 		public event BuildingPlacedEventHandler OnBuildingPlaced;
+		public event DebugEventHandler OnDebug;
 
 		public GameData()
 		{
+			availableBuildingSizes = new Dictionary<ZoneType, List<Vec2>>();
+			availableBuildingSizes.Add(ZoneType.Residential, new List<Vec2> { new Vec2(1, 1), new Vec2(2, 2) });
+			availableBuildingSizes.Add(ZoneType.Commercial, new List<Vec2> { new Vec2(1, 1) });
+			availableBuildingSizes.Add(ZoneType.Industrial, new List<Vec2> { new Vec2(1, 1) });
 			buildingPlacer = new BuildingPlacer(this, availableBuildingSizes);
+			time= new Time();
 		}
 
 		public void SetUpGrid(int _gridWith, int _gridHeight)
@@ -62,6 +69,8 @@ namespace Assets.Model.Data
 			}
 
             PlaceIncomingRoad();
+
+			DebugInUnity("grid set up is finished");
 		}
 
         public void PlaceIncomingRoad()
@@ -126,6 +135,13 @@ namespace Assets.Model.Data
 			grid[x][z].zoneType = _zoneType;
 			//raise zonetype change event
 			OnZoneTypeChanged?.Invoke(x, z, _zoneType);
+
+			if(_zoneType == ZoneType.Road)
+			{
+				UpdateRoadConnectivity(x, z);
+			}
+
+			DebugInUnity("zone type changed to " + _zoneType.ToString() + " at " + x + " " + z);
 		}
 
 		public bool IsRoad(int x, int z)
@@ -180,10 +196,20 @@ namespace Assets.Model.Data
 		public void BuildingPlaced(int x, int z, Block buildingInstance)
 		{
 			//fire event
+			DebugInUnity("invoke event for building placed at " + x + " " + z);
 			OnBuildingPlaced?.Invoke(x, z, buildingInstance);
 		}
 
-		
+		public void DebugInUnity(string message)
+		{
+			// invoke event
+			OnDebug?.Invoke(message);
+		}
+
+		public void OnApplicationExit()
+		{
+			buildingPlacer.ExitTimeEvent();
+		}
 
 		/*public List<Block> GetBuildings()
 		{
