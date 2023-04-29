@@ -31,7 +31,7 @@ namespace Assets.Model.Data
 		public GameData()
 		{
 			availableBuildingSizes = new Dictionary<ZoneType, List<Vec2>>();
-			availableBuildingSizes.Add(ZoneType.Residential, new List<Vec2> { new Vec2(1, 1), new Vec2(2, 2) });
+			availableBuildingSizes.Add(ZoneType.Residential, new List<Vec2> { new Vec2(1, 1), new Vec2(2, 2), new Vec2(3,3) });
 			availableBuildingSizes.Add(ZoneType.Commercial, new List<Vec2> { new Vec2(1, 1) });
 			availableBuildingSizes.Add(ZoneType.Industrial, new List<Vec2> { new Vec2(1, 1) });
 			buildingPlacer = new BuildingPlacer(this, availableBuildingSizes);

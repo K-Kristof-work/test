@@ -200,7 +200,6 @@ public class GridSystem : MonoBehaviour
 
 		if (zoneType == ZoneType.Road)
 		{
-
 			// Instantiate the roadMeshPrefab
 			GameObject roadMeshObject = Instantiate(roadMeshPrefab,grid[x][z].Position, roadMeshPrefab.transform.rotation, grid[x][z].CellObject.transform);
 			roadMeshObject.name = "RoadMesh";
@@ -210,7 +209,6 @@ public class GridSystem : MonoBehaviour
 
 			UpdateRoadMesh(x, z);
 			updateRoadsAround(x, z);
-			UpdateRoadConnectivity(x ,z);
 		}
 
 		UpdateCell(x, z, zoneType);
@@ -466,95 +464,11 @@ public class GridSystem : MonoBehaviour
 		return false;
 	}
 
-	private void UpdateRoadConnectivity(int x, int z)
-	{
-		//cant remove connection yet!!!
-
-		if (!CheckGrid(x,z)) return;
-
-		if (ZoneType.Road != gameData.grid[x][z].zoneType || grid[x][z].IsConnectedToIncomingRoad) return;
-
-		//check if any of the 4 adjacent cells are road with connection
-		if (IsConnectedRoad(x - 1, z) || IsConnectedRoad(x + 1, z) || IsConnectedRoad(x, z - 1) || IsConnectedRoad(x, z + 1))
-		{
-			grid[x][z].IsConnectedToIncomingRoad = true;
-
-			UpdateRoadConnectivity(x - 1, z);
-			UpdateRoadConnectivity(x + 1, z);
-			UpdateRoadConnectivity(x, z - 1);
-			UpdateRoadConnectivity(x, z + 1);
-		}
-		else
-		{
-			grid[x][z].IsConnectedToIncomingRoad = false;
-		}
-
-
-	}
-
-	private bool IsConnectedRoad(int x, int z)
-	{
-		if (!CheckGrid(x, z)) 
-			return false;
-		if (!IsRoad(x, z))
-			return false;
-		if (grid[x][z].IsConnectedToIncomingRoad)
-			return true;
-		if (gameData.grid[x][z].zoneType == ZoneType.IncomingRoad)
-			return true;
-		return false;
-	}
-
 	#endregion
 
 	#endregion
 
 	#region methods for buildings
-
-	private IEnumerator PlaceBuildingsOverTime()
-	{
-		WaitForSeconds wait = new WaitForSeconds(buildInterval);
-		List<Vector2Int> buildablePositions = new List<Vector2Int>();
-		int checkingFrequency = 10; // bigger is fewer checks
-		int counter = 0;
-		while (true)
-		{
-
-
-			if (checkingFrequency == counter)
-			{
-				buildablePositions = new List<Vector2Int>();
-				counter = 0;
-				for (int x = 0; x < GridWidth; x++)
-				{
-					for (int z = 0; z < GridHeight; z++)
-					{	
-						if (gameData.grid[x][z].zoneType != ZoneType.Empty && gameData.grid[x][z].zoneType != ZoneType.Road && grid[x][z].Building == null)
-						{
-							// Check if there's a road in the vicinity
-							if (IsConnectedRoad(x - 1, z) || IsConnectedRoad(x + 1, z) || IsConnectedRoad(x, z - 1) || IsConnectedRoad(x, z + 1))
-							{
-									buildablePositions.Add(new Vector2Int(x, z));
-							}
-						}
-
-						
-					}
-				}
-			}
-			counter++;
-			if (buildablePositions.Count > 0)
-			{
-				// Choose a random buildable position
-				Vector2Int randomPosition = buildablePositions[Random.Range(0, buildablePositions.Count)];
-
-				// Place a building at the random position
-				//PlaceBuilding(randomPosition.x, randomPosition.y, gameData.grid[randomPosition.x][randomPosition.y].zoneType);
-			}
-
-			yield return wait;
-		}
-	}
 
 	private void HandleBuildingPlaced(int x, int z, Block block)
 	{
