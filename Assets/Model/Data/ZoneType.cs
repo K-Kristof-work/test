@@ -6,8 +6,16 @@ using System.Threading.Tasks;
 
 namespace Assets.Model.Data
 {
-    public enum ZoneType
-    {
-        Residential, Commercial, Industrial
-    }
+	public enum ZoneType
+	{
+		Empty,
+		Residential,
+		Commercial,
+		Industrial,
+		Road,
+		IncomingRoad,
+		Water
+	}
+
 }
+	

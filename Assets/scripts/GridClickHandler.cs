@@ -1,3 +1,4 @@
+using Assets.Model.Data;
 using UnityEngine;
 using UnityEngine.EventSystems;
 

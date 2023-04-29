@@ -1,3 +1,4 @@
+using Assets.Model.Data;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,8 +9,7 @@ public class ZoneMaterials : MonoBehaviour
 	public List<Material> commercialMaterials;
 	public List<Material> industrialMaterials;
 	public List<Material> TransperentMaterials;
-
-	public Dictionary<ZoneType, List<Material>> Materials { get; private set; }
+	public Dictionary< ZoneType , List<Material>> Materials { get; private set; }
 
 	private void Awake()
 	{
@@ -40,15 +40,4 @@ public class ZoneMaterials : MonoBehaviour
 		Debug.Log("No materials found for zone type " + zoneType);
 		return null;
 	}
-}
-
-public enum ZoneType
-{
-	Empty,
-	Residential,
-	Commercial,
-	Industrial,
-	Road,
-	IncomingRoad,
-	Water
 }
