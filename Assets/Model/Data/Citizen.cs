@@ -12,6 +12,10 @@ namespace Assets.Model.Data
         public double paidTaxes;
         public int age;
         public double happiness;
+        public bool diploma;
+        public bool bsc;
+        public double highSchoolEducation;
+        public double universityEducation;
         public Field home;
         public Field work;
 
@@ -23,6 +27,11 @@ namespace Assets.Model.Data
             happiness = 0;
             home = null;
             work = null;
+            highSchoolEducation = 0;
+            universityEducation = 0;
+            diploma = false;
+            bsc = false;
+
         }
 
         public Citizen(int age)
@@ -33,6 +42,10 @@ namespace Assets.Model.Data
             happiness = 0;
             home = null;
             work = null;
+            highSchoolEducation = 0;
+            universityEducation = 0;
+            diploma = false;
+            bsc = false;
         }
     }
 }

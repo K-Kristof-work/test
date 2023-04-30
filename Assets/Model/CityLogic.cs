@@ -12,7 +12,10 @@ namespace Assets.Model
         private double industryRadius = 2.0;
         private double forestRadius = 2.0;
         private double homeToWorkRadius = 1.0;
+        private double highSchoolRadius = 2.0;
+        private double universityRadius = 2.0;
         private double standardCitizenHapiness = 1.0;
+
 
         private double safetyRadius = 2.0;
 
@@ -37,6 +40,11 @@ namespace Assets.Model
                 GetTaxes();
                 PayPension();
                 PayMaintenanceCosts();
+                //if its not winter, grow the forests
+                if (data.time.getSeason() != 3)
+                {
+                    GrowForests();
+                }
             }
             //Every year, update citizen age and kill the elderly
             if (season == 3 && data.time.getSeason() == 0) { 
@@ -44,6 +52,7 @@ namespace Assets.Model
                 KillTheElderly();
 
             }
+            EducateCitizens();
             UpdateCitizenHappiness();
 
             season = data.time.getSeason();
@@ -105,6 +114,25 @@ namespace Assets.Model
             }
         }
 
+        private void GrowForests()
+        {
+            foreach (List<Field> row in data.grid)
+            {
+                foreach (Field field in row)
+                {
+                    if (field.block.type == BlockType.Forest && field.block.lvl < 3)
+                    {
+                        field.block.building_progress++;
+                        if (field.block.building_progress == 10)
+                        {
+                            field.block.lvl++;
+                            field.block.building_progress = 0;
+                        }
+                    }
+                }
+            }
+        }
+
         private void UpdateCitizenHappiness()
         {
             foreach (Citizen citizen in data.citizens)
@@ -139,7 +167,8 @@ namespace Assets.Model
                         //if a forest is near citizen, increase happiness
                         if (field.block.type == BlockType.Forest && Field.distanceFrom2Field(citizen.home, field) <= forestRadius)
                         {
-                            citizen.happiness += 0.01;
+                            //depending on how big the forest is, increase happiness
+                            citizen.happiness += 0.01 * (field.block.lvl + 1) + (0.001 * field.block.building_progress);
                         }
                         //Increase safety depending on how close the police station is
                         if (field.block.type == BlockType.PoliceStation)
@@ -188,6 +217,40 @@ namespace Assets.Model
                 if (factories / commercials > 1.2 || factories / commercials < 0.8)
                 {
                     citizen.happiness -= 0.01;
+                }
+            }
+        }
+
+        private void EducateCitizens()
+        {
+            foreach (Citizen citizen in data.citizens)
+            {
+                foreach (List<Field> row in data.grid)
+                {
+                    foreach (Field field in row)
+                    {
+                        //if a school is near a citizen, increase education
+                        if (field.block.type == BlockType.School && Field.distanceFrom2Field(citizen.home, field) <= highSchoolRadius)
+                        {
+                            citizen.highSchoolEducation += 0.01;
+                            if (citizen.highSchoolEducation >= 10)
+                            {
+                                citizen.diploma = true;
+                            }
+                        }
+                        //if a university is near a citizen, increase education
+                        if (field.block.type == BlockType.University && Field.distanceFrom2Field(citizen.home, field) <= universityRadius)
+                        {
+                            if (citizen.diploma)
+                            {
+                                citizen.universityEducation += 0.01;
+                                if (citizen.universityEducation >= 20)
+                                {
+                                    citizen.bsc = true;
+                                }
+                            }                            
+                        }
+                    }
                 }
             }
         }

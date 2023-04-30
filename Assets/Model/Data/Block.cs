@@ -12,6 +12,7 @@ namespace Assets.Model.Data
         public int lvl; // 0-3, 0 = building in progress
         public int building_progress; // 1-10
         public int operating_cost;
+        public bool isPowered;
         public Vec2 blockSize;
     }
 }
