@@ -16,6 +16,8 @@ namespace Assets.Model
         private double universityRadius = 2.0;
         private double standardCitizenHapiness = 1.0;
 
+        private double powerConnectivityRadius = 2.0;
+
 
         private double safetyRadius = 2.0;
 
@@ -54,6 +56,7 @@ namespace Assets.Model
             }
             EducateCitizens();
             UpdateCitizenHappiness();
+            UpdatePowerConnectivity();
 
             season = data.time.getSeason();
         }
@@ -66,7 +69,10 @@ namespace Assets.Model
                 return;
             }
             //If the game is not paused, update the time
-            data.time.date = data.time.date.AddMinutes(data.time.speed);
+            else
+            {
+                data.time.date = data.time.date.AddMinutes(data.time.speed);
+            }
         }
 
         private void UpdateCitizenAge()
@@ -83,8 +89,8 @@ namespace Assets.Model
             {
                 if (citizen.age < 65)
                 {
-                    data.balance += (int)(citizen.salary * (data.residenceTax * 0.01));
-                    citizen.paidTaxes += (int)(citizen.salary * (data.residenceTax * 0.01));
+                    data.balance += (int)(citizen.salary * (data.residencialTax * 0.01));
+                    citizen.paidTaxes += (int)(citizen.salary * (data.residencialTax * 0.01));
                 }
             }
         }
@@ -146,12 +152,12 @@ namespace Assets.Model
                     citizen.happiness += 0.01;
                 }
                 //if taxes are more then double the standard, decrease happiness
-                if (data.residenceTax > standardResidenceTax * 2 || data.commercialTax > standardCommercialTax * 2 || data.industrialTax > standardIndustrialTax * 2)
+                if (data.residencialTax > standardResidenceTax * 2 || data.commercialTax > standardCommercialTax * 2 || data.industrialTax > standardIndustrialTax * 2)
                 {
                     citizen.happiness -= 0.01;
                 }
                 //if taxex are less then 1.5 than the standard, increase happiness
-                else if (data.residenceTax < standardResidenceTax * 1.5 || data.commercialTax < standardCommercialTax * 1.5 || data.industrialTax < standardIndustrialTax * 1.5)
+                else if (data.residencialTax < standardResidenceTax * 1.5 || data.commercialTax < standardCommercialTax * 1.5 || data.industrialTax < standardIndustrialTax * 1.5)
                 {
                     citizen.happiness += 0.01;
                 }
@@ -271,6 +277,11 @@ namespace Assets.Model
                     }
                 }
             }
+        }
+
+        private void UpdatePowerConnectivity()
+        {
+
         }
     }
 }

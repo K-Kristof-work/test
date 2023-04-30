@@ -11,6 +11,7 @@ namespace Assets.Model.Data
         public Vec2 pos; // top left corner
         public ZoneType zoneType;
         public Block block;
+        public int tax;
         public bool IsConnectedToIncomingRoad = false;
 
         public Vec2 getCenterPoz()

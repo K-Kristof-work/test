@@ -10,9 +10,6 @@ namespace Assets.Model.Data
     class GameData
     {
         public int balance;
-        public int residenceTax;
-		public int commercialTax;
-		public int industrialTax;
         public int loans;
         public List<List<Field>> grid;
         public int gridWidth;
