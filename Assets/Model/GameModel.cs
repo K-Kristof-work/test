@@ -23,6 +23,6 @@ public class GameModel : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        cityLogic.Update();
     }
 }

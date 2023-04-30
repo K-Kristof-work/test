@@ -10,7 +10,9 @@ namespace Assets.Model.Data
     class GameData
     {
         public int balance;
-        public int[] taxes;
+        public int residenceTax;
+		public int commercialTax;
+		public int industrialTax;
         public int loans;
         public List<List<Field>> grid;
         public int gridWidth;
@@ -35,7 +37,7 @@ namespace Assets.Model.Data
 			availableBuildingSizes.Add(ZoneType.Commercial, new List<Vec2> { new Vec2(1, 1) });
 			availableBuildingSizes.Add(ZoneType.Industrial, new List<Vec2> { new Vec2(1, 1) });
 			buildingPlacer = new BuildingPlacer(this, availableBuildingSizes);
-			time= new Time();
+			time = new Time();
 		}
 
 		public void SetUpGrid(int _gridWith, int _gridHeight)
