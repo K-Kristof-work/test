@@ -210,16 +210,23 @@ namespace Assets.Model.Data
 			buildingPlacer.ExitTimeEvent();
 		}
 
-		/*public List<Block> GetBuildings()
+		public List<Block> GetBuildings()
 		{
-			var flattenedGrid = grid.SelectMany(g => g).ToList();
-			return flattenedGrid
-				.FindAll(b => GameConfig.Buildings.Contains(b.zoneType))
-				.Select(f => new Block { zonetype = f.zoneType })
-				.ToList();
+			List<Block> buildings = new List<Block>();
+			foreach (List<Field> row in grid)
+			{
+				foreach (Field field in row)
+				{
+					if (!buildings.Contains(field.block))
+					{
+						buildings.Add(field.block);
+					}
+				}
+			}
+			return buildings;
 		}
 
-		public int getOperatingCost()
+		/*public int getOperatingCost()
         {
             return getBuildings().AsEnumerable().Sum(b => b.operating_cost);
         }

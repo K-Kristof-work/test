@@ -16,6 +16,7 @@ namespace Assets.Model.Data
         public double powerConsumption;
         public Citizen[] citizens;
         public Vec2 blockSize;
+        public Vec2 midPosition;
 
         public void PowerConsumption()
         {

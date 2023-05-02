@@ -89,8 +89,8 @@ namespace Assets.Model
             {
                 if (citizen.age < 65)
                 {
-                    data.balance += (int)(citizen.salary * (data.residencialTax * 0.01));
-                    citizen.paidTaxes += (int)(citizen.salary * (data.residencialTax * 0.01));
+                    //data.balance += (int)(citizen.salary * (data.residencialTax * 0.01));
+                    //citizen.paidTaxes += (int)(citizen.salary * (data.residencialTax * 0.01));
                 }
             }
         }
@@ -108,33 +108,24 @@ namespace Assets.Model
 
         private void PayMaintenanceCosts()
         {
-            foreach (List<Field> row in data.grid)
+            foreach (Block block in data.GetBuildings()) 
             {
-                foreach (Field field in row)
-                {
-                    if (field.block.type != BlockType.Empty)
-                    {
-                        data.balance -= field.block.operating_cost;
-                    }
-                }
+                data.balance -= block.operating_cost;
             }
         }
 
         private void GrowForests()
         {
-            foreach (List<Field> row in data.grid)
+            foreach (Block block in data.GetBuildings())
             {
-                foreach (Field field in row)
+                if (block.type == BlockType.Forest && block.lvl < 3)
                 {
-                    if (field.block.type == BlockType.Forest && field.block.lvl < 3)
+                    block.building_progress++;
+                    if (block.building_progress == 10)
                     {
-                        field.block.building_progress++;
-                        if (field.block.building_progress == 10)
-                        {
-                            field.block.lvl++;
-                            field.block.building_progress = 0;
-                        }
-                    }
+                        block.lvl++;
+                        block.building_progress = 0;
+                    }                    
                 }
             }
         }
@@ -152,12 +143,12 @@ namespace Assets.Model
                     citizen.happiness += 0.01;
                 }
                 //if taxes are more then double the standard, decrease happiness
-                if (data.residencialTax > standardResidenceTax * 2 || data.commercialTax > standardCommercialTax * 2 || data.industrialTax > standardIndustrialTax * 2)
+                //if (data.residencialTax > standardResidenceTax * 2 || data.commercialTax > standardCommercialTax * 2 || data.industrialTax > standardIndustrialTax * 2)
                 {
                     citizen.happiness -= 0.01;
                 }
                 //if taxex are less then 1.5 than the standard, increase happiness
-                else if (data.residencialTax < standardResidenceTax * 1.5 || data.commercialTax < standardCommercialTax * 1.5 || data.industrialTax < standardIndustrialTax * 1.5)
+                //else if (data.residencialTax < standardResidenceTax * 1.5 || data.commercialTax < standardCommercialTax * 1.5 || data.industrialTax < standardIndustrialTax * 1.5)
                 {
                     citizen.happiness += 0.01;
                 }
@@ -231,30 +222,27 @@ namespace Assets.Model
         {
             foreach (Citizen citizen in data.citizens)
             {
-                foreach (List<Field> row in data.grid)
+                foreach (Block block in data.GetBuildings())
                 {
-                    foreach (Field field in row)
+                    //if a school is near a citizen, increase education
+                    if (block.type == BlockType.School && Field.distanceFromFieldAndBlock(citizen.home, block.midPosition) <= highSchoolRadius)
                     {
-                        //if a school is near a citizen, increase education
-                        if (field.block.type == BlockType.School && Field.distanceFrom2Field(citizen.home, field) <= highSchoolRadius)
+                        citizen.highSchoolEducation += 0.01;
+                        if (citizen.highSchoolEducation >= 10)
                         {
-                            citizen.highSchoolEducation += 0.01;
-                            if (citizen.highSchoolEducation >= 10)
-                            {
-                                citizen.diploma = true;
-                            }
+                            citizen.diploma = true;
                         }
-                        //if a university is near a citizen, increase education
-                        if (field.block.type == BlockType.University && Field.distanceFrom2Field(citizen.home, field) <= universityRadius)
+                    }
+                    //if a university is near a citizen, increase education
+                    if (block.type == BlockType.University && Field.distanceFromFieldAndBlock(citizen.home, block.midPosition) <= universityRadius)
+                    {
+                        if (citizen.diploma)
                         {
-                            if (citizen.diploma)
+                            citizen.universityEducation += 0.01;
+                            if (citizen.universityEducation >= 20)
                             {
-                                citizen.universityEducation += 0.01;
-                                if (citizen.universityEducation >= 20)
-                                {
-                                    citizen.bsc = true;
-                                }
-                            }                            
+                                citizen.bsc = true;
+                            }
                         }
                     }
                 }
