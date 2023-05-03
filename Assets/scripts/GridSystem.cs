@@ -59,7 +59,14 @@ public class GridSystem : MonoBehaviour
 	#endregion
 
 	#region unity methods
-	public void Awake()
+
+
+	public void HandleDebug(string message)
+	{
+		Debug.Log(message);
+	}
+
+	void Start()
 	{
 		roadMeshes = new Dictionary<int, List<Mesh>>
 		{
@@ -76,7 +83,8 @@ public class GridSystem : MonoBehaviour
 			{BlockType.Factory, industrialBuildingPrefabs}
 
 		};
-		gameData = new GameData();
+
+		gameData = GameModel.instance.gameData;
 
 		gameData.OnZoneTypeChanged += HandleZoneTypeChanged;
 		gameData.OnBuildingPlaced += HandleBuildingPlaced;
@@ -84,17 +92,6 @@ public class GridSystem : MonoBehaviour
 
 		UnityThread.initUnityThread();
 
-	}
-
-
-
-	public void HandleDebug(string message)
-	{
-		Debug.Log(message);
-	}
-
-	void Start()
-	{
 		zoneMaterials = GetComponent<ZoneMaterials>();
 
 		SetUpGrid(gridWidth, gridHeight);

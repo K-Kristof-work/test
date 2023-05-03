@@ -4,13 +4,16 @@ using UnityEngine;
 using Assets.Model;
 using Assets.Model.Data;
 
-public class GameModel : MonoBehaviour
+class GameModel : MonoBehaviour
 {
-    private GameData gameData;
-    private CityLogic cityLogic;
+    public GameData gameData;
+    public CityLogic cityLogic;
+
+    public static GameModel instance;
 
     private void Awake()
     {
+        instance = this;
         gameData = new GameData();
         cityLogic = new CityLogic(gameData);
     }
