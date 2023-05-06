@@ -36,7 +36,7 @@ class BuildingPlacer
 	{
 		try { PlaceBuildingsOverTime(); } 
 		catch (Exception ex){
-			gameData.DebugInUnity("An error occurred: " + ex.Message);
+			gameData.DebugInUnity(this,"An error occurred: " + ex.Message);
 		}
 		
 	}
@@ -95,10 +95,8 @@ class BuildingPlacer
 			// Place a building at the random position
 			
 			PlaceBuilding((int)randomPosition.x, (int)randomPosition.y, gameData.grid[(int)randomPosition.x][(int)randomPosition.y].zoneType, blocktype);
-			gameData.DebugInUnity("building placed at " + randomPosition.x + ", " + randomPosition.y + "+ current buildable positions: " + buildablePositions.Count);
+			gameData.DebugInUnity(this,"building placed at " + randomPosition.x + ", " + randomPosition.y + "+ current buildable positions: " + buildablePositions.Count);
 		}
-
-		gameData.DebugInUnity("buildable positions: " + buildablePositions.Count);
 	}
 
 	private int RandomRange(int min, int max)
@@ -115,7 +113,7 @@ class BuildingPlacer
 		// Determine the largest possible building size for the given position
 		int maxSize = GetMaxSize(x, z, zoneType);
 
-		gameData.DebugInUnity("maxsize calculated for " + blocktype + " in position " + x + ", " + z);
+		gameData.DebugInUnity(this,"maxsize calculated for " + blocktype + " in position " + x + ", " + z);
 
 		// Get a random building prefab of the appropriate size for the zone type
 		List<Vec2> suitableSizes = availableBuildingSizes[zoneType].Where(block =>
@@ -125,7 +123,7 @@ class BuildingPlacer
 		Random rand = new Random();
 		Vec2 buildingPrefab = suitableSizes[rand.Next(0, suitableSizes.Count)];
 
-		gameData.DebugInUnity("random building selected for " + blocktype + " in position " + x + ", " + z);
+		gameData.DebugInUnity(this,"random building selected for " + blocktype + " in position " + x + ", " + z);
 
 		// Get road direction
 		int roadDirection = GetRoadDirection(x, z);
@@ -147,7 +145,7 @@ class BuildingPlacer
 
 		int chosenQuadrant = GetQuadrant(x, z, maxSize, zoneType);
 
-		gameData.DebugInUnity("getquadrant calculated for " + blocktype + " in position " + x + ", " + z);
+		gameData.DebugInUnity(this,"getquadrant calculated for " + blocktype + " in position " + x + ", " + z);
 
 		Block buildingInstance = new Block()
 		{
@@ -156,7 +154,7 @@ class BuildingPlacer
 		};
 		gameData.grid[x][z].block = buildingInstance;
 
-		gameData.DebugInUnity("block set in grid for " + blocktype + " in position " + x + ", " + z);
+		gameData.DebugInUnity(this,"block set in grid for " + blocktype + " in position " + x + ", " + z);
 
 		// Update the other grid cells that the building spawns on top of
 		for (int offsetX = 0; offsetX < buildingSizeX; offsetX++)
@@ -165,7 +163,7 @@ class BuildingPlacer
 			{
 				if (offsetX == 0 && offsetZ == 0) continue; // Skip the original grid cell
 
-				gameData.DebugInUnity("building placed and set the cells for it, " + blocktype + " in position " + x + ", " + z);
+				gameData.DebugInUnity(this,"building placed and set the cells for it, " + blocktype + " in position " + x + ", " + z);
 
 				int affectedX = x + (chosenQuadrant == 1 || chosenQuadrant == 3 ? -offsetX : offsetX);
 				int affectedZ = z + (chosenQuadrant == 2 || chosenQuadrant == 3 ? -offsetZ : offsetZ);
@@ -180,7 +178,7 @@ class BuildingPlacer
 		//raise place building event
 		gameData.BuildingPlaced(x, z, buildingInstance);
 
-		gameData.DebugInUnity("building placed of type " + blocktype + " in position " + x + ", " + z);
+		gameData.DebugInUnity(this,"building placed of type " + blocktype + " in position " + x + ", " + z);
 	}
 
 	private int GetMaxSize(int x, int z, ZoneType zoneType)

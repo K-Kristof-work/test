@@ -90,11 +90,11 @@ public class BuildAnimationController : MonoBehaviour
         // Set the variables to the values from the script
         buildingX = BuildingPrefab.BuildingSize.x;
         buildingY = BuildingPrefab.BuildingSize.y;
-        // Find the GridSystem script
-        GridSystem gridSystem = GameObject.Find("Grid System").GetComponent<GridSystem>();
+        // Find the GameView script
+        GameView GameView = GameObject.Find("Grid System").GetComponent<GameView>();
         // Set the variables to the values from the script
-        cellX = gridSystem.cellHeight;
-        cellY = gridSystem.cellWidth;
+        cellX = GameView.cellHeight;
+        cellY = GameView.cellWidth;
         // Instantiate the MaskContainer object from the prefab
         maskContainer = Instantiate(maskContainerPrefab, transform.position, Quaternion.identity);
         // Creating the sphere masks
