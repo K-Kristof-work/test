@@ -13,5 +13,6 @@ namespace Assets.Model.Data
         public int building_progress; // 1-10
         public int operating_cost;
         public Vec2 blockSize;
+
     }
 }

@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.18029143, g: 0.22572419, b: 0.30693057, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028331, g: 0.2257133, b: 0.3069217, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -2859,7 +2859,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 327473101}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0.00017452006, y: 0.0015707754, z: -0.00000027413213, w: 0.9999988}
   m_LocalPosition: {x: 0, y: 0, z: -5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -2868,7 +2868,7 @@ RectTransform:
   - {fileID: 607157566}
   m_Father: {fileID: 659530165}
   m_RootOrder: 4
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0.02, y: 0.18, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
   m_AnchoredPosition: {x: 430, y: 0}
@@ -2918,16 +2918,16 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: 
-        m_Mode: 1
+      - m_Target: {fileID: 1039642953}
+        m_TargetAssemblyTypeName: FloatingBuildings, Assembly-CSharp
+        m_MethodName: OnBuildingPlacerButtonClicked
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: PoliceStation
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &327473104
@@ -8667,8 +8667,9 @@ GameObject:
   - component: {fileID: 1039642950}
   - component: {fileID: 1039642951}
   - component: {fileID: 1039642952}
+  - component: {fileID: 1039642953}
   m_Layer: 0
-  m_Name: Grid System
+  m_Name: GameView
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8739,6 +8740,7 @@ MonoBehaviour:
   - {fileID: 113233378154089179, guid: 1c78bcc43e559984cb38e70e04bdff95, type: 3}
   - {fileID: 7588828341164985064, guid: 22cd19a324bb6ff4c8420621b722eb9e, type: 3}
   - {fileID: 2550523065354267995, guid: 5a5cb0c304a49714b9451c32f274c5fb, type: 3}
+  FloatingObject: {fileID: 0}
 --- !u!4 &1039642949
 Transform:
   m_ObjectHideFlags: 0
@@ -8801,7 +8803,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ZoneButtonSelected: 0
-  gridSystem: {fileID: 1039642948}
+  GameView: {fileID: 0}
   selectionBox: {fileID: 1770768173}
 --- !u!114 &1039642952
 MonoBehaviour:
@@ -8824,6 +8826,22 @@ MonoBehaviour:
   normalColor: {r: 1, g: 1, b: 1, a: 1}
   selectedColor: {r: 0.54254186, g: 0.9056604, b: 0.54254186, a: 1}
   sidebar: {fileID: 1645258418}
+--- !u!114 &1039642953
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1039642947}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 09b7803ab98c8ae4c822b219bbfbc11b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  PoliceFloatingObject: {fileID: 6399728808837600598, guid: ee9e55f15832d1749b1c5968fc090b5a, type: 3}
+  UniversityFloatingObject: {fileID: 0}
+  HighschoolFloatingObject: {fileID: 0}
+  StadiumFloatingObject: {fileID: 0}
 --- !u!1 &1062427295
 GameObject:
   m_ObjectHideFlags: 0
