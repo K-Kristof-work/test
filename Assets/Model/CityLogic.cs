@@ -4,6 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Assets.Model.Data;
+using System.Timers;
+using static Assets.Model.Data.GameData;
+using System.Diagnostics;
 
 namespace Assets.Model
 {
@@ -27,38 +30,64 @@ namespace Assets.Model
 
         private int season = 0;
 
+        public delegate void CityLogicEventHandler(Time time);
+
+        public event CityLogicEventHandler OnCityLogic;
+
         private GameData data;
         public CityLogic (GameData gd)
         {
             data = gd;
+            Timer timer = new Timer(3000);
+            timer.Elapsed += Update;
+            timer.AutoReset = true;
+            timer.Enabled = true;
         }
 
-        public void Update()
+        public void Update(object source, ElapsedEventArgs e)
         {
+            data.DebugInUnity("calling update1");
             UpdateTime();
             //Every quarter of a year, get taxes, pay pension and maintenance costs
             if (season != data.time.getSeason())
             {
+                data.DebugInUnity("1");
                 GetTaxes();
+                data.DebugInUnity("2");
                 PayPension();
+                data.DebugInUnity("3");
                 PayMaintenanceCosts();
+                data.DebugInUnity("4");
                 //if its not winter, grow the forests
                 if (data.time.getSeason() != 3)
                 {
+                    data.DebugInUnity("5");
                     GrowForests();
                 }
             }
             //Every year, update citizen age and kill the elderly
-            if (season == 3 && data.time.getSeason() == 0) { 
+            if (season == 3 && data.time.getSeason() == 0) {
+                data.DebugInUnity("6");
                 UpdateCitizenAge();
+                data.DebugInUnity("7");
                 KillTheElderly();
 
             }
+            data.DebugInUnity("8");
             EducateCitizens();
+            data.DebugInUnity("9");
             UpdateCitizenHappiness();
+            data.DebugInUnity("10");
             UpdatePowerConnectivity();
 
             season = data.time.getSeason();
+
+            //debug in unity
+
+            data.DebugInUnity("calling update2");
+            data.DebugInUnity("Time: " + data.time.date.ToString());
+            OnCityLogic?.Invoke(data.time);
+
         }
 
         private void UpdateTime()
@@ -71,7 +100,7 @@ namespace Assets.Model
             //If the game is not paused, update the time
             else
             {
-                data.time.date = data.time.date.AddMinutes(data.time.speed);
+                data.time.date = data.time.date.AddMinutes(data.time.speed*100);
             }
         }
 
@@ -85,6 +114,8 @@ namespace Assets.Model
 
         private void GetTaxes()
         {
+            data.DebugInUnity("bruw");
+            data.DebugInUnity("num of citizen" + data.citizens.Count);
             foreach (Citizen citizen in data.citizens)
             {
                 if (citizen.age < 65)
@@ -108,6 +139,8 @@ namespace Assets.Model
 
         private void PayMaintenanceCosts()
         {
+            data.DebugInUnity("paying maintenance costs");
+            data.DebugInUnity("num of buildings" + data.GetBuildings().Count);
             foreach (Block block in data.GetBuildings()) 
             {
                 data.balance -= block.operating_cost;

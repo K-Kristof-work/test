@@ -18,14 +18,17 @@ namespace Assets.Model.Data
         public Time time;
 		public BuildingPlacer buildingPlacer;
 		public Dictionary<ZoneType, List<Vec2>> availableBuildingSizes;
+		public CityLogic cityLogic;
 
 		public delegate void ZoneTypeChangedEventHandler(int x, int z, ZoneType newZoneType);
 		public delegate void BuildingPlacedEventHandler(int x, int z, Block buildingInstance);
 		public delegate void DebugEventHandler(string message);
 
+
 		public event ZoneTypeChangedEventHandler OnZoneTypeChanged;
 		public event BuildingPlacedEventHandler OnBuildingPlaced;
 		public event DebugEventHandler OnDebug;
+
 
 		public GameData()
 		{
@@ -34,6 +37,10 @@ namespace Assets.Model.Data
 			availableBuildingSizes.Add(ZoneType.Commercial, new List<Vec2> { new Vec2(1, 1) });
 			availableBuildingSizes.Add(ZoneType.Industrial, new List<Vec2> { new Vec2(1, 1) });
 			buildingPlacer = new BuildingPlacer(this, availableBuildingSizes);
+			citizens = new List<Citizen>();
+			cityLogic = new CityLogic(this);
+			loans = 0;
+			balance = 10000;
 			time = new Time();
 		}
 
