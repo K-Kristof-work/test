@@ -12,7 +12,7 @@ public class GridClickHandler : MonoBehaviour
 	public bool ZoneButtonSelected = false;
 
 	public ZoneType SelectedZoneType { get; set; }
-	public GridSystem gridSystem; // Drag and drop the GridManager object to this field in the Inspector
+	public GameView gameView; // Drag and drop the GridManager object to this field in the Inspector
 
 	public SelectionBox selectionBox; // Drag and drop the Image GameObject to this field in the Inspector
 
@@ -38,7 +38,7 @@ public class GridClickHandler : MonoBehaviour
 
 					if (Physics.Raycast(ray, out hit))
 					{
-						gridSystem.SetZone(hit.point, SelectedZoneType);
+						gameView.SetZone(hit.point, SelectedZoneType);
 						return;
 					}
 				}
@@ -64,7 +64,7 @@ public class GridClickHandler : MonoBehaviour
 				if (Physics.Raycast(ray, out hit))
 				{
 					dragEndWorldPosition = hit.point;
-					gridSystem.SetZoneRectangle(dragStartWorldPosition, dragEndWorldPosition, SelectedZoneType);
+					gameView.SetZoneRectangle(dragStartWorldPosition, dragEndWorldPosition, SelectedZoneType);
 				}
 				isDragging = false;
 				selectionBox.SetVisible(false);

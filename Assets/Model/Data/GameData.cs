@@ -22,7 +22,7 @@ namespace Assets.Model.Data
 
 		public delegate void ZoneTypeChangedEventHandler(int x, int z, ZoneType newZoneType);
 		public delegate void BuildingPlacedEventHandler(int x, int z, Block buildingInstance);
-		public delegate void DebugEventHandler(string message);
+		public delegate void DebugEventHandler(object ob, string message);
 
 		public event ZoneTypeChangedEventHandler OnZoneTypeChanged;
 		public event BuildingPlacedEventHandler OnBuildingPlaced;
@@ -70,7 +70,7 @@ namespace Assets.Model.Data
 
             PlaceIncomingRoad();
 
-			DebugInUnity("grid set up is finished");
+			DebugInUnity(this,"grid set up is finished");
 		}
 
         public void PlaceIncomingRoad()
@@ -141,7 +141,7 @@ namespace Assets.Model.Data
 				UpdateRoadConnectivity(x, z);
 			}
 
-			DebugInUnity("zone type changed to " + _zoneType.ToString() + " at " + x + " " + z);
+			DebugInUnity(this,"zone type changed to " + _zoneType.ToString() + " at " + x + " " + z);
 		}
 
 		public bool IsRoad(int x, int z)
@@ -196,14 +196,14 @@ namespace Assets.Model.Data
 		public void BuildingPlaced(int x, int z, Block buildingInstance)
 		{
 			//fire event
-			DebugInUnity("invoke event for building placed at " + x + " " + z);
+			DebugInUnity(this,"invoke event for building placed at " + x + " " + z);
 			OnBuildingPlaced?.Invoke(x, z, buildingInstance);
 		}
 
-		public void DebugInUnity(string message)
+		public void DebugInUnity(object ob, string message)
 		{
 			// invoke event
-			OnDebug?.Invoke(message);
+			OnDebug?.Invoke(ob, message);
 		}
 
 		public void OnApplicationExit()
