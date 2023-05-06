@@ -42,20 +42,6 @@ public class BuildAnimationController : MonoBehaviour
                 transform.position += Vector3.up * returnSpeed * Time.deltaTime;
             }
         }
-        else
-        {
-            // If the object is returning, check if it has reached its original position
-            if (transform.position.y <= originalPosition.y)
-            {
-                // If the object has reached its original position, stop returning
-                isFalling = true;
-            }
-            else
-            {
-                // If the object hasn't reached its original position, continue returning
-                transform.position -= Vector3.up * returnSpeed * Time.deltaTime;
-            }
-        }
     }
 
     /*public int numSphereMasks; // The number of SphereMasks to create

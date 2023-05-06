@@ -4,15 +4,305 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Assets.Model.Data;
+using System.Timers;
+using static Assets.Model.Data.GameData;
+using System.Diagnostics;
 
 namespace Assets.Model
 {
     class CityLogic
     {
+        private double industryRadius = 2.0;
+        private double forestRadius = 2.0;
+        private double homeToWorkRadius = 1.0;
+        private double highSchoolRadius = 2.0;
+        private double universityRadius = 2.0;
+        private double standardCitizenHapiness = 1.0;
+
+        private double powerConnectivityRadius = 2.0;
+
+
+        private double safetyRadius = 2.0;
+
+        private int standardResidenceTax = 5;
+        private int standardCommercialTax = 5;
+        private int standardIndustrialTax = 5;
+
+        private int season = 0;
+
+        public delegate void CityLogicEventHandler(Time time);
+
+        public event CityLogicEventHandler OnCityLogic;
+
         private GameData data;
         public CityLogic (GameData gd)
         {
             data = gd;
+            Timer timer = new Timer(3000);
+            timer.Elapsed += Update;
+            timer.AutoReset = true;
+            timer.Enabled = true;
+        }
+
+        public void Update(object source, ElapsedEventArgs e)
+        {
+            data.DebugInUnity("calling update1");
+            UpdateTime();
+            //Every quarter of a year, get taxes, pay pension and maintenance costs
+            if (season != data.time.getSeason())
+            {
+                data.DebugInUnity("1");
+                GetTaxes();
+                data.DebugInUnity("2");
+                PayPension();
+                data.DebugInUnity("3");
+                PayMaintenanceCosts();
+                data.DebugInUnity("4");
+                //if its not winter, grow the forests
+                if (data.time.getSeason() != 3)
+                {
+                    data.DebugInUnity("5");
+                    GrowForests();
+                }
+            }
+            //Every year, update citizen age and kill the elderly
+            if (season == 3 && data.time.getSeason() == 0) {
+                data.DebugInUnity("6");
+                UpdateCitizenAge();
+                data.DebugInUnity("7");
+                KillTheElderly();
+
+            }
+            data.DebugInUnity("8");
+            EducateCitizens();
+            data.DebugInUnity("9");
+            UpdateCitizenHappiness();
+            data.DebugInUnity("10");
+            UpdatePowerConnectivity();
+
+            season = data.time.getSeason();
+
+            //debug in unity
+
+            data.DebugInUnity("calling update2");
+            data.DebugInUnity("Time: " + data.time.date.ToString());
+            OnCityLogic?.Invoke(data.time);
+
+        }
+
+        private void UpdateTime()
+        {
+            //If the game is paused, don't update the time
+            if(data.time.speed == 0)
+            {
+                return;
+            }
+            //If the game is not paused, update the time
+            else
+            {
+                data.time.date = data.time.date.AddMinutes(data.time.speed*100);
+            }
+        }
+
+        private void UpdateCitizenAge()
+        {
+            foreach (Citizen citizen in data.citizens)
+            {
+                citizen.age++;
+            }
+        }
+
+        private void GetTaxes()
+        {
+            data.DebugInUnity("bruw");
+            data.DebugInUnity("num of citizen" + data.citizens.Count);
+            foreach (Citizen citizen in data.citizens)
+            {
+                if (citizen.age < 65)
+                {
+                    //data.balance += (int)(citizen.salary * (data.residencialTax * 0.01));
+                    //citizen.paidTaxes += (int)(citizen.salary * (data.residencialTax * 0.01));
+                }
+            }
+        }
+
+        private void PayPension()
+        {
+            foreach (Citizen citizen in data.citizens)
+            {
+                if (citizen.age >= 65)
+                {
+                    data.balance -= (int)(citizen.paidTaxes / 2.0);
+                }
+            }            
+        }
+
+        private void PayMaintenanceCosts()
+        {
+            data.DebugInUnity("paying maintenance costs");
+            data.DebugInUnity("num of buildings" + data.GetBuildings().Count);
+            foreach (Block block in data.GetBuildings()) 
+            {
+                data.balance -= block.operating_cost;
+            }
+        }
+
+        private void GrowForests()
+        {
+            foreach (Block block in data.GetBuildings())
+            {
+                if (block.type == BlockType.Forest && block.lvl < 3)
+                {
+                    block.building_progress++;
+                    if (block.building_progress == 10)
+                    {
+                        block.lvl++;
+                        block.building_progress = 0;
+                    }                    
+                }
+            }
+        }
+
+        private void UpdateCitizenHappiness()
+        {
+            foreach (Citizen citizen in data.citizens)
+            {
+                double safety = 0.0;
+                citizen.happiness = standardCitizenHapiness;
+
+                //if a citizen works close to home, increase happiness
+                if (Field.distanceFrom2Field(citizen.home, citizen.work) <= homeToWorkRadius)
+                {
+                    citizen.happiness += 0.01;
+                }
+                //if taxes are more then double the standard, decrease happiness
+                //if (data.residencialTax > standardResidenceTax * 2 || data.commercialTax > standardCommercialTax * 2 || data.industrialTax > standardIndustrialTax * 2)
+                {
+                    citizen.happiness -= 0.01;
+                }
+                //if taxex are less then 1.5 than the standard, increase happiness
+                //else if (data.residencialTax < standardResidenceTax * 1.5 || data.commercialTax < standardCommercialTax * 1.5 || data.industrialTax < standardIndustrialTax * 1.5)
+                {
+                    citizen.happiness += 0.01;
+                }
+                foreach (List<Field> row in data.grid)
+                {
+                    foreach (Field field in row)
+                    {
+                        //if factory is near citizen, decrease happiness
+                        if (field.block.type == BlockType.Factory && Field.distanceFrom2Field(citizen.home, field) <= industryRadius)
+                        {
+                            citizen.happiness -= 0.01;
+                        }
+                        //if a forest is near citizen, increase happiness
+                        if (field.block.type == BlockType.Forest && Field.distanceFrom2Field(citizen.home, field) <= forestRadius)
+                        {
+                            //depending on how big the forest is, increase happiness
+                            citizen.happiness += 0.01 * (field.block.lvl + 1) + (0.001 * field.block.building_progress);
+                        }
+                        //Increase safety depending on how close the police station is
+                        if (field.block.type == BlockType.PoliceStation)
+                        {
+                            citizen.happiness += 0.01;
+                            if(Field.distanceFrom2Field(citizen.home, field) <= safetyRadius/2)
+                            {
+                                safety += 0.01;
+                            }
+                            else if (Field.distanceFrom2Field(citizen.home, field) <= safetyRadius)
+                            {
+                                safety += 0.005;
+                            }
+                            else if (Field.distanceFrom2Field(citizen.home, field) <= safetyRadius*2)
+                            {
+                                safety += 0.0025;
+                            }
+                        }
+                    }
+                }
+                //increase happiness by the safety
+                citizen.happiness += safety;
+                //if the balance is negative, decrease happiness depending on how negative it is
+                if (data.balance < 0)
+                {
+                    citizen.happiness -= data.balance / 100000;
+                }
+                //count the number of factories and commercial buildings
+                int factories = 0;
+                int commercials = 0;
+                foreach (List<Field> row in data.grid)
+                {
+                    foreach (Field field in row)
+                    {
+                        if (field.block.type == BlockType.Factory)
+                        {
+                            factories++;
+                        }
+                        else if (field.block.type == BlockType.Shop)
+                        {
+                            commercials++;
+                        }
+                    }
+                }
+                //if the ratio of factories to commercials is not close to 1, decrease happiness
+                if (factories / commercials > 1.2 || factories / commercials < 0.8)
+                {
+                    citizen.happiness -= 0.01;
+                }
+            }
+        }
+
+        private void EducateCitizens()
+        {
+            foreach (Citizen citizen in data.citizens)
+            {
+                foreach (Block block in data.GetBuildings())
+                {
+                    //if a school is near a citizen, increase education
+                    if (block.type == BlockType.School && Field.distanceFromFieldAndBlock(citizen.home, block.midPosition) <= highSchoolRadius)
+                    {
+                        citizen.highSchoolEducation += 0.01;
+                        if (citizen.highSchoolEducation >= 10)
+                        {
+                            citizen.diploma = true;
+                        }
+                    }
+                    //if a university is near a citizen, increase education
+                    if (block.type == BlockType.University && Field.distanceFromFieldAndBlock(citizen.home, block.midPosition) <= universityRadius)
+                    {
+                        if (citizen.diploma)
+                        {
+                            citizen.universityEducation += 0.01;
+                            if (citizen.universityEducation >= 20)
+                            {
+                                citizen.bsc = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private void KillTheElderly()
+        {
+            foreach (Citizen citizen in data.citizens)
+            {
+                if (citizen.age >= 65)
+                {
+                    //Theres a 1 in 1000 chance that a citizen dies
+                    Random rnd = new Random();
+                    if (rnd.Next(0, 1000) == 0)
+                    {
+                        data.citizens.Remove(citizen);
+                        data.citizens.Add(new Citizen(18));
+                        //TODO: The new citizen needs to find a home and a job
+                    }
+                }
+            }
+        }
+
+        private void UpdatePowerConnectivity()
+        {
+
         }
     }
 }

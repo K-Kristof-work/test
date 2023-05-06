@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using Unity.VisualScripting;
 using Assets.Model.Data;
 using UnityEngine.Playables;
+using TMPro;
 
 public class GridSystem : MonoBehaviour
 {
@@ -35,6 +36,8 @@ public class GridSystem : MonoBehaviour
 	public List<GameObject> residentialBuildingPrefabs;
 	public List<GameObject> commercialBuildingPrefabs;
 	public List<GameObject> industrialBuildingPrefabs;
+
+	public GameObject UI_Time;
 
 	#endregion
 
@@ -88,10 +91,27 @@ public class GridSystem : MonoBehaviour
 
 		gameData.OnZoneTypeChanged += HandleZoneTypeChanged;
 		gameData.OnBuildingPlaced += HandleBuildingPlaced;
+		gameData.cityLogic.OnCityLogic += HandleCityLogic;
 		gameData.OnDebug += HandleDebug;
 
 		UnityThread.initUnityThread();
 
+	}
+
+	private void HandleCityLogic(Assets.Model.Data.Time time)
+	{
+		Debug.Log("CityLogic");
+        UI_Time.GetComponent<TextMeshPro>().text = gameData.time.date.ToString();
+
+    }
+
+    public void HandleDebug(string message)
+	{
+		Debug.Log(message);
+	}
+
+	void Start()
+	{
 		zoneMaterials = GetComponent<ZoneMaterials>();
 
 		SetUpGrid(gridWidth, gridHeight);

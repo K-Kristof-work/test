@@ -10,7 +10,6 @@ namespace Assets.Model.Data
     class GameData
     {
         public int balance;
-        public int[] taxes;
         public int loans;
         public List<List<Field>> grid;
         public int gridWidth;
@@ -19,14 +18,17 @@ namespace Assets.Model.Data
         public Time time;
 		public BuildingPlacer buildingPlacer;
 		public Dictionary<ZoneType, List<Vec2>> availableBuildingSizes;
+		public CityLogic cityLogic;
 
 		public delegate void ZoneTypeChangedEventHandler(int x, int z, ZoneType newZoneType);
 		public delegate void BuildingPlacedEventHandler(int x, int z, Block buildingInstance);
 		public delegate void DebugEventHandler(string message);
 
+
 		public event ZoneTypeChangedEventHandler OnZoneTypeChanged;
 		public event BuildingPlacedEventHandler OnBuildingPlaced;
 		public event DebugEventHandler OnDebug;
+
 
 		public GameData()
 		{
@@ -35,7 +37,11 @@ namespace Assets.Model.Data
 			availableBuildingSizes.Add(ZoneType.Commercial, new List<Vec2> { new Vec2(1, 1) });
 			availableBuildingSizes.Add(ZoneType.Industrial, new List<Vec2> { new Vec2(1, 1) });
 			buildingPlacer = new BuildingPlacer(this, availableBuildingSizes);
-			time= new Time();
+			citizens = new List<Citizen>();
+			cityLogic = new CityLogic(this);
+			loans = 0;
+			balance = 10000;
+			time = new Time();
 		}
 
 		public void SetUpGrid(int _gridWith, int _gridHeight)
@@ -211,16 +217,23 @@ namespace Assets.Model.Data
 			buildingPlacer.ExitTimeEvent();
 		}
 
-		/*public List<Block> GetBuildings()
+		public List<Block> GetBuildings()
 		{
-			var flattenedGrid = grid.SelectMany(g => g).ToList();
-			return flattenedGrid
-				.FindAll(b => GameConfig.Buildings.Contains(b.zoneType))
-				.Select(f => new Block { zonetype = f.zoneType })
-				.ToList();
+			List<Block> buildings = new List<Block>();
+			foreach (List<Field> row in grid)
+			{
+				foreach (Field field in row)
+				{
+					if (!buildings.Contains(field.block))
+					{
+						buildings.Add(field.block);
+					}
+				}
+			}
+			return buildings;
 		}
 
-		public int getOperatingCost()
+		/*public int getOperatingCost()
         {
             return getBuildings().AsEnumerable().Sum(b => b.operating_cost);
         }
