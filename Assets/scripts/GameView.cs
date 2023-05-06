@@ -98,6 +98,14 @@ public class GameView : MonoBehaviour
 
 		UnityThread.initUnityThread();
 
+		zoneMaterials = GetComponent<ZoneMaterials>();
+
+		SetUpGrid(gridWidth, gridHeight);
+		gameData.SetUpGrid(gridWidth, gridHeight);
+
+
+		//StartCoroutine(PlaceBuildingsOverTime());
+
 	}
 
 	private void HandleCityLogic(Assets.Model.Data.Time time)
@@ -106,22 +114,6 @@ public class GameView : MonoBehaviour
         UI_Time.GetComponent<TextMeshPro>().text = gameData.time.date.ToString();
 
     }
-
-    public void HandleDebug(string message)
-	{
-		Debug.Log(message);
-	}
-
-	void Start()
-	{
-		zoneMaterials = GetComponent<ZoneMaterials>();
-
-		SetUpGrid(gridWidth, gridHeight);
-		gameData.SetUpGrid(gridWidth, gridHeight);
-
-
-		//StartCoroutine(PlaceBuildingsOverTime());
-	}
 
 	private void OnApplicationQuit()
 	{

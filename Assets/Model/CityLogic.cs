@@ -46,46 +46,46 @@ namespace Assets.Model
 
         public void Update(object source, ElapsedEventArgs e)
         {
-            data.DebugInUnity("calling update1");
+            data.DebugInUnity(this,"calling update1");
             UpdateTime();
             //Every quarter of a year, get taxes, pay pension and maintenance costs
             if (season != data.time.getSeason())
             {
-                data.DebugInUnity("1");
+                data.DebugInUnity(this,"1");
                 GetTaxes();
-                data.DebugInUnity("2");
+                data.DebugInUnity(this,"2");
                 PayPension();
-                data.DebugInUnity("3");
+                data.DebugInUnity(this,"3");
                 PayMaintenanceCosts();
-                data.DebugInUnity("4");
+                data.DebugInUnity(this,"4");
                 //if its not winter, grow the forests
                 if (data.time.getSeason() != 3)
                 {
-                    data.DebugInUnity("5");
+                    data.DebugInUnity(this,"5");
                     GrowForests();
                 }
             }
             //Every year, update citizen age and kill the elderly
             if (season == 3 && data.time.getSeason() == 0) {
-                data.DebugInUnity("6");
+                data.DebugInUnity(this,"6");
                 UpdateCitizenAge();
-                data.DebugInUnity("7");
+                data.DebugInUnity(this,"7");
                 KillTheElderly();
 
             }
-            data.DebugInUnity("8");
+            data.DebugInUnity(this,"8");
             EducateCitizens();
-            data.DebugInUnity("9");
+            data.DebugInUnity(this,"9");
             UpdateCitizenHappiness();
-            data.DebugInUnity("10");
+            data.DebugInUnity(this,"10");
             UpdatePowerConnectivity();
 
             season = data.time.getSeason();
 
             //debug in unity
 
-            data.DebugInUnity("calling update2");
-            data.DebugInUnity("Time: " + data.time.date.ToString());
+            data.DebugInUnity(this,"calling update2");
+            data.DebugInUnity(this,"Time: " + data.time.date.ToString());
             OnCityLogic?.Invoke(data.time);
 
         }
@@ -114,8 +114,8 @@ namespace Assets.Model
 
         private void GetTaxes()
         {
-            data.DebugInUnity("bruw");
-            data.DebugInUnity("num of citizen" + data.citizens.Count);
+            data.DebugInUnity(this,"bruw");
+            data.DebugInUnity(this,"num of citizen" + data.citizens.Count);
             foreach (Citizen citizen in data.citizens)
             {
                 if (citizen.age < 65)
@@ -139,8 +139,8 @@ namespace Assets.Model
 
         private void PayMaintenanceCosts()
         {
-            data.DebugInUnity("paying maintenance costs");
-            data.DebugInUnity("num of buildings" + data.GetBuildings().Count);
+            data.DebugInUnity(this,"paying maintenance costs");
+            data.DebugInUnity(this,"num of buildings" + data.GetBuildings().Count);
             foreach (Block block in data.GetBuildings()) 
             {
                 data.balance -= block.operating_cost;
