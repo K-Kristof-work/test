@@ -76,7 +76,8 @@ namespace Assets.Model.Data
 				}
 			}
 
-            PlaceIncomingRoad();
+			//PlaceIncomingRoad();
+			PlaceIncomingRoadCenter();
 
 			DebugInUnity(this,"grid set up is finished");
 		}
@@ -116,6 +117,13 @@ namespace Assets.Model.Data
 			}
 		}
 
+		public void PlaceIncomingRoadCenter()
+        {
+			ChangeZoneType(gridWidth / 2, 0, ZoneType.IncomingRoad, 0);
+			ChangeZoneType(gridWidth / 2 + 1, 0, ZoneType.Water, 0);
+			ChangeZoneType(gridWidth / 2 - 1, 0, ZoneType.Water, 0);
+		}
+
 		public bool isFieldValid(int x, int z)
 		{
 			if (x < 0 || x >= gridWidth || z < 0 || z >= gridHeight)
@@ -142,15 +150,8 @@ namespace Assets.Model.Data
 
 			grid[x][z].zoneType = _zoneType;
 
-			if(_zoneType == ZoneType.Residential || _zoneType == ZoneType.Commercial || _zoneType == ZoneType.Industrial)
-            {
-				grid[x][z].zoneId = _zoneId;
-				nextZone = _zoneId + 1;
-            }
-            else
-            {
-				grid[x][z].zoneId = 0;
-			}
+			// Set zoneid and clear overlap zones
+			UpdateZoneId(x, z, _zoneType, _zoneId);
 
 			//raise zonetype change event
 			OnZoneTypeChanged?.Invoke(x, z, _zoneType);
@@ -161,6 +162,42 @@ namespace Assets.Model.Data
 			}
 
 			DebugInUnity(this,"zone type changed to " + _zoneType.ToString() + " at " + x + " " + z);
+		}
+
+		private void UpdateZoneId(int x, int z, ZoneType _zoneType, int _zoneId)
+        {
+			if (_zoneType == ZoneType.Residential || _zoneType == ZoneType.Commercial || _zoneType == ZoneType.Industrial)
+			{
+				if (grid[x][z].zoneId > 0)
+				{
+					ClearZone(grid[x][z].zoneId);
+				}
+
+				grid[x][z].zoneId = _zoneId;
+				nextZone = _zoneId + 1;
+			}
+			else
+			{
+				grid[x][z].zoneId = 0;
+			}
+		}
+
+		private void ClearZone(int _zoneId)
+        {
+			for (int i = 0; i < gridWidth; i++)
+			{
+				for (int j = 0; j < gridHeight; j++)
+				{
+					if(grid[i][j].zoneId == _zoneId)
+                    {
+						grid[i][j].zoneId = 0;
+						grid[i][j].zoneType = ZoneType.Empty;
+
+						//raise zonetype change event
+						OnZoneTypeChanged?.Invoke(i, j, ZoneType.Empty);
+					}
+				}
+			}
 		}
 
 		public bool IsRoad(int x, int z)

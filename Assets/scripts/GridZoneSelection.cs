@@ -9,15 +9,15 @@ public class GridZoneSelection : MonoBehaviour
     public SelectionBox selectionBox;
 
     private Camera mainCamera;
-    private GameData gameData;
     private PlayerAction playerAction;
     private GameView gameView;
+    private GridClickHandler gridClickHandler;
 
     void Start()
     {
-        gameData = GameModel.instance.gameData;
         playerAction = GameModel.instance.playerAction;
         gameView = GetComponent<GameView>();
+        gridClickHandler = GetComponent<GridClickHandler>();
         mainCamera = Camera.main;
 
         playerAction.OnZoneSelected += HandleZoneSelected;
@@ -48,10 +48,13 @@ public class GridZoneSelection : MonoBehaviour
 
     private void fieldSelected(Vector3 worldPosition)
     {
+        if (gridClickHandler.ZoneButtonSelected) return;
+
         int x = Mathf.FloorToInt((worldPosition.x - transform.position.x) / gameView.CellWidth + gameView.CellWidth / 2);
         int z = Mathf.FloorToInt((worldPosition.z - transform.position.z) / gameView.CellHeight + gameView.CellHeight / 2);
 
         //Debug.Log("zoneid at " + x + " " + z + " = " + gameData.getZoneId(x,z).ToString());
+        selectionBox.SetVisible(false);
         playerAction.SelectZone(x, z);
     }
 
