@@ -20,7 +20,7 @@ namespace Assets.Model.Data
 		public Dictionary<ZoneType, List<Vec2>> availableBuildingSizes;
 		public CityLogic cityLogic;
 
-		private int nextZone = 0;
+		private int nextZone = 1;
 
 		public delegate void ZoneTypeChangedEventHandler(int x, int z, ZoneType newZoneType);
 		public delegate void BuildingPlacedEventHandler(int x, int z, Block buildingInstance);
@@ -141,7 +141,16 @@ namespace Assets.Model.Data
 				return;
 
 			grid[x][z].zoneType = _zoneType;
-			grid[x][z].zoneId = _zoneId;
+
+			if(_zoneType == ZoneType.Residential || _zoneType == ZoneType.Commercial || _zoneType == ZoneType.Industrial)
+            {
+				grid[x][z].zoneId = _zoneId;
+				nextZone = _zoneId + 1;
+            }
+            else
+            {
+				grid[x][z].zoneId = 0;
+			}
 
 			//raise zonetype change event
 			OnZoneTypeChanged?.Invoke(x, z, _zoneType);
@@ -239,8 +248,12 @@ namespace Assets.Model.Data
 
 		public int getNextZoneId()
         {
-			nextZone++;
 			return nextZone;
+        }
+
+		public int getZoneId(int x, int z)
+        {
+			return grid[x][z].zoneId;
         }
 
 		/*public int getOperatingCost()
