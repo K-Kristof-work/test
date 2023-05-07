@@ -12,7 +12,10 @@ namespace Assets.Model
         private GameData gameData;
 
         public delegate void ZoneSelectEventHandler(int tx, int tz, int bx, int bz);
+        public delegate void ZoneInfoEventHandler(ZoneType zoneType);
+
         public event ZoneSelectEventHandler OnZoneSelected;
+        public event ZoneInfoEventHandler OnZoneInfo;
 
         public PlayerAction (GameData gd)
         {
@@ -47,6 +50,11 @@ namespace Assets.Model
             }
 
             OnZoneSelected?.Invoke(tx, tz, bx, bz);
+        }
+
+        public void ZoneInfo(int x, int z)
+        {
+            OnZoneInfo?.Invoke(gameData.grid[x][z].zoneType);
         }
     }
 }
