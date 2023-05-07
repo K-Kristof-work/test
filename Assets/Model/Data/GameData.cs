@@ -145,6 +145,11 @@ namespace Assets.Model.Data
 			if(_zoneType == ZoneType.Road)
 			{
 				UpdateRoadConnectivity(x, z);
+
+				Block block = new Block();
+				block.type = BlockType.Road;
+				block.setDefaultValues();
+				cityLogic.BuildingPlacedByUser(block);
 			}
 
 			DebugInUnity(this,"zone type changed to " + _zoneType.ToString() + " at " + x + " " + z);
@@ -224,7 +229,7 @@ namespace Assets.Model.Data
 			{
 				foreach (Field field in row)
 				{
-					if (!buildings.Contains(field.block))
+					if (!buildings.Contains(field.block) && field.block != null)
 					{
 						buildings.Add(field.block);
 					}

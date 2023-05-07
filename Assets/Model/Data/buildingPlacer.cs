@@ -150,8 +150,9 @@ class BuildingPlacer
 		Block buildingInstance = new Block()
 		{
 			type = blocktype,
-			blockSize = new Vec2((uint)buildingSizeX, (uint)buildingSizeZ)
+			blockSize = new Vec2((uint)buildingSizeX, (uint)buildingSizeZ)			
 		};
+		buildingInstance.setDefaultValues();
 		gameData.grid[x][z].block = buildingInstance;
 
 		gameData.DebugInUnity(this,"block set in grid for " + blocktype + " in position " + x + ", " + z);

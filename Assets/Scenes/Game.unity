@@ -38,8 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
-  m_IndirectSpecularColor: {r: 0.18028331, g: 0.2257133, b: 0.3069217, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028334, g: 0.2257134, b: 0.30692226, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1918,11 +1917,11 @@ MonoBehaviour:
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
+  m_Maskable: 0
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: '12:38
+  m_text: '12:11
 
     2023. 01. 01.'
   m_isRightToLeft: 0
@@ -1967,7 +1966,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 1
+  m_enableWordWrapping: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -1983,7 +1982,7 @@ MonoBehaviour:
   m_verticalMapping: 0
   m_uvLineOffset: 0
   m_geometrySortingOrder: 0
-  m_IsTextObjectScaleStatic: 0
+  m_IsTextObjectScaleStatic: 1
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
@@ -6614,7 +6613,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 821716269}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
@@ -8741,7 +8740,16 @@ MonoBehaviour:
   - {fileID: 113233378154089179, guid: 1c78bcc43e559984cb38e70e04bdff95, type: 3}
   - {fileID: 7588828341164985064, guid: 22cd19a324bb6ff4c8420621b722eb9e, type: 3}
   - {fileID: 2550523065354267995, guid: 5a5cb0c304a49714b9451c32f274c5fb, type: 3}
+  UI_Time: {fileID: 203798135}
+  UI_Money: {fileID: 1029051741}
+  SpeedObject: {fileID: 1786953186}
+  PauseButtonImage: {fileID: 21300000, guid: 66a48cf36f4e87c43963d29b3886ef22, type: 3}
+  SlowButtonImage: {fileID: 21300000, guid: bcff6f590536f2b46b265773aca5ae2b, type: 3}
+  MediumButtonImage: {fileID: 21300000, guid: ab40aa6e4e774d64790966dba376a6ca, type: 3}
+  FastButtonImage: {fileID: 21300000, guid: 5f8f02514aa2c8246aa54ded6c87417f, type: 3}
   FloatingObject: {fileID: 0}
+  debugBanList:
+  - BuildingPlacer
 --- !u!4 &1039642949
 Transform:
   m_ObjectHideFlags: 0
@@ -8804,7 +8812,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ZoneButtonSelected: 0
-  GameView: {fileID: 0}
+  gameView: {fileID: 1039642948}
   selectionBox: {fileID: 1770768173}
 --- !u!114 &1039642952
 MonoBehaviour:
@@ -16491,7 +16499,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1786953189}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1039642948}
+        m_TargetAssemblyTypeName: GameView, Assembly-CSharp
+        m_MethodName: PlayButtonPressed
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1786953189
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17791,7 +17811,7 @@ Canvas:
   m_RenderMode: 0
   m_Camera: {fileID: 0}
   m_PlaneDistance: 100
-  m_PixelPerfect: 1
+  m_PixelPerfect: 0
   m_ReceivesEvents: 1
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0

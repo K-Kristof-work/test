@@ -11,6 +11,12 @@ namespace Assets.Model.Data
         public DateTime date;
         public int speed;
 
+        public Time()
+        {
+            date = DateTime.Now;
+            speed = 1;
+        }
+
         // TODO add functions
         public int getSeason()
         {
