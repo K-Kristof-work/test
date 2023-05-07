@@ -8858,6 +8858,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   selectionBox: {fileID: 1770768173}
+  sidebar: {fileID: 1645258418}
 --- !u!1 &1062427295
 GameObject:
   m_ObjectHideFlags: 0

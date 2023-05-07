@@ -15,6 +15,11 @@ public class SelectionBox : MonoBehaviour
 		lineRenderer.enabled = visible;
 	}
 
+	public bool IsVisible()
+    {
+		return lineRenderer.enabled;
+	}
+
 	public void UpdateSelectionBox(Vector3 start, Vector3 end)
 	{
 		corners[0] = new Vector3(start.x, start.y, start.z);

@@ -7,11 +7,15 @@ using Assets.Model.Data;
 public class GridZoneSelection : MonoBehaviour
 {
     public SelectionBox selectionBox;
+    public Sidebar sidebar;
 
     private Camera mainCamera;
     private PlayerAction playerAction;
     private GameView gameView;
     private GridClickHandler gridClickHandler;
+
+    [HideInInspector]
+    public bool IsZoneSelected = false;
 
     void Start()
     {
@@ -21,6 +25,7 @@ public class GridZoneSelection : MonoBehaviour
         mainCamera = Camera.main;
 
         playerAction.OnZoneSelected += HandleZoneSelected;
+        playerAction.OnZoneInfo += HandleZoneInfo;
 
         UnityThread.initUnityThread();
     }
@@ -28,12 +33,13 @@ public class GridZoneSelection : MonoBehaviour
     private void OnApplicationQuit()
     {
         playerAction.OnZoneSelected -= HandleZoneSelected;
+        playerAction.OnZoneInfo -= HandleZoneInfo;
     }
 
-        // Update is called once per frame
-        void Update()
+    // Update is called once per frame
+    void Update()
     {
-        if (Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) // Left mouse button down or held down
+        if (Input.GetMouseButtonDown(0)) // Left mouse button down or held down
         {
             RaycastHit hit;
             Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
@@ -54,8 +60,16 @@ public class GridZoneSelection : MonoBehaviour
         int z = Mathf.FloorToInt((worldPosition.z - transform.position.z) / gameView.CellHeight + gameView.CellHeight / 2);
 
         //Debug.Log("zoneid at " + x + " " + z + " = " + gameData.getZoneId(x,z).ToString());
+
+        IsZoneSelected = false;
         selectionBox.SetVisible(false);
+
         playerAction.SelectZone(x, z);
+
+        if (!IsZoneSelected)
+        {
+            sidebar.Close();
+        }
     }
 
     private void HandleZoneSelected(int tx, int tz, int bx, int bz)
@@ -65,5 +79,25 @@ public class GridZoneSelection : MonoBehaviour
 
         selectionBox.UpdateSelectionBox(new Vector3(tx - w, 0, tz - h), new Vector3(bx + w, 0, bz + h));
         selectionBox.SetVisible(true);
+        IsZoneSelected = true;
+
+        // Also get zone info
+        playerAction.ZoneInfo(tx, tz);
+    }
+
+    private void HandleZoneInfo(ZoneType zoneType)
+    {
+        switch (zoneType)
+        {
+            case ZoneType.Commercial:
+                sidebar.Open(SidebarPanel.CommercialZone);
+                break;
+            case ZoneType.Residential:
+                sidebar.Open(SidebarPanel.ResidentialZone);
+                break;
+            case ZoneType.Industrial:
+                sidebar.Open(SidebarPanel.IndustrialZone);
+                break;
+        }
     }
 }
