@@ -318,7 +318,7 @@ public class GameView : MonoBehaviour
 	{
 		int x = Mathf.FloorToInt((worldPosition.x - transform.position.x) / CellWidth + CellWidth / 2);
 		int z = Mathf.FloorToInt((worldPosition.z - transform.position.z) / CellHeight + CellHeight / 2);
-		gameData.ChangeZoneType(x, z, SelectedZoneType);
+		gameData.ChangeZoneType(x, z, SelectedZoneType, gameData.getNextZoneId());
 
 	}
 
@@ -331,13 +331,15 @@ public class GameView : MonoBehaviour
 		int endX = Mathf.FloorToInt(Mathf.Max(start.x + halfCellWidth, end.x + halfCellWidth));
 		int endZ = Mathf.FloorToInt(Mathf.Max(start.z + halfCellHeight, end.z + halfCellHeight));
 
+		int zoneId = gameData.getNextZoneId();
+
 		for (int x = startX; x <= endX; x++)
 		{
 			for (int z = startZ; z <= endZ; z++)
 			{
 				if (x >= 0 && x < GridWidth && z >= 0 && z < GridHeight)
 				{
-					gameData.ChangeZoneType(x, z, SelectedZoneType);
+					gameData.ChangeZoneType(x, z, SelectedZoneType, zoneId);
 				}
 			}
 		}
@@ -345,7 +347,7 @@ public class GameView : MonoBehaviour
 
 	public void OnCellClicked(int xIndex, int zIndex, ZoneType newZoneType)
 	{
-		gameData.ChangeZoneType(xIndex, zIndex, newZoneType);
+		gameData.ChangeZoneType(xIndex, zIndex, newZoneType, gameData.getNextZoneId());
 	}
 
 	#endregion

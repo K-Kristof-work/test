@@ -20,6 +20,8 @@ namespace Assets.Model.Data
 		public Dictionary<ZoneType, List<Vec2>> availableBuildingSizes;
 		public CityLogic cityLogic;
 
+		private int nextZone = 0;
+
 		public delegate void ZoneTypeChangedEventHandler(int x, int z, ZoneType newZoneType);
 		public delegate void BuildingPlacedEventHandler(int x, int z, Block buildingInstance);
 		public delegate void DebugEventHandler(object ob, string message);
@@ -90,27 +92,27 @@ namespace Assets.Model.Data
 
 			if (randomSide == 0)
 			{
-				ChangeZoneType(randomPosition, 0, ZoneType.IncomingRoad);
-				ChangeZoneType(randomPosition + 1, 0, ZoneType.Water);
-				ChangeZoneType(randomPosition - 1, 0, ZoneType.Water);
+				ChangeZoneType(randomPosition, 0, ZoneType.IncomingRoad, 0);
+				ChangeZoneType(randomPosition + 1, 0, ZoneType.Water, 0);
+				ChangeZoneType(randomPosition - 1, 0, ZoneType.Water, 0);
 			}
 			else if (randomSide == 1)
 			{
-				ChangeZoneType(gridWidth - 1, randomPosition, ZoneType.IncomingRoad);
-				ChangeZoneType(gridWidth - 1, randomPosition - 1, ZoneType.Water);
-				ChangeZoneType(gridWidth - 1, randomPosition + 1, ZoneType.Water);
+				ChangeZoneType(gridWidth - 1, randomPosition, ZoneType.IncomingRoad, 0);
+				ChangeZoneType(gridWidth - 1, randomPosition - 1, ZoneType.Water, 0);
+				ChangeZoneType(gridWidth - 1, randomPosition + 1, ZoneType.Water, 0);
 			}
 			else if (randomSide == 2)
 			{
-				ChangeZoneType(randomPosition, gridHeight - 1, ZoneType.IncomingRoad);
-				ChangeZoneType(randomPosition + 1, gridHeight - 1, ZoneType.Water);
-				ChangeZoneType(randomPosition - 1, gridHeight - 1, ZoneType.Water);
+				ChangeZoneType(randomPosition, gridHeight - 1, ZoneType.IncomingRoad, 0);
+				ChangeZoneType(randomPosition + 1, gridHeight - 1, ZoneType.Water, 0);
+				ChangeZoneType(randomPosition - 1, gridHeight - 1, ZoneType.Water, 0);
 			}
 			else if (randomSide == 3)
 			{
-				ChangeZoneType(0, randomPosition, ZoneType.IncomingRoad);
-				ChangeZoneType(0, randomPosition - 1, ZoneType.Water);
-				ChangeZoneType(0, randomPosition + 1, ZoneType.Water);
+				ChangeZoneType(0, randomPosition, ZoneType.IncomingRoad, 0);
+				ChangeZoneType(0, randomPosition - 1, ZoneType.Water, 0);
+				ChangeZoneType(0, randomPosition + 1, ZoneType.Water, 0);
 			}
 		}
 
@@ -121,7 +123,7 @@ namespace Assets.Model.Data
 			return true;
 		}
 
-		public void ChangeZoneType(int x, int z, ZoneType _zoneType)
+		public void ChangeZoneType(int x, int z, ZoneType _zoneType, int _zoneId)
 		{
 			if (!isFieldValid(x, z)) return;
 			
@@ -139,6 +141,8 @@ namespace Assets.Model.Data
 				return;
 
 			grid[x][z].zoneType = _zoneType;
+			grid[x][z].zoneId = _zoneId;
+
 			//raise zonetype change event
 			OnZoneTypeChanged?.Invoke(x, z, _zoneType);
 
@@ -232,6 +236,12 @@ namespace Assets.Model.Data
 			}
 			return buildings;
 		}
+
+		public int getNextZoneId()
+        {
+			nextZone++;
+			return nextZone;
+        }
 
 		/*public int getOperatingCost()
         {
