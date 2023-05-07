@@ -8665,8 +8665,8 @@ GameObject:
   - component: {fileID: 1039642949}
   - component: {fileID: 1039642948}
   - component: {fileID: 1039642950}
-  - component: {fileID: 1039642954}
   - component: {fileID: 1039642951}
+  - component: {fileID: 1039642954}
   - component: {fileID: 1039642952}
   - component: {fileID: 1039642953}
   m_Layer: 0
@@ -8857,6 +8857,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f9690b596a6ca4b4e8041e6d9d0ee418, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  selectionBox: {fileID: 1770768173}
 --- !u!1 &1062427295
 GameObject:
   m_ObjectHideFlags: 0
