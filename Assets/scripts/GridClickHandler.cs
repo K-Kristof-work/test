@@ -10,7 +10,7 @@ public class GridClickHandler : MonoBehaviour
 	private Vector3 dragEndWorldPosition;
 	[HideInInspector]
 	public bool ZoneButtonSelected = false;
-
+	
 	public ZoneType SelectedZoneType { get; set; }
 	public GameView gameView; // Drag and drop the GridManager object to this field in the Inspector
 

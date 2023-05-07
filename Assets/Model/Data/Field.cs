@@ -9,6 +9,7 @@ namespace Assets.Model.Data
     class Field
     {
         public Vec2 pos; // top left corner
+        public int zoneId;
         public ZoneType zoneType;
         public Block block;
         public int tax;
