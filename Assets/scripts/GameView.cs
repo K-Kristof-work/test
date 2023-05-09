@@ -56,10 +56,11 @@ public class GameView : MonoBehaviour
 	private bool isroadupdating = false;
 	private GameData gameData;
 
+	
+
 	#endregion
 
 	#region public properties
-
 	public int GridWidth { get { return gridWidth; } }
 	public int GridHeight { get { return gridHeight; } }
 	public float CellWidth { get { return cellWidth; } }
@@ -588,6 +589,8 @@ public class GameView : MonoBehaviour
 		HandleDebug(this, "other cells have been allocated for the building");
 
 		// Attaching the BuildingAnimationController script to the building will play the animation
+
+		if(block.type == BlockType.House || block.type == BlockType.Factory || block.type == BlockType.Shop)
 		buildingInstance.AddComponent<BuildAnimationController>();
 
 		HandleDebug(this, "placeing builidng is finished");
@@ -708,6 +711,11 @@ public class GameView : MonoBehaviour
 			gridString += "\n";
 		}
 		Debug.Log(gridString);
+	}
+
+	public Vec2 GetBuildingPlacerSizeForBuildingType(BlockType type)
+	{
+			return gameData.buildingPlacer.GetSizeForBuildingType(type);
 	}
 
 }

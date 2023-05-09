@@ -282,6 +282,25 @@ class BuildingPlacer
 		return -1;
 	}
 
+	public Vec2 GetSizeForBuildingType(BlockType blocktype)
+	{
+		switch (blocktype)
+		{
+			case BlockType.PoliceStation:
+				return new Vec2(1, 1);
+			case BlockType.Stadium:
+				return new Vec2(2, 2);
+			case BlockType.School:
+				return new Vec2(2, 2);
+			case BlockType.University:
+				return new Vec2(1, 1);
+			case BlockType.PowerPlant:
+				return new Vec2(1, 1);
+			default:
+				return new Vec2(1, 1);
+		}
+	}
+
 	public void PlaceBuildingByUser(Vec2 pos, BlockType blocktype)
 	{
 		//get x and z from pos
@@ -292,29 +311,7 @@ class BuildingPlacer
 		// Check if a building is already placed
 		if (gameData.grid[x][z].block != null) return;
 
-		Vec2 buildingPrefab;
-
-		switch (blocktype)
-		{
-			case BlockType.PoliceStation:
-				buildingPrefab = new Vec2(1, 1);
-				break;
-			case BlockType.Stadium:
-				buildingPrefab = new Vec2(1, 1);
-				break;
-			case BlockType.School:
-				buildingPrefab = new Vec2(1, 1);
-				break;
-			case BlockType.University:
-				buildingPrefab = new Vec2(1, 1);
-				break;
-			case BlockType.PowerPlant:
-				buildingPrefab = new Vec2(1, 1);
-				break;
-			default:
-				buildingPrefab = new Vec2(1, 1);
-				break;
-		}
+		Vec2 buildingPrefab = GetSizeForBuildingType(blocktype);
 
 		gameData.DebugInUnity(this, "building size is selected for " + blocktype + " in position " + x + ", " + z);
 
