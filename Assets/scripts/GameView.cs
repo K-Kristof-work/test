@@ -40,6 +40,10 @@ public class GameView : MonoBehaviour
 	public TextMeshProUGUI UI_Time;
 	public TextMeshProUGUI UI_Money;
 
+	public GameObject Content;
+	public GameObject Row;
+	public int RowCount = 0;
+
 	public GameObject SpeedObject;
 
 	public Sprite PauseButtonImage;
@@ -153,12 +157,27 @@ public class GameView : MonoBehaviour
 		});	
     }
 
-	private void HandleMoney(int money)
+	private void HandleMoney(int balance, int difference, string type)
 	{
         UnityThread.executeInUpdate(() =>
 		{
-			Debug.Log("Money: " + money);
-            UI_Money.text = money.ToString();
+			Debug.Log("Money: " + balance);
+            UI_Money.text = balance.ToString();
+
+			//Create a new row
+			GameObject newRow = Instantiate(Row);
+			//change the rows rect transform y position
+			newRow.GetComponent<RectTransform>().anchoredPosition = new Vector2(400, RowCount * -50 + 25);
+			RowCount++;
+            TextMeshProUGUI typeText = newRow.transform.GetChild(0).GetComponent<TextMeshProUGUI>();
+            TextMeshProUGUI diffrenceText = newRow.transform.GetChild(1).GetComponent<TextMeshProUGUI>();
+
+			typeText.text = type;
+			diffrenceText.text = difference.ToString();
+
+			//set the row to be a child of the content
+			newRow.transform.SetParent(Content.transform, false);
+
         });
     }
 

@@ -31,10 +31,12 @@ namespace Assets.Model
         private int season = 0;
 
         public delegate void TimeEventHandler(Time time);
-        public delegate void MoneyEventHandler(int money);
+        public delegate void MoneyEventHandler(int balance, int difference, string type);
+        public delegate void IncomeSpendingEventHandler(int money);
 
         public event TimeEventHandler OnTimeChanged;
         public event MoneyEventHandler OnMoneyChanged;
+        public event IncomeSpendingEventHandler OnIncome;
 
         private GameData data;
         public CityLogic (GameData gd)
@@ -54,9 +56,7 @@ namespace Assets.Model
         public void FastUpdate(object source, ElapsedEventArgs e)
         {
             UpdateTime();
-            OnTimeChanged?.Invoke(data.time);
-            OnMoneyChanged?.Invoke(data.balance);
-            
+            OnTimeChanged?.Invoke(data.time);        
         }
 
         public void SlowUpdate(object source, ElapsedEventArgs e)
@@ -70,7 +70,6 @@ namespace Assets.Model
                 PayPension();
                 data.DebugInUnity(this, "3");
                 PayMaintenanceCosts();
-                OnMoneyChanged?.Invoke(data.balance);
                 data.DebugInUnity(this, "4");
                 //if its not winter, grow the forests
                 if (data.time.getSeason() != 3)
@@ -108,7 +107,7 @@ namespace Assets.Model
             //If the game is not paused, update the time
             else
             {
-                data.time.date = data.time.date.AddMinutes(data.time.speed*2);
+                data.time.date = data.time.date.AddMinutes(data.time.speed*20);
             }
         }
 
@@ -122,6 +121,7 @@ namespace Assets.Model
 
         private void GetTaxes()
         {
+            int taxes = 0;
             data.DebugInUnity(this,"bruw");
             data.DebugInUnity(this,"num of citizen" + data.citizens.Count);
             foreach (Citizen citizen in data.citizens)
@@ -132,28 +132,36 @@ namespace Assets.Model
                     //citizen.paidTaxes += (int)(citizen.salary * (data.residencialTax * 0.01));
                 }
             }
+            OnMoneyChanged?.Invoke(data.balance, taxes, "Tax");
         }
 
         private void PayPension()
         {
+            int pensionCosts = 0;
             foreach (Citizen citizen in data.citizens)
             {
                 if (citizen.age >= 65)
                 {
-                    data.balance -= (int)(citizen.paidTaxes / 2.0);
+                    pensionCosts += (int)(citizen.salary * 0.5);
+                    data.balance -= (int)(citizen.paidTaxes * 0.5);
                 }
-            }            
+            }
+            OnMoneyChanged?.Invoke(data.balance, pensionCosts, "Pension");
         }
 
         private void PayMaintenanceCosts()
         {
+            int maintenanceCosts = 0;
             data.DebugInUnity(this,"paying maintenance costs");
             data.DebugInUnity(this,"num of buildings" + data.GetBuildings().Count);
-            foreach (Block block in data.GetBuildings()) 
+            foreach (List<Field> row in data.grid)
             {
-                data.DebugInUnity(this, block.type.ToString());
-                data.balance -= block.operating_cost;
+                foreach (Field field in row)
+                {
+                    
+                }
             }
+            OnMoneyChanged?.Invoke(data.balance, maintenanceCosts, "MaintinenceCosts");
         }
 
         private void GrowForests()
@@ -318,7 +326,7 @@ namespace Assets.Model
         public void BuildingPlacedByUser(Block block)
         {
             data.balance -= block.building_cost;
-
+            OnMoneyChanged?.Invoke(data.balance, block.building_cost, block.type.ToString());
         }
 
         public void SpeedChange()
