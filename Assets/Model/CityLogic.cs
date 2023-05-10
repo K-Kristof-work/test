@@ -21,22 +21,29 @@ namespace Assets.Model
 
         private double powerConnectivityRadius = 2.0;
 
-
         private double safetyRadius = 2.0;
 
-        private int standardResidenceTax = 5;
-        private int standardCommercialTax = 5;
-        private int standardIndustrialTax = 5;
-
         private int season = 0;
+
+        private double happinessFromLowCommute = 0;
+        private double happinessFromTax = 0;
+        private double happinessFromIndustry = 0;
+        private double happinessFromForest = 0;
+        private double happinessFromSafety = 0;
+        private double happinessFromDebt = 0;
+        private double happinessFromWorkRatio = 0;
+
+        private double happinessReward = 1;
 
         public delegate void TimeEventHandler(Time time);
         public delegate void MoneyEventHandler(int balance, int difference, string type);
         public delegate void IncomeSpendingEventHandler(int money);
+        public delegate void HappinessEventHandler(double commute, double tax, double industry, double forest, double safety, double debt, double ratio);
 
         public event TimeEventHandler OnTimeChanged;
         public event MoneyEventHandler OnMoneyChanged;
         public event IncomeSpendingEventHandler OnIncome;
+        public event HappinessEventHandler OnHappinessChanged;
 
         private GameData data;
         public CityLogic (GameData gd)
@@ -51,7 +58,15 @@ namespace Assets.Model
             slowTimer.Elapsed += SlowUpdate;
             slowTimer.AutoReset = true;
             slowTimer.Enabled = true;
+            //Init();
+            //No idea how to call the first update of the balance
         }
+
+        /*public void Init()
+        {
+            //Bug in UI, first element doest show up, this fixed this and the first update of the balance aswelll
+            OnMoneyChanged?.Invoke(data.balance, 0, "Init");
+        }*/
 
         public void FastUpdate(object source, ElapsedEventArgs e)
         {
@@ -132,6 +147,9 @@ namespace Assets.Model
                     //citizen.paidTaxes += (int)(citizen.salary * (data.residencialTax * 0.01));
                 }
             }
+            //jsut for testing
+            //data.DebugInUnity(this, "wuddaheeeeeeeeellomg");
+            //taxes = 1000;
             OnMoneyChanged?.Invoke(data.balance, taxes, "Tax");
         }
 
@@ -182,6 +200,14 @@ namespace Assets.Model
 
         private void UpdateCitizenHappiness()
         {
+            happinessFromLowCommute = 0;
+            happinessFromTax = 0;
+            happinessFromIndustry = 0;
+            happinessFromForest = 0;
+            happinessFromSafety = 0;
+            happinessFromDebt = 0;
+            happinessFromWorkRatio = 0;
+
             foreach (Citizen citizen in data.citizens)
             {
                 double safety = 0.0;
@@ -190,18 +216,21 @@ namespace Assets.Model
                 //if a citizen works close to home, increase happiness
                 if (Field.distanceFrom2Field(citizen.home, citizen.work) <= homeToWorkRadius)
                 {
-                    citizen.happiness += 0.01;
+                    happinessFromLowCommute += happinessReward;
+                    citizen.happiness += happinessReward;
                 }
                 //if taxes are more then double the standard, decrease happiness
                 //if (data.residencialTax > standardResidenceTax * 2 || data.commercialTax > standardCommercialTax * 2 || data.industrialTax > standardIndustrialTax * 2)
-                {
+                /*{
+                    happinessFromTax -= 0.01;
                     citizen.happiness -= 0.01;
-                }
+                }*/
                 //if taxex are less then 1.5 than the standard, increase happiness
                 //else if (data.residencialTax < standardResidenceTax * 1.5 || data.commercialTax < standardCommercialTax * 1.5 || data.industrialTax < standardIndustrialTax * 1.5)
-                {
+                /*{
+                    happinessFromTax += 0.01;
                     citizen.happiness += 0.01;
-                }
+                }*/
                 foreach (List<Field> row in data.grid)
                 {
                     foreach (Field field in row)
@@ -209,38 +238,42 @@ namespace Assets.Model
                         //if factory is near citizen, decrease happiness
                         if (field.block.type == BlockType.Factory && Field.distanceFrom2Field(citizen.home, field) <= industryRadius)
                         {
-                            citizen.happiness -= 0.01;
+                            happinessFromIndustry -= happinessReward;
+                            citizen.happiness -= happinessReward;
                         }
                         //if a forest is near citizen, increase happiness
                         if (field.block.type == BlockType.Forest && Field.distanceFrom2Field(citizen.home, field) <= forestRadius)
                         {
                             //depending on how big the forest is, increase happiness
-                            citizen.happiness += 0.01 * (field.block.lvl + 1) + (0.001 * field.block.building_progress);
+                            happinessFromForest += happinessReward * (field.block.lvl + 1) + (0.1 * happinessReward * field.block.building_progress);
+                            citizen.happiness += happinessReward * (field.block.lvl + 1) + (0.1 * happinessReward * field.block.building_progress);
                         }
                         //Increase safety depending on how close the police station is
                         if (field.block.type == BlockType.PoliceStation)
                         {
-                            citizen.happiness += 0.01;
+                            citizen.happiness += happinessReward;
                             if(Field.distanceFrom2Field(citizen.home, field) <= safetyRadius/2)
                             {
-                                safety += 0.01;
+                                safety += happinessReward;
                             }
                             else if (Field.distanceFrom2Field(citizen.home, field) <= safetyRadius)
                             {
-                                safety += 0.005;
+                                safety += happinessReward/2;
                             }
                             else if (Field.distanceFrom2Field(citizen.home, field) <= safetyRadius*2)
                             {
-                                safety += 0.0025;
+                                safety += happinessReward/4;
                             }
                         }
                     }
                 }
                 //increase happiness by the safety
+                happinessFromSafety += safety;
                 citizen.happiness += safety;
                 //if the balance is negative, decrease happiness depending on how negative it is
                 if (data.balance < 0)
                 {
+                    happinessFromDebt -= data.balance / 100000;
                     citizen.happiness -= data.balance / 100000;
                 }
                 //count the number of factories and commercial buildings
@@ -263,10 +296,12 @@ namespace Assets.Model
                 //if the ratio of factories to commercials is not close to 1, decrease happiness
                 if (factories / commercials > 1.2 || factories / commercials < 0.8)
                 {
-                    citizen.happiness -= 0.01;
+                    happinessFromWorkRatio -= happinessReward;
+                    citizen.happiness -= happinessReward;
                 }
                 data.DebugInUnity(this, "citizen happiness: " + citizen.happiness);
             }
+            OnHappinessChanged?.Invoke(happinessFromLowCommute, happinessFromTax ,happinessFromIndustry, happinessFromForest, happinessFromSafety, happinessFromDebt, happinessFromWorkRatio);
         }
 
         private void EducateCitizens()

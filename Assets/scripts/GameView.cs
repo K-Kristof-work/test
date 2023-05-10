@@ -39,6 +39,7 @@ public class GameView : MonoBehaviour
 
 	public TextMeshProUGUI UI_Time;
 	public TextMeshProUGUI UI_Money;
+	public TextMeshProUGUI UI_Happiness;
 
 	public GameObject Content;
 	public GameObject Row;
@@ -50,6 +51,10 @@ public class GameView : MonoBehaviour
 	public Sprite SlowButtonImage;
 	public Sprite MediumButtonImage;
 	public Sprite FastButtonImage;
+
+	public Sprite HappyFace;
+	public Sprite NeutralFace;
+	public Sprite SadFace;
 
 
 	public GameObject FloatingObject;
@@ -135,6 +140,7 @@ public class GameView : MonoBehaviour
 		gameData.OnBuildingPlaced += HandleBuildingPlaced;
 		gameData.cityLogic.OnTimeChanged += HandleTime;
 		gameData.cityLogic.OnMoneyChanged += HandleMoney;
+		gameData.cityLogic.OnHappinessChanged += HandleHappiness;
 		gameData.OnDebug += HandleDebug;
 
 		UnityThread.initUnityThread();
@@ -148,6 +154,14 @@ public class GameView : MonoBehaviour
         //StartCoroutine(PlaceBuildingsOverTime());
 
     }
+
+	private void HandleHappiness(double commute, double tax, double industry, double forest, double safety, double debt, double ratio)
+    {
+		UnityThread.executeInUpdate(() =>
+		{
+
+		});
+	}
 
 	private void HandleTime(Assets.Model.Data.Time time)
 	{
@@ -177,6 +191,8 @@ public class GameView : MonoBehaviour
 
 			//set the row to be a child of the content
 			newRow.transform.SetParent(Content.transform, false);
+			Debug.Log(typeText.text);
+			Debug.Log("Row count: " + RowCount);
 
         });
     }
@@ -189,6 +205,7 @@ public class GameView : MonoBehaviour
 		gameData.OnDebug -= HandleDebug;
 		gameData.cityLogic.OnTimeChanged -= HandleTime;
 		gameData.cityLogic.OnMoneyChanged -= HandleMoney;
+		gameData.cityLogic.OnHappinessChanged -= HandleHappiness;
 	}
 
 	#endregion
