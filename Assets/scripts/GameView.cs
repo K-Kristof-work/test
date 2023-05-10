@@ -41,9 +41,13 @@ public class GameView : MonoBehaviour
 	public TextMeshProUGUI UI_Money;
 	public TextMeshProUGUI UI_Happiness;
 
-	public GameObject Content;
-	public GameObject Row;
-	public int RowCount = 0;
+	public GameObject ExpenseContent;
+	public GameObject ExpenseRow;
+	public int ExpenseRowCount = 0;
+
+	public GameObject HappinessContent;
+	public GameObject HappinessRow;
+	public int HappinessRowCount = 0;
 
 	public GameObject SpeedObject;
 
@@ -101,19 +105,19 @@ public class GameView : MonoBehaviour
 	{
 		switch (gameData.time.speed)
 		{
-            case 0:
-                SpeedObject.GetComponent<Image>().sprite = PauseButtonImage;
-                break;
-            case 1:
-                SpeedObject.GetComponent<Image>().sprite = SlowButtonImage;
-                break;
-            case 2:
-                SpeedObject.GetComponent<Image>().sprite = MediumButtonImage;
-                break;
-            case 3:
-                SpeedObject.GetComponent<Image>().sprite = FastButtonImage;
-                break;
-        }
+			case 0:
+				SpeedObject.GetComponent<Image>().sprite = PauseButtonImage;
+				break;
+			case 1:
+				SpeedObject.GetComponent<Image>().sprite = SlowButtonImage;
+				break;
+			case 2:
+				SpeedObject.GetComponent<Image>().sprite = MediumButtonImage;
+				break;
+			case 3:
+				SpeedObject.GetComponent<Image>().sprite = FastButtonImage;
+				break;
+		}
 	}
 
 	void Start()
@@ -150,18 +154,41 @@ public class GameView : MonoBehaviour
 		SetUpGrid(gridWidth, gridHeight);
 		gameData.SetUpGrid(gridWidth, gridHeight);
 
-        ChangeSpeedIcon();
-        //StartCoroutine(PlaceBuildingsOverTime());
+		ChangeSpeedIcon();
+		//StartCoroutine(PlaceBuildingsOverTime());
 
-    }
+	}
 
 	private void HandleHappiness(double commute, double tax, double industry, double forest, double safety, double debt, double ratio)
-    {
-		UnityThread.executeInUpdate(() =>
-		{
+	{
+        UnityThread.executeInUpdate(() =>
+        {
+            UI_Happiness.text = "69%";
+			CreateNewHappinessRow("Munkahely távolsága", commute);
+			CreateNewHappinessRow("Adó", tax);
+			CreateNewHappinessRow("Ipar", industry);
+        });
+    }
 
-		});
-	}
+	public void CreateNewHappinessRow(string happinessType, double percent)
+	{
+        //Create a new row
+        GameObject newRow = Instantiate(HappinessRow);
+        //change the rows rect transform y position
+        newRow.GetComponent<RectTransform>().anchoredPosition = new Vector2(400, ExpenseRowCount * -50 + 25);
+        ExpenseRowCount++;
+        TextMeshProUGUI type = newRow.transform.GetChild(1).GetComponent<TextMeshProUGUI>();
+        TextMeshProUGUI percentage = newRow.transform.GetChild(2).GetComponent<TextMeshProUGUI>();
+        GameObject icon = newRow.transform.GetChild(3).gameObject;
+
+		type.text = happinessType;
+		percentage.text = percent.ToString("0.00") + "%";
+        icon.GetComponent<Image>().sprite = HappyFace;
+
+
+        //set the row to be a child of the content
+        newRow.transform.SetParent(HappinessContent.transform, false);
+    }
 
 	private void HandleTime(Assets.Model.Data.Time time)
 	{
@@ -179,10 +206,10 @@ public class GameView : MonoBehaviour
             UI_Money.text = balance.ToString();
 
 			//Create a new row
-			GameObject newRow = Instantiate(Row);
+			GameObject newRow = Instantiate(ExpenseRow);
 			//change the rows rect transform y position
-			newRow.GetComponent<RectTransform>().anchoredPosition = new Vector2(400, RowCount * -50 + 25);
-			RowCount++;
+			newRow.GetComponent<RectTransform>().anchoredPosition = new Vector2(400, ExpenseRowCount * -50 + 25);
+			ExpenseRowCount++;
             TextMeshProUGUI typeText = newRow.transform.GetChild(0).GetComponent<TextMeshProUGUI>();
             TextMeshProUGUI diffrenceText = newRow.transform.GetChild(1).GetComponent<TextMeshProUGUI>();
 
@@ -190,9 +217,9 @@ public class GameView : MonoBehaviour
 			diffrenceText.text = difference.ToString();
 
 			//set the row to be a child of the content
-			newRow.transform.SetParent(Content.transform, false);
+			newRow.transform.SetParent(ExpenseContent.transform, false);
 			Debug.Log(typeText.text);
-			Debug.Log("Row count: " + RowCount);
+			Debug.Log("Row count: " + ExpenseRowCount);
 
         });
     }
