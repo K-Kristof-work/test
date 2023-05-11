@@ -1,8 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using Assets.Model;
 using Assets.Model.Data;
+using System;
 
 public class GridZoneSelection : MonoBehaviour
 {
@@ -32,14 +34,22 @@ public class GridZoneSelection : MonoBehaviour
 
     private void OnApplicationQuit()
     {
-        playerAction.OnZoneSelected -= HandleZoneSelected;
-        playerAction.OnZoneInfo -= HandleZoneInfo;
+        try
+        {
+            playerAction.OnZoneSelected -= HandleZoneSelected;
+        }catch(Exception){}
+
+        try
+        {
+            playerAction.OnZoneInfo -= HandleZoneInfo;
+        }
+        catch(Exception){}
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetMouseButtonDown(0)) // Left mouse button down or held down
+        if (Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject()) // Left mouse button down or held down
         {
             RaycastHit hit;
             Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
@@ -47,6 +57,7 @@ public class GridZoneSelection : MonoBehaviour
             if (Physics.Raycast(ray, out hit))
             {
                 fieldSelected(hit.point);
+                Debug.Log(hit.point);
                 return;
             }
         }
