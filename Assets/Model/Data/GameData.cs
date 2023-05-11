@@ -142,16 +142,17 @@ namespace Assets.Model.Data
 			}
 
 			if (grid[x][z].zoneType == _zoneType ||
+				(grid[x][z].zoneType == ZoneType.Residential && _zoneType == ZoneType.Empty) ||
+				(grid[x][z].zoneType == ZoneType.Commercial && _zoneType == ZoneType.Empty) ||
+				(grid[x][z].zoneType == ZoneType.Industrial && _zoneType == ZoneType.Empty) ||
+				(grid[x][z].zoneType == ZoneType.Road && _zoneType != ZoneType.Empty) ||
 				grid[x][z].zoneType == ZoneType.IncomingRoad ||
 				grid[x][z].zoneType == ZoneType.Water ||
 				grid[x][z].block != null)
-				return;
-
-			if(_zoneType == ZoneType.Empty && 
-				(grid[x][z].zoneType == ZoneType.Residential || grid[x][z].zoneType == ZoneType.Industrial || grid[x][z].zoneType == ZoneType.Commercial))
             {
 				return;
-            }
+			}
+
 
 			grid[x][z].zoneType = _zoneType;
 
