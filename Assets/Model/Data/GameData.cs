@@ -209,6 +209,13 @@ namespace Assets.Model.Data
 
 						if(grid[i][j].zoneType == ZoneType.Residential || grid[i][j].zoneType == ZoneType.Commercial || grid[i][j].zoneType == ZoneType.Industrial)
                         {
+							
+							if(this.grid[i][j].block != null &&
+								(this.grid[i][j].block.type == BlockType.Empty || this.grid[i][j].block.type == BlockType.House || this.grid[i][j].block.type == BlockType.Factory || this.grid[i][j].block.type == BlockType.Shop))
+                            {
+								this.grid[i][j].block = null;
+							}
+
 							this.grid[i][j].zoneType = ZoneType.Empty;
 							OnZoneTypeChanged?.Invoke(i, j, ZoneType.Empty);
 						}
