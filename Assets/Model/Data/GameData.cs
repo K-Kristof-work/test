@@ -142,11 +142,16 @@ namespace Assets.Model.Data
 			}
 
 			if (grid[x][z].zoneType == _zoneType ||
-				grid[x][z].zoneType == ZoneType.Road ||
 				grid[x][z].zoneType == ZoneType.IncomingRoad ||
 				grid[x][z].zoneType == ZoneType.Water ||
 				grid[x][z].block != null)
 				return;
+
+			if(_zoneType == ZoneType.Empty && 
+				(grid[x][z].zoneType == ZoneType.Residential || grid[x][z].zoneType == ZoneType.Industrial || grid[x][z].zoneType == ZoneType.Commercial))
+            {
+				return;
+            }
 
 			grid[x][z].zoneType = _zoneType;
 
@@ -164,39 +169,43 @@ namespace Assets.Model.Data
 			DebugInUnity(this,"zone type changed to " + _zoneType.ToString() + " at " + x + " " + z);
 		}
 
+		public void ChangeZoneTypeRectangle(Vec2 start, Vec2 end, ZoneType zoneType, int zoneId)
+        {
+			// Pre check
+			for (int x = (int)start.x; x <= (int)end.x; x++)
+			{
+				for (int z = (int)start.y; z <= (int)end.y; z++)
+				{
+					if (x >= 0 && x < this.gridWidth && z >= 0 && z < this.gridHeight && this.grid[x][z].zoneId > 0)
+					{
+						// todo fire popup event
+						return;
+					}
+				}
+			}
+
+			for (int x = (int)start.x; x <= (int)end.x; x++)
+			{
+				for (int z = (int)start.y; z <= (int)end.y; z++)
+				{
+					if (x >= 0 && x < this.gridWidth && z >= 0 && z < this.gridHeight)
+					{
+						this.ChangeZoneType(x, z, zoneType, zoneId);
+					}
+				}
+			}
+		}
+
 		private void UpdateZoneId(int x, int z, ZoneType _zoneType, int _zoneId)
         {
 			if (_zoneType == ZoneType.Residential || _zoneType == ZoneType.Commercial || _zoneType == ZoneType.Industrial)
 			{
-				if (grid[x][z].zoneId > 0)
-				{
-					ClearZone(grid[x][z].zoneId);
-				}
-
 				grid[x][z].zoneId = _zoneId;
 				nextZone = _zoneId + 1;
 			}
 			else
 			{
 				grid[x][z].zoneId = 0;
-			}
-		}
-
-		private void ClearZone(int _zoneId)
-        {
-			for (int i = 0; i < gridWidth; i++)
-			{
-				for (int j = 0; j < gridHeight; j++)
-				{
-					if(grid[i][j].zoneId == _zoneId)
-                    {
-						grid[i][j].zoneId = 0;
-						grid[i][j].zoneType = ZoneType.Empty;
-
-						//raise zonetype change event
-						OnZoneTypeChanged?.Invoke(i, j, ZoneType.Empty);
-					}
-				}
 			}
 		}
 
