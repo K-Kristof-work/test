@@ -47,13 +47,13 @@ public class ZoneTypeSelector : MonoBehaviour
 				sidebar.Open(SidebarPanel.Road);
 				break;
 			case ZoneType.Residential:
-				sidebar.Open(SidebarPanel.ResidentialZone);
+				sidebar.Open(SidebarPanel.BuildResidentialZone);
 				break;
 			case ZoneType.Industrial:
-				sidebar.Open(SidebarPanel.IndustrialZone);
+				sidebar.Open(SidebarPanel.BuildIndustrialZone);
 				break;
 			case ZoneType.Commercial:
-				sidebar.Open(SidebarPanel.CommercialZone);
+				sidebar.Open(SidebarPanel.BuildCommercialZone);
 				break;
 		}
     }

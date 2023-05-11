@@ -55,4 +55,4 @@ public class Sidebar : MonoBehaviour
     }
 }
 
-public enum SidebarPanel { Road, ResidentialZone, IndustrialZone, CommercialZone };
+public enum SidebarPanel { Road, BuildResidentialZone, BuildIndustrialZone, BuildCommercialZone, ResidentialZone, IndustrialZone, CommercialZone };

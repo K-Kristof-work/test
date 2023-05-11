@@ -222,6 +222,15 @@ public class GameView : MonoBehaviour
 			updateRoadsAround(x, z);
 		}
 
+		if(zoneType == ZoneType.Empty && grid[x][z].Building != null)
+        {
+			Destroy(grid[x][z].Building);
+			grid[x][z].Building = null;
+
+		}
+
+
+
 		UpdateCell(x, z, zoneType);
 	}
 
@@ -333,16 +342,7 @@ public class GameView : MonoBehaviour
 
 		int zoneId = gameData.getNextZoneId();
 
-		for (int x = startX; x <= endX; x++)
-		{
-			for (int z = startZ; z <= endZ; z++)
-			{
-				if (x >= 0 && x < GridWidth && z >= 0 && z < GridHeight)
-				{
-					gameData.ChangeZoneType(x, z, SelectedZoneType, zoneId);
-				}
-			}
-		}
+		gameData.ChangeZoneTypeRectangle(new Vec2((uint)startX, (uint)startZ), new Vec2((uint)endX, (uint)endZ), SelectedZoneType, zoneId);
 	}
 
 	public void OnCellClicked(int xIndex, int zIndex, ZoneType newZoneType)

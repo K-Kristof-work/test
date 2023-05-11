@@ -11,7 +11,7 @@ namespace Assets.Model
     {
         private GameData gameData;
 
-        public delegate void ZoneSelectEventHandler(int tx, int tz, int bx, int bz);
+        public delegate void ZoneSelectEventHandler(int id, int tx, int tz, int bx, int bz);
         public delegate void ZoneInfoEventHandler(ZoneType zoneType);
 
         public event ZoneSelectEventHandler OnZoneSelected;
@@ -49,12 +49,12 @@ namespace Assets.Model
                 }
             }
 
-            OnZoneSelected?.Invoke(tx, tz, bx, bz);
+            OnZoneSelected?.Invoke(id, tx, tz, bx, bz);
         }
 
-        public void ZoneInfo(int x, int z)
+        public void ZoneInfo(int id)
         {
-            OnZoneInfo?.Invoke(gameData.grid[x][z].zoneType);
+            OnZoneInfo?.Invoke(gameData.GetZoneType(id));
         }
     }
 }
