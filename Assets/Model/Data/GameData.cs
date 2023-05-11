@@ -197,6 +197,47 @@ namespace Assets.Model.Data
 			}
 		}
 
+		public void DeleteZone(int id)
+		{
+			for (int i = 0; i < this.gridWidth; i++)
+			{
+				for (int j = 0; j < this.gridHeight; j++)
+				{
+					if (this.grid[i][j].zoneId == id)
+					{
+						this.grid[i][j].zoneId = 0;
+
+						if(grid[i][j].zoneType == ZoneType.Residential || grid[i][j].zoneType == ZoneType.Commercial || grid[i][j].zoneType == ZoneType.Industrial)
+                        {
+							this.grid[i][j].zoneType = ZoneType.Empty;
+							OnZoneTypeChanged?.Invoke(i, j, ZoneType.Empty);
+						}
+					}
+				}
+			}
+		}
+
+		public ZoneType GetZoneType(int id)
+        {
+			// TODO: zones in a dictionary
+
+			for (int i = 0; i < this.gridWidth; i++)
+			{
+				for (int j = 0; j < this.gridHeight; j++)
+				{
+					if (this.grid[i][j].zoneId == id)
+					{
+						if (grid[i][j].zoneType == ZoneType.Residential || grid[i][j].zoneType == ZoneType.Commercial || grid[i][j].zoneType == ZoneType.Industrial)
+						{
+							return this.grid[i][j].zoneType;
+						}
+					}
+				}
+			}
+
+			return ZoneType.Empty;
+		}
+
 		private void UpdateZoneId(int x, int z, ZoneType _zoneType, int _zoneId)
         {
 			if (_zoneType == ZoneType.Residential || _zoneType == ZoneType.Commercial || _zoneType == ZoneType.Industrial)
@@ -204,7 +245,7 @@ namespace Assets.Model.Data
 				grid[x][z].zoneId = _zoneId;
 				nextZone = _zoneId + 1;
 			}
-			else
+			else if(_zoneType != ZoneType.Road)
 			{
 				grid[x][z].zoneId = 0;
 			}

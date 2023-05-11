@@ -14,15 +14,20 @@ public class GridZoneSelection : MonoBehaviour
     private Camera mainCamera;
     private PlayerAction playerAction;
     private GameView gameView;
+    private GameData gameData;
     private GridClickHandler gridClickHandler;
 
     [HideInInspector]
     public bool IsZoneSelected = false;
 
+    [HideInInspector]
+    public int selection_id;
+
     void Start()
     {
         playerAction = GameModel.instance.playerAction;
         gameView = GetComponent<GameView>();
+        gameData = GameModel.instance.gameData;
         gridClickHandler = GetComponent<GridClickHandler>();
         mainCamera = Camera.main;
 
@@ -73,6 +78,7 @@ public class GridZoneSelection : MonoBehaviour
         //Debug.Log("zoneid at " + x + " " + z + " = " + gameData.getZoneId(x,z).ToString());
 
         IsZoneSelected = false;
+        selection_id = 0;
         selectionBox.SetVisible(false);
 
         playerAction.SelectZone(x, z);
@@ -83,7 +89,7 @@ public class GridZoneSelection : MonoBehaviour
         }
     }
 
-    private void HandleZoneSelected(int tx, int tz, int bx, int bz)
+    private void HandleZoneSelected(int id, int tx, int tz, int bx, int bz)
     {
         float w = gameView.CellWidth / 2;
         float h = gameView.cellHeight / 2;
@@ -91,9 +97,21 @@ public class GridZoneSelection : MonoBehaviour
         selectionBox.UpdateSelectionBox(new Vector3(tx - w, 0, tz - h), new Vector3(bx + w, 0, bz + h));
         selectionBox.SetVisible(true);
         IsZoneSelected = true;
+        selection_id = id;
 
         // Also get zone info
-        playerAction.ZoneInfo(tx, tz);
+        playerAction.ZoneInfo(id);
+    }
+
+    public void DeleteZoneSelected()
+    {
+        if(this.selection_id > 0)
+        {
+            gameData.DeleteZone(this.selection_id);
+            selectionBox.SetVisible(false);
+            IsZoneSelected = false;
+            sidebar.Close();
+        }
     }
 
     private void HandleZoneInfo(ZoneType zoneType)
