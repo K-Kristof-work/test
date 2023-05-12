@@ -7,7 +7,7 @@ using Assets.Model.Data;
 
 namespace Assets.Model
 {
-    class PlayerAction
+    public class PlayerAction
     {
         private GameData gameData;
 
