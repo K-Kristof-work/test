@@ -41,6 +41,8 @@ else
     echo -e "\033[33mCode Coverage package not found in $PACKAGE_MANIFEST_PATH. Please install the package \"Code Coverage\" through Unity's Package Manager to enable coverage reports.\033[0m"
   } 2> /dev/null
 fi
-
+echo "Test results"
+cat $UNITY_DIR/$TEST_PLATFORM-results.xml
+cat "Passed tests"
 cat $UNITY_DIR/$TEST_PLATFORM-results.xml | grep test-run | grep Passed
 exit $UNITY_EXIT_CODE
