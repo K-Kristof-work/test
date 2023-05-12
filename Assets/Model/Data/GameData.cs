@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Assets.Model.Data
 {
-    class GameData
+    public class GameData
     {
         public int balance;
         public int loans;

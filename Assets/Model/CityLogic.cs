@@ -10,7 +10,7 @@ using System.Diagnostics;
 
 namespace Assets.Model
 {
-    class CityLogic
+    public class CityLogic
     {
         private double industryRadius = 2.0;
         private double forestRadius = 2.0;

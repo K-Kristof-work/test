@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Assets.Model.Data
 {
-    class Field
+    public class Field
     {
         public Vec2 pos; // top left corner
         public int zoneId;
