@@ -5,7 +5,7 @@ stages:
 # If you are looking for a place where to add 'UNITY_LICENSE_FILE' and other secrets, please visit your project's gitlab page:
 # settings > CI/CD > Variables instead
 variables:
-  BUILD_NAME: Unity
+  BUILD_NAME: CityBuilder
   UNITY_ACTIVATION_FILE: ./unity3d.alf
   UNITY_VERSION: "2021.3.4f1"
   IMAGE: unityci/editor # https://hub.docker.com/r/unityci/editor
