@@ -1,8 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using Assets.Model.Data;
 using UnityEngine.UIElements;
+using System;
 
 public class FloatingBuildings : MonoBehaviour
 {
@@ -27,7 +29,8 @@ public class FloatingBuildings : MonoBehaviour
 		{
 			{BlockType.PoliceStation,  PoliceFloatingObject},
 			{BlockType.University, UniversityFloatingObject},
-			{BlockType.Stadium, StadiumFloatingObject}
+			{BlockType.Stadium, StadiumFloatingObject},
+			{BlockType.School, HighschoolFloatingObject}
 		};
 	}
 
@@ -43,31 +46,35 @@ public class FloatingBuildings : MonoBehaviour
 			if (gridPlane.Raycast(mouseRay, out rayDistance))
 			{
 				Vector3 mousePosition = mouseRay.GetPoint(rayDistance);
+				Vec2 offset = gameView.GetBuildingPlacerSizeForBuildingType(blockType);
+				if(offset.x == 2 || offset.y == 2)
+				{
+					mousePosition.x += 0.5f;
+					mousePosition.z += 0.5f;
+				}
+				gameView.HandleDebug(this, mousePosition.ToString());
 				floatingObject.transform.position = mousePosition;
+			}
+
+			// if clicked, destroy the floating object
+			if (Input.GetMouseButtonDown(0))
+			{
+				Destroy(floatingObject);
+				floatingObject = null;
+
+				RaycastHit hit;
+				Camera mainCamera = Camera.main;
+				Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+
+				if (Physics.Raycast(ray, out hit))
+				{
+					gameView.PlaceBuildingByUser(hit.point, blockType);
+				}
+
 			}
 		}
 
-		// if clicked, destroy the floating object
-		if (Input.GetMouseButtonDown(0))
-		{
-
-			/*
-			 *		RaycastHit hit;
-					Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
-
-					if (Physics.Raycast(ray, out hit))
-					{
-						gameView.placebuilding(hit.point, blockType);
-						return;
-					}
-			 * 
-			*/
-
-			Destroy(floatingObject);
-			floatingObject = null;
-
-
-		}
+		
 	}
 
 
@@ -91,7 +98,7 @@ public class FloatingBuildings : MonoBehaviour
         if(blockType== BlockType.Empty)
         {
             //throw error
-            gameView.HandleDebug(this, "ERROR: BlockType not found");
+            gameView.HandleDebug(this, "BlockType not found");
             return;
         }
 

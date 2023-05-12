@@ -23,7 +23,7 @@ namespace Assets.Model.Data
 		private int nextZone = 1;
 
 		public delegate void ZoneTypeChangedEventHandler(int x, int z, ZoneType newZoneType);
-		public delegate void BuildingPlacedEventHandler(int x, int z, Block buildingInstance);
+		public delegate void BuildingPlacedEventHandler(List<Vec2> positions, Block buildingInstance);
 		public delegate void DebugEventHandler(object ob, string message);
 
 
@@ -35,7 +35,7 @@ namespace Assets.Model.Data
 		public GameData()
 		{
 			availableBuildingSizes = new Dictionary<ZoneType, List<Vec2>>();
-			availableBuildingSizes.Add(ZoneType.Residential, new List<Vec2> { new Vec2(1, 1), new Vec2(2, 2), new Vec2(3,3) });
+			availableBuildingSizes.Add(ZoneType.Residential, new List<Vec2> { new Vec2(1, 1), new Vec2(2, 2), new Vec2(3,3), new Vec2(1,2) });
 			availableBuildingSizes.Add(ZoneType.Commercial, new List<Vec2> { new Vec2(1, 1) });
 			availableBuildingSizes.Add(ZoneType.Industrial, new List<Vec2> { new Vec2(1, 1) });
 			buildingPlacer = new BuildingPlacer(this, availableBuildingSizes);
@@ -249,11 +249,11 @@ namespace Assets.Model.Data
 			return false;
 		}
 
-		public void BuildingPlaced(int x, int z, Block buildingInstance)
+		public void BuildingPlaced(List<Vec2> positions, Block buildingInstance)
 		{
 			//fire event
-			DebugInUnity(this,"invoke event for building placed at " + x + " " + z);
-			OnBuildingPlaced?.Invoke(x, z, buildingInstance);
+			DebugInUnity(this,"invoke event for building placed at " + positions[0].x + " " + positions[0].y);
+			OnBuildingPlaced?.Invoke(positions, buildingInstance);
 		}
 
 		public void DebugInUnity(object ob, string message)

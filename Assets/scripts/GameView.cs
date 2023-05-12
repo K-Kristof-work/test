@@ -35,6 +35,10 @@ public class GameView : MonoBehaviour
 	public List<GameObject> residentialBuildingPrefabs;
 	public List<GameObject> commercialBuildingPrefabs;
 	public List<GameObject> industrialBuildingPrefabs;
+	public List<GameObject> policeBuildingPrefabs;
+	public List<GameObject> StadiumBuildingPrefabs;
+	public List<GameObject> SchoolBuildingPrefabs;
+	public List<GameObject> UniversityBuildingPrefabs;
 
 	public GameObject UI_Time;
 	public GameObject FloatingObject;
@@ -52,10 +56,11 @@ public class GameView : MonoBehaviour
 	private bool isroadupdating = false;
 	private GameData gameData;
 
+	
+
 	#endregion
 
 	#region public properties
-
 	public int GridWidth { get { return gridWidth; } }
 	public int GridHeight { get { return gridHeight; } }
 	public float CellWidth { get { return cellWidth; } }
@@ -85,7 +90,11 @@ public class GameView : MonoBehaviour
 		{
 			{BlockType.House,  residentialBuildingPrefabs},
 			{BlockType.Shop, commercialBuildingPrefabs},
-			{BlockType.Factory, industrialBuildingPrefabs}
+			{BlockType.Factory, industrialBuildingPrefabs},
+			{BlockType.PoliceStation, policeBuildingPrefabs},
+			{BlockType.Stadium, StadiumBuildingPrefabs},
+			{BlockType.School, SchoolBuildingPrefabs},
+			{BlockType.University, UniversityBuildingPrefabs},
 
 		};
 
@@ -483,26 +492,30 @@ public class GameView : MonoBehaviour
 
 	#region methods for buildings
 
-	private void HandleBuildingPlaced(int x, int z, Block block)
+	private void HandleBuildingPlaced(List<Vec2> positions, Block block)
 	{
 		HandleDebug(this, "building placement on main thread starting");
 		UnityThread.executeInUpdate(() =>
 		
 		{
-			Placebuilding(x, z, block);
+			Placebuilding(positions, block);
 		});
 	}
 
-	private void Placebuilding(int x, int z, Block block)
+	private void Placebuilding(List<Vec2> positions, Block block)
 	{
 
 		HandleDebug(this, "building placment starting in view");
+
+		int x = (int)positions[0].x;
+		int z = (int)positions[0].y;
 
 		// Get a random building prefab of the appropriate size for the zone type
 		List<GameObject> suitablePrefabs = zoneTypeToBuildingPrefabs[block.type].Where(prefab =>
 		{
 			BuildingPrefab prefabScript = prefab.GetComponent<BuildingPrefab>();
-			return prefabScript.BuildingSize.x == block.blockSize.x && prefabScript.BuildingSize.y == block.blockSize.y;
+			return (prefabScript.BuildingSize.x == block.blockSize.x && prefabScript.BuildingSize.y == block.blockSize.y) ||
+				   (prefabScript.BuildingSize.y == block.blockSize.x && prefabScript.BuildingSize.x == block.blockSize.y);
 		}).ToList();
 		if (suitablePrefabs.Count == 0)
 		{
@@ -536,7 +549,7 @@ public class GameView : MonoBehaviour
 
 		float buildingPosY = buildingPrefab.transform.position.y;
 		int chosenQuadrant = -1;
-		Vector3 centerPosition = GetCenterPosition(x, z, (int)block.blockSize.x, (int)block.blockSize.y, buildingPosY, ref chosenQuadrant);
+		Vector3 centerPosition = GetCenterPosition(positions, (int)block.blockSize.x, (int)block.blockSize.y, buildingPosY, ref chosenQuadrant);
 
 		HandleDebug(this, "prefab center position calculated");
 
@@ -548,6 +561,17 @@ public class GameView : MonoBehaviour
 		HandleDebug(this, "prefab added to grid");
 
 		// Update the other grid cells that the building spawns on top of
+
+		foreach (Vec2 position in positions)
+		{
+			int affectedX = (int)position.x;
+			int affectedZ = (int)position.y;
+			if (affectedX != x || affectedZ != z)
+			{
+				grid[affectedX][affectedZ].Building = buildingInstance;
+			}
+		}
+		/*
 		for (int offsetX = 0; offsetX < block.blockSize.x; offsetX++)
 		{
 			for (int offsetZ = 0; offsetZ < block.blockSize.y; offsetZ++)
@@ -562,11 +586,13 @@ public class GameView : MonoBehaviour
 					grid[affectedX][affectedZ].Building = buildingInstance;
 				}
 			}
-		}
+		}*/
 
 		HandleDebug(this, "other cells have been allocated for the building");
 
 		// Attaching the BuildingAnimationController script to the building will play the animation
+
+		if(block.type == BlockType.House || block.type == BlockType.Factory || block.type == BlockType.Shop)
 		buildingInstance.AddComponent<BuildAnimationController>();
 
 		HandleDebug(this, "placeing builidng is finished");
@@ -592,40 +618,64 @@ public class GameView : MonoBehaviour
 	}
 
 
-	private Vector3 GetCenterPosition(int x, int z, int buildingSizeX, int buildingSizeZ, float buildingPosY, ref int chosenQuadrant)
+	private Vector3 GetCenterPosition(List<Vec2> positions, int buildingSizeX, int buildingSizeZ, float buildingPosY, ref int chosenQuadrant)
 	{
 		int maxSize = Mathf.Max(buildingSizeX, buildingSizeZ);
 
-
-		for (int quadrant = 0; quadrant < 6; quadrant++)
+		foreach (Vec2 position in positions)
 		{
-			bool canPlace = true;
-			for (int offsetX = 0; offsetX < maxSize; offsetX++)
+			int x = (int)position.x;
+			int z = (int)position.y;
+
+			for (int quadrant = 0; quadrant < 6; quadrant++)
 			{
-				for (int offsetZ = 0; offsetZ < maxSize; offsetZ++)
+				bool canPlace = true;
+				for (int offsetX = 0; offsetX < maxSize; offsetX++)
 				{
-					int adjustedX = x + (quadrant == 1 || quadrant == 3 ? -offsetX : offsetX);
-					int adjustedZ = z + (quadrant == 2 || quadrant == 3 ? -offsetZ : offsetZ);
-
-					if (adjustedX < 0 || adjustedZ < 0 || adjustedX >= GridWidth || adjustedZ >= GridHeight || gameData.grid[adjustedX][adjustedZ].zoneType != gameData.grid[x][z].zoneType || grid[adjustedX][adjustedZ].Building != null)
+					for (int offsetZ = 0; offsetZ < maxSize; offsetZ++)
 					{
-						canPlace = false;
-						break;
-					}
-				}
-				if (!canPlace) break;
-			}
+						int adjustedX = x + (quadrant == 1 || quadrant == 3 ? -offsetX : offsetX);
+						int adjustedZ = z + (quadrant == 2 || quadrant == 3 ? -offsetZ : offsetZ);
 
-			if (canPlace)
-			{
-				float xOffset = ((buildingSizeX - 1) / 2f) * (quadrant == 1 || quadrant == 3 ? -1 : 1);
-				float zOffset = ((buildingSizeZ - 1) / 2f) * (quadrant == 2 || quadrant == 3 ? -1 : 1);
-				chosenQuadrant = quadrant;
-				return grid[x][z].Position + new Vector3(xOffset, buildingPosY / 10, zOffset); // divide per 10 to make it work dont kn ow why just dont touch it
+						if (adjustedX < 0 || adjustedZ < 0 || adjustedX >= GridWidth || adjustedZ >= GridHeight || gameData.grid[adjustedX][adjustedZ].zoneType != gameData.grid[x][z].zoneType || grid[adjustedX][adjustedZ].Building != null)
+						{
+							canPlace = false;
+							break;
+						}
+					}
+					if (!canPlace) break;
+				}
+
+				if (canPlace)
+				{
+					float xOffset = ((buildingSizeX - 1) / 2f) * (quadrant == 1 || quadrant == 3 ? -1 : 1);
+					float zOffset = ((buildingSizeZ - 1) / 2f) * (quadrant == 2 || quadrant == 3 ? -1 : 1);
+					chosenQuadrant = quadrant;
+					return grid[x][z].Position + new Vector3(xOffset, buildingPosY / 10f, zOffset);
+				}
 			}
 		}
 
-		return new Vector3(grid[x][z].Position.x, buildingPosY, grid[x][z].Position.z);
+		// Default position if no valid center position is found
+		Vec2 firstPosition = positions[0];
+		int firstX = (int)firstPosition.x;
+		int firstZ = (int)firstPosition.y;
+		return new Vector3(grid[firstX][firstZ].Position.x, buildingPosY, grid[firstX][firstZ].Position.z);
+	}
+
+	public void PlaceBuildingByUser(Vector3 worldPosition, BlockType type)
+	{
+		//convert world position to grid position
+		int x = Mathf.FloorToInt((worldPosition.x - transform.position.x) / CellWidth + CellWidth / 2);
+		int z = Mathf.FloorToInt((worldPosition.z - transform.position.z) / CellHeight + CellHeight / 2);
+		if (!CheckGrid(x, z)) return;
+		Vec2 pos = new Vec2((uint)x, (uint)z);
+
+		gameData.buildingPlacer.PlaceBuildingByUser(pos, type);
+
+		//place the building there
+		
+
 	}
 
 	#endregion
@@ -644,6 +694,31 @@ public class GameView : MonoBehaviour
 		Debug.Log(ob.GetType().Name + ": " + message);
 	}
 
+
+	//print out gamedata.grid to console
+	public void PrintGrid()
+	{
+		string gridString = "";
+		for (int i = 0; i < GridWidth; i++)
+		{
+			for (int j = 0; j < GridHeight; j++)
+			{
+				if(gameData.grid[i][j].block == null)
+					gridString += "- ";
+				else
+				{
+					gridString += gameData.grid[i][j].block.type.ToString()[0] + " ";
+				}
+			}
+			gridString += "\n";
+		}
+		Debug.Log(gridString);
+	}
+
+	public Vec2 GetBuildingPlacerSizeForBuildingType(BlockType type)
+	{
+			return gameData.buildingPlacer.GetSizeForBuildingType(type);
+	}
 
 }
 

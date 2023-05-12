@@ -157,6 +157,9 @@ class BuildingPlacer
 		gameData.DebugInUnity(this,"block set in grid for " + blocktype + " in position " + x + ", " + z);
 
 		// Update the other grid cells that the building spawns on top of
+		List<Vec2> buildingCells = new List<Vec2>();
+		buildingCells.Add(new Vec2((uint)x, (uint)z));
+
 		for (int offsetX = 0; offsetX < buildingSizeX; offsetX++)
 		{
 			for (int offsetZ = 0; offsetZ < buildingSizeZ; offsetZ++)
@@ -171,12 +174,13 @@ class BuildingPlacer
 				if (affectedX >= 0 && affectedZ >= 0 && affectedX < gameData.gridWidth && affectedZ < gameData.gridHeight)
 				{
 					gameData.grid[affectedX][affectedZ].block = buildingInstance;
+					buildingCells.Add(new Vec2((uint)affectedX, (uint)affectedZ));
 				}
 			}
 		}
 
 		//raise place building event
-		gameData.BuildingPlaced(x, z, buildingInstance);
+		gameData.BuildingPlaced(buildingCells, buildingInstance);
 
 		gameData.DebugInUnity(this,"building placed of type " + blocktype + " in position " + x + ", " + z);
 	}
@@ -278,5 +282,82 @@ class BuildingPlacer
 		return -1;
 	}
 
+	public Vec2 GetSizeForBuildingType(BlockType blocktype)
+	{
+		switch (blocktype)
+		{
+			case BlockType.PoliceStation:
+				return new Vec2(1, 1);
+			case BlockType.Stadium:
+				return new Vec2(2, 2);
+			case BlockType.School:
+				return new Vec2(2, 2);
+			case BlockType.University:
+				return new Vec2(1, 1);
+			case BlockType.PowerPlant:
+				return new Vec2(1, 1);
+			default:
+				return new Vec2(1, 1);
+		}
+	}
 
+	public void PlaceBuildingByUser(Vec2 pos, BlockType blocktype)
+	{
+		//get x and z from pos
+		int x = (int)pos.x;
+		int z = (int)pos.y;
+
+
+		// Check if a building is already placed
+		if (gameData.grid[x][z].block != null) return;
+
+		Vec2 buildingPrefab = GetSizeForBuildingType(blocktype);
+
+		gameData.DebugInUnity(this, "building size is selected for " + blocktype + " in position " + x + ", " + z);
+
+
+		// Instantiate the building
+		int buildingSizeX;
+		int buildingSizeZ;
+
+		buildingSizeX = (int)buildingPrefab.x;
+		buildingSizeZ = (int)buildingPrefab.y;
+
+		Block buildingInstance = new Block()
+		{
+			type = blocktype,
+			blockSize = new Vec2((uint)buildingSizeX, (uint)buildingSizeZ)
+		};
+		gameData.grid[x][z].block = buildingInstance;
+
+		gameData.DebugInUnity(this, "block set in grid for " + blocktype + " in position " + x + ", " + z);
+
+		// Update the other grid cells that the building spawns on top of
+		List<Vec2> buildingCells = new List<Vec2>();
+		buildingCells.Add(new Vec2((uint)x, (uint)z));
+		int chosenQuadrant = 0;
+		for (int offsetX = 0; offsetX < buildingSizeX; offsetX++)
+		{
+			for (int offsetZ = 0; offsetZ < buildingSizeZ; offsetZ++)
+			{
+				if (offsetX == 0 && offsetZ == 0) continue; // Skip the original grid cell
+
+				gameData.DebugInUnity(this, "building placed and set the cells for it, " + blocktype + " in position " + x + ", " + z);
+
+				int affectedX = x + (chosenQuadrant == 1 || chosenQuadrant == 3 ? -offsetX : offsetX);
+				int affectedZ = z + (chosenQuadrant == 2 || chosenQuadrant == 3 ? -offsetZ : offsetZ);
+
+				if (affectedX >= 0 && affectedZ >= 0 && affectedX < gameData.gridWidth && affectedZ < gameData.gridHeight)
+				{
+					gameData.grid[affectedX][affectedZ].block = buildingInstance;
+					buildingCells.Add(new Vec2((uint)affectedX, (uint)affectedZ));
+				}
+			}
+		}
+
+		//raise place building event
+		gameData.BuildingPlaced(buildingCells, buildingInstance);
+
+		gameData.DebugInUnity(this, "building placed of type " + blocktype + " in position " + x + ", " + z);
+	}
 }
