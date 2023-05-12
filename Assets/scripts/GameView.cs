@@ -7,6 +7,7 @@ using Unity.VisualScripting;
 using Assets.Model.Data;
 using UnityEngine.Playables;
 using TMPro;
+using UnityEngine.UI;
 
 public class GameView : MonoBehaviour
 {
@@ -40,8 +41,26 @@ public class GameView : MonoBehaviour
 	public List<GameObject> SchoolBuildingPrefabs;
 	public List<GameObject> UniversityBuildingPrefabs;
 
-	public GameObject UI_Time;
-	public GameObject FloatingObject;
+    public TextMeshProUGUI UI_Time;
+    public TextMeshProUGUI UI_Money;
+    public TextMeshProUGUI UI_Happiness;
+
+    public GameObject ExpenseContent;
+    public GameObject ExpenseRow;
+    public int ExpenseRowCount = 0;
+
+    public GameObject SpeedObject;
+
+    public Sprite PauseButtonImage;
+    public Sprite SlowButtonImage;
+    public Sprite MediumButtonImage;
+    public Sprite FastButtonImage;
+
+    public Sprite HappyFace;
+    public Sprite NeutralFace;
+    public Sprite SadFace;
+
+    public GameObject FloatingObject;
 
 	public List<string> debugBanList = new List<string>();
 
@@ -76,7 +95,32 @@ public class GameView : MonoBehaviour
 		Debug.Log(message);
 	}
 
-	void Start()
+    public void PlayButtonPressed()
+    {
+        gameData.cityLogic.SpeedChange();
+        ChangeSpeedIcon();
+    }
+
+    public void ChangeSpeedIcon()
+    {
+        switch (gameData.time.speed)
+        {
+            case 0:
+                SpeedObject.GetComponent<Image>().sprite = PauseButtonImage;
+                break;
+            case 1:
+                SpeedObject.GetComponent<Image>().sprite = SlowButtonImage;
+                break;
+            case 2:
+                SpeedObject.GetComponent<Image>().sprite = MediumButtonImage;
+                break;
+            case 3:
+                SpeedObject.GetComponent<Image>().sprite = FastButtonImage;
+                break;
+        }
+    }
+
+    void Start()
 	{
 		roadMeshes = new Dictionary<int, List<Mesh>>
 		{
@@ -102,8 +146,9 @@ public class GameView : MonoBehaviour
 
 		gameData.OnZoneTypeChanged += HandleZoneTypeChanged;
 		gameData.OnBuildingPlaced += HandleBuildingPlaced;
-		gameData.cityLogic.OnCityLogic += HandleCityLogic;
-		gameData.OnDebug += HandleDebug;
+        gameData.cityLogic.OnTimeChanged += HandleTime;
+        gameData.cityLogic.OnMoneyChanged += HandleMoney;
+        gameData.OnDebug += HandleDebug;
 
 		UnityThread.initUnityThread();
 
@@ -112,12 +157,46 @@ public class GameView : MonoBehaviour
 		SetUpGrid(gridWidth, gridHeight);
 		gameData.SetUpGrid(gridWidth, gridHeight);
 
-
+		ChangeSpeedIcon();
 		//StartCoroutine(PlaceBuildingsOverTime());
 
 	}
 
-	private void HandleCityLogic(Assets.Model.Data.Time time)
+    private void HandleTime(Assets.Model.Data.Time time)
+    {
+        UnityThread.executeInUpdate(() =>
+        {
+            UI_Time.text = time.date.Hour + ":" + time.date.Minute + "\n" + time.date.Year.ToString() + ". " + time.date.Month + ". " + time.date.Day + ".";
+        });
+    }
+
+    private void HandleMoney(int balance, int difference, string type)
+    {
+        UnityThread.executeInUpdate(() =>
+        {
+            Debug.Log("Money: " + balance);
+            UI_Money.text = balance.ToString();
+
+            //Create a new row
+            GameObject newRow = Instantiate(ExpenseRow);
+            //change the rows rect transform y position
+            newRow.GetComponent<RectTransform>().anchoredPosition = new Vector2(400, ExpenseRowCount * -50 + 25);
+            ExpenseRowCount++;
+            TextMeshProUGUI typeText = newRow.transform.GetChild(0).GetComponent<TextMeshProUGUI>();
+            TextMeshProUGUI diffrenceText = newRow.transform.GetChild(1).GetComponent<TextMeshProUGUI>();
+
+            typeText.text = type;
+            diffrenceText.text = difference.ToString();
+
+            //set the row to be a child of the content
+            newRow.transform.SetParent(ExpenseContent.transform, false);
+            Debug.Log(typeText.text);
+            Debug.Log("Row count: " + ExpenseRowCount);
+
+        });
+    }
+
+    private void HandleCityLogic(Assets.Model.Data.Time time)
 	{
 		Debug.Log("CityLogic");
         UI_Time.GetComponent<TextMeshPro>().text = gameData.time.date.ToString();
@@ -130,7 +209,9 @@ public class GameView : MonoBehaviour
 		gameData.OnZoneTypeChanged -= HandleZoneTypeChanged;
 		gameData.OnBuildingPlaced -= HandleBuildingPlaced;
 		gameData.OnDebug -= HandleDebug;
-	}
+        gameData.cityLogic.OnTimeChanged -= HandleTime;
+        gameData.cityLogic.OnMoneyChanged -= HandleMoney;
+    }
 
 	#endregion
 
@@ -695,8 +776,8 @@ public class GameView : MonoBehaviour
 	}
 
 
-	//print out gamedata.grid to console
-	public void PrintGrid()
+    //print out gamedata.grid to console
+    public void PrintGrid()
 	{
 		string gridString = "";
 		for (int i = 0; i < GridWidth; i++)
