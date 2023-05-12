@@ -43,6 +43,6 @@ else
 fi
 echo "Test results"
 cat $UNITY_DIR/$TEST_PLATFORM-results.xml
-cat "Passed tests"
+echo "Passed tests"
 cat $UNITY_DIR/$TEST_PLATFORM-results.xml | grep test-run | grep Passed
 exit $UNITY_EXIT_CODE
