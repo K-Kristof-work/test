@@ -44,6 +44,8 @@ namespace Assets.Model.Data
 			loans = 0;
 			balance = 10000;
 			time = new Time();
+			time.date = DateTime.Now;
+			time.speed = 1;
 		}
 
 		public void SetUpGrid(int _gridWith, int _gridHeight)
