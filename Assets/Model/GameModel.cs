@@ -4,7 +4,7 @@ using UnityEngine;
 using Assets.Model;
 using Assets.Model.Data;
 
-class GameModel : MonoBehaviour
+public class GameModel : MonoBehaviour
 {
     public GameData gameData;
     public CityLogic cityLogic;

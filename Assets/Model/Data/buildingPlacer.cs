@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
 
-class BuildingPlacer
+public class BuildingPlacer
 {
 	private GameData gameData;
 	private Timer timer;

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Assets.Model.Data
 {
-    class Block
+    public class Block
     {
         public BlockType type;
         public int lvl; // 0-3, 0 = building in progress
