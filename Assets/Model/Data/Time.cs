@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Assets.Model.Data
 {
-    class Time
+    public class Time
     {
         public DateTime date;
         public int speed;

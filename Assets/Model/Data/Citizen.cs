@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Assets.Model.Data
 {
-    class Citizen
+    public class Citizen
     {
         public double salary;
         public double paidTaxes;
