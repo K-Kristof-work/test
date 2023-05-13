@@ -38,12 +38,14 @@ namespace Assets.Model
         public delegate void TimeEventHandler(Time time);
         public delegate void MoneyEventHandler(int balance, int difference, string type);
         //public delegate void IncomeSpendingEventHandler(int money);
-        public delegate void HappinessEventHandler(double commute, double tax, double industry, double forest, double safety, double debt, double ratio);
+        //public delegate void HappinessEventHandler(double commute, double tax, double industry, double forest, double safety, double debt, double ratio);
+        public delegate void OnHappinessChangedEventHandler(double happiness);
 
         public event TimeEventHandler OnTimeChanged;
         public event MoneyEventHandler OnMoneyChanged;
         //public event IncomeSpendingEventHandler OnIncome;
-        public event HappinessEventHandler OnHappinessChanged;
+        //public event HappinessEventHandler OnHappinessChanged;
+        public event OnHappinessChangedEventHandler OnHappinessChanged;
 
         private GameData data;
         public CityLogic(GameData gd)
@@ -201,14 +203,6 @@ namespace Assets.Model
 
         private void UpdateCitizenHappiness()
         {
-            happinessFromLowCommute = 0;
-            happinessFromTax = 0;
-            happinessFromIndustry = 0;
-            happinessFromForest = 0;
-            happinessFromSafety = 0;
-            happinessFromDebt = 0;
-            happinessFromWorkRatio = 0;
-
             foreach (Citizen citizen in data.citizens)
             {
                 double safety = 0.0;
@@ -302,7 +296,16 @@ namespace Assets.Model
                 }
                 data.DebugInUnity(this, "citizen happiness: " + citizen.happiness);
             }
-            OnHappinessChanged?.Invoke(happinessFromLowCommute, happinessFromTax, happinessFromIndustry, happinessFromForest, happinessFromSafety, happinessFromDebt, happinessFromWorkRatio);
+
+            double avgHappiness = 0;
+            foreach (Citizen citizen in data.citizens)
+            {
+                //calculate the average happiness
+                avgHappiness += citizen.happiness;
+            }
+            avgHappiness /= data.citizens.Count;
+            //use the sigmoid function to calculate the happiness
+            OnHappinessChanged?.Invoke(1 / (1 + Math.Exp(-avgHappiness)));
         }
 
         private void EducateCitizens()

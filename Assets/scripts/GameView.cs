@@ -24,8 +24,10 @@ public class GameView : MonoBehaviour
 	public GameObject IncomingRoadMeshPrefab;
 	public GameObject WaterMeshPrefab;
 
-	//make list for all of the road meshes
-	public List<Mesh> StraightRoad = new List<Mesh>();
+    private List<(string, int)> budgetTracking = new();
+
+    //make list for all of the road meshes
+    public List<Mesh> StraightRoad = new List<Mesh>();
 	public List<Mesh> CornerRoad = new List<Mesh>();
 	public List<Mesh> TIntersectionRoad = new List<Mesh>();
 	public List<Mesh> CrossRoad = new List<Mesh>();
@@ -148,6 +150,7 @@ public class GameView : MonoBehaviour
 		gameData.OnBuildingPlaced += HandleBuildingPlaced;
         gameData.cityLogic.OnTimeChanged += HandleTime;
         gameData.cityLogic.OnMoneyChanged += HandleMoney;
+		gameData.cityLogic.OnHappinessChanged += HandleHappiness;
         gameData.OnDebug += HandleDebug;
 
 		UnityThread.initUnityThread();
@@ -172,10 +175,14 @@ public class GameView : MonoBehaviour
 
     private void HandleMoney(int balance, int difference, string type)
     {
-        UnityThread.executeInUpdate(() =>
+		budgetTracking.Add((type, difference));
+
+		Debug.Log("Money: " + balance);
+        UI_Money.text = balance.ToString();
+		//UPDATE THE UI
+
+        /*UnityThread.executeInUpdate(() =>
         {
-            Debug.Log("Money: " + balance);
-            UI_Money.text = balance.ToString();
 
             //Create a new row
             GameObject newRow = Instantiate(ExpenseRow);
@@ -193,8 +200,13 @@ public class GameView : MonoBehaviour
             Debug.Log(typeText.text);
             Debug.Log("Row count: " + ExpenseRowCount);
 
-        });
+        });*/
     }
+
+	private void HandleHappiness(double happiness)
+	{
+
+	}
 
 	private void OnApplicationQuit()
 	{
@@ -204,6 +216,7 @@ public class GameView : MonoBehaviour
 		gameData.OnDebug -= HandleDebug;
         gameData.cityLogic.OnTimeChanged -= HandleTime;
         gameData.cityLogic.OnMoneyChanged -= HandleMoney;
+		gameData.cityLogic.OnHappinessChanged -= HandleHappiness;
     }
 
 	#endregion
