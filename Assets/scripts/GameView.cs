@@ -196,13 +196,6 @@ public class GameView : MonoBehaviour
         });
     }
 
-    private void HandleCityLogic(Assets.Model.Data.Time time)
-	{
-		Debug.Log("CityLogic");
-        UI_Time.GetComponent<TextMeshPro>().text = gameData.time.date.ToString();
-
-    }
-
 	private void OnApplicationQuit()
 	{
 		gameData.OnApplicationExit();

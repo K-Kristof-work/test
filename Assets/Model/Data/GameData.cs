@@ -79,8 +79,8 @@ namespace Assets.Model.Data
 			}
 
 			//PlaceIncomingRoad();
-			PlaceIncomingRoadCenter();
-
+		    PlaceIncomingRoadCenter();
+			//cityLogic.OnIncome
 			DebugInUnity(this,"grid set up is finished");
 		}
 
@@ -167,6 +167,10 @@ namespace Assets.Model.Data
 			if(_zoneType == ZoneType.Road)
 			{
 				UpdateRoadConnectivity(x, z);
+				Block road = new Block();
+				road.type = BlockType.Road;
+				road.setDefaultValues();
+				cityLogic.BuildingPlacedByUser(road);
 			}
 
 			DebugInUnity(this,"zone type changed to " + _zoneType.ToString() + " at " + x + " " + z);
@@ -314,6 +318,10 @@ namespace Assets.Model.Data
 			//fire event
 			DebugInUnity(this,"invoke event for building placed at " + positions[0].x + " " + positions[0].y);
 			OnBuildingPlaced?.Invoke(positions, buildingInstance);
+			if (buildingInstance.type != BlockType.House && buildingInstance.type != BlockType.Factory && buildingInstance.type!= BlockType.Shop )
+			{
+				cityLogic.BuildingPlacedByUser(buildingInstance);	
+            }
 		}
 
 		public void DebugInUnity(object ob, string message)

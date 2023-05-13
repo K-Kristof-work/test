@@ -37,12 +37,12 @@ namespace Assets.Model
 
         public delegate void TimeEventHandler(Time time);
         public delegate void MoneyEventHandler(int balance, int difference, string type);
-        public delegate void IncomeSpendingEventHandler(int money);
+        //public delegate void IncomeSpendingEventHandler(int money);
         public delegate void HappinessEventHandler(double commute, double tax, double industry, double forest, double safety, double debt, double ratio);
 
         public event TimeEventHandler OnTimeChanged;
         public event MoneyEventHandler OnMoneyChanged;
-        public event IncomeSpendingEventHandler OnIncome;
+        //public event IncomeSpendingEventHandler OnIncome;
         public event HappinessEventHandler OnHappinessChanged;
 
         private GameData data;
@@ -196,6 +196,7 @@ namespace Assets.Model
                     }
                 }
             }
+            data.DebugInUnity(this, "growing forests");
         }
 
         private void UpdateCitizenHappiness()

@@ -152,6 +152,7 @@ public class BuildingPlacer
 			type = blocktype,
 			blockSize = new Vec2((uint)buildingSizeX, (uint)buildingSizeZ)
 		};
+		buildingInstance.setDefaultValues();
 		gameData.grid[x][z].block = buildingInstance;
 
 		gameData.DebugInUnity(this,"block set in grid for " + blocktype + " in position " + x + ", " + z);
@@ -328,6 +329,7 @@ public class BuildingPlacer
 			type = blocktype,
 			blockSize = new Vec2((uint)buildingSizeX, (uint)buildingSizeZ)
 		};
+		buildingInstance.setDefaultValues();
 		gameData.grid[x][z].block = buildingInstance;
 
 		gameData.DebugInUnity(this, "block set in grid for " + blocktype + " in position " + x + ", " + z);
@@ -355,8 +357,9 @@ public class BuildingPlacer
 			}
 		}
 
-		//raise place building event
-		gameData.BuildingPlaced(buildingCells, buildingInstance);
+        gameData.DebugInUnity(this, "the builidng cost is:" + buildingInstance.building_cost);
+        //raise place building event
+        gameData.BuildingPlaced(buildingCells, buildingInstance);
 
 		gameData.DebugInUnity(this, "building placed of type " + blocktype + " in position " + x + ", " + z);
 	}
