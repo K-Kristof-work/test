@@ -9732,7 +9732,8 @@ MonoBehaviour:
   NeutralFace: {fileID: 21300000, guid: 0b0310585e5aca54195b2e32684cb320, type: 3}
   SadFace: {fileID: 21300000, guid: e3b90b8b8b02edf43b27c1ed3fbff819, type: 3}
   FloatingObject: {fileID: 0}
-  debugBanList: []
+  debugBanList:
+  - CityLogic
 --- !u!4 &1039642949
 Transform:
   m_ObjectHideFlags: 0
@@ -9863,9 +9864,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefab_cylinder: {fileID: 5967791351818794213, guid: 6675dd447f1114749bb7b005a019b49a, type: 3}
+  prefab_meteor: {fileID: 160260, guid: becedaa36441f6448abcf34c66eb61e3, type: 3}
   MeteoritButton: {fileID: 1706355677}
   NormalColor: {r: 1, g: 1, b: 1, a: 1}
   SelectedColor: {r: 0.5411765, g: 0.9058824, b: 0.5411765, a: 1}
+  size: 5
 --- !u!1 &1066628268
 GameObject:
   m_ObjectHideFlags: 0

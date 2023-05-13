@@ -10,12 +10,16 @@ public class PlaceMeteor : MonoBehaviour
     private GameView gameView;
 
     public GameObject prefab_cylinder;
+    public GameObject prefab_meteor;
+
     public Button MeteoritButton;
     public Color NormalColor;
     public Color SelectedColor;
-    public int size = 5;
+    private int size = 5;
 
     private GameObject cylinder;
+    private GameObject meteor;
+
     private bool btn_active = false;
     private List<Vector2> clear = new List<Vector2>();
 
@@ -27,14 +31,19 @@ public class PlaceMeteor : MonoBehaviour
 
         MeteoritButton.onClick.AddListener(() =>
         {
-            btn_active = !btn_active;
-            if (!btn_active && cylinder)
-            {
-                Destroy(cylinder);
-            }
-
-            UpdateButtonColor();
+            ToggleButton();
         });
+    }
+
+    private void ToggleButton()
+    {
+        btn_active = !btn_active;
+        if (!btn_active && cylinder)
+        {
+            Destroy(cylinder);
+        }
+
+        UpdateButtonColor();
     }
 
     // Update is called once per frame
@@ -47,17 +56,22 @@ public class PlaceMeteor : MonoBehaviour
 
             if (Physics.Raycast(ray, out hit))
             {
-                hoverEffect(hit.point);
+                int x = Mathf.FloorToInt((hit.point.x - transform.position.x) / gameView.CellWidth + gameView.CellWidth / 2);
+                int z = Mathf.FloorToInt((hit.point.z - transform.position.z) / gameView.CellHeight + gameView.CellHeight / 2);
+
+                if (Input.GetMouseButtonDown(0))
+                {
+                    startMeteor(x, z);
+                    return;
+                }
+
+                hoverEffect(x, z);
             }
         }
-
     }
 
-    private void hoverEffect(Vector3 worldPosition)
+    private void hoverEffect(int x, int z)
     {
-        int x = Mathf.FloorToInt((worldPosition.x - transform.position.x) / gameView.CellWidth + gameView.CellWidth / 2);
-        int z = Mathf.FloorToInt((worldPosition.z - transform.position.z) / gameView.CellHeight + gameView.CellHeight / 2);
-
         if(cylinder == null)
         {
             cylinder = Instantiate(prefab_cylinder);
@@ -66,6 +80,22 @@ public class PlaceMeteor : MonoBehaviour
         }
 
         cylinder.transform.position = new Vector3(x, 0, z);
+    }
+
+    private void startMeteor(int x, int z)
+    {
+        /*
+        cylinder = Instantiate(prefab_cylinder);
+        cylinder.transform.localScale = new Vector3(size, 0.01f, size);
+        cylinder.transform.parent = this.transform;
+        cylinder.transform.position = new Vector3(x, 0, z);*/
+
+        meteor = Instantiate(prefab_meteor);
+        meteor.transform.parent = this.transform;
+        meteor.transform.Rotate(new Vector3(Random.Range(0,360), Random.Range(0, 360), Random.Range(0, 360)));
+        meteor.transform.localScale = new Vector3(size / 2, size / 2, size / 2);
+        meteor.transform.position = new Vector3(x + 24, 20, z);
+        meteor.GetComponent<Rigidbody>().AddForce(new Vector3(-600, 0, 0));
     }
 
     private void UpdateButtonColor()
