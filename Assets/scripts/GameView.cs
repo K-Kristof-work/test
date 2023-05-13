@@ -179,6 +179,8 @@ public class GameView : MonoBehaviour
 		//UPDATE THE UI
         UnityThread.executeInUpdate(() =>
         {
+			if (difference == 0) return;
+
             difference *= -1;
             budgetTracking.Add((type, difference));
 
