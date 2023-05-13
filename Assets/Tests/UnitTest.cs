@@ -45,7 +45,7 @@ public class UnitTest
     {
         LoopGrid((Field field) =>
         {
-            if(field.zoneType == ZoneType.IncomingRoad)
+            if(field.zone.zone_type == ZoneType.IncomingRoad)
             {
                 Assert.Pass();
             }

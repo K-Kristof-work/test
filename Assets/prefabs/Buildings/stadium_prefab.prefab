@@ -112,5 +112,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   BuildingSize: {x: 2, y: 2}
-  rotationInMeshOnX: 0
-  rotationdirection: -1
+  rotationInMeshOnX: -90
+  rotationdirection: 2
