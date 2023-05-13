@@ -80,6 +80,9 @@ namespace Assets.Model.Data
 
 			//PlaceIncomingRoad();
 		    PlaceIncomingRoadCenter();
+
+			PlaceRandomTrees();
+
 			//cityLogic.OnIncome
 			DebugInUnity(this,"grid set up is finished");
 		}
@@ -117,6 +120,11 @@ namespace Assets.Model.Data
 				ChangeZoneType(0, randomPosition - 1, ZoneType.Water, 0);
 				ChangeZoneType(0, randomPosition + 1, ZoneType.Water, 0);
 			}
+		}
+
+		public void PlaceRandomTrees()
+		{
+			int howmany = 0;
 		}
 
 		public void PlaceIncomingRoadCenter()

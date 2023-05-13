@@ -49,6 +49,7 @@ public class GameView : MonoBehaviour
 
     public GameObject ExpenseContent;
     public GameObject ExpenseRow;
+    public GameObject IncomeRow;
     public int ExpenseRowCount = 0;
 
     public GameObject SpeedObject;
@@ -175,17 +176,28 @@ public class GameView : MonoBehaviour
 
     private void HandleMoney(int balance, int difference, string type)
     {
-		budgetTracking.Add((type, difference));
-
-		Debug.Log("Money: " + balance);
-        UI_Money.text = balance.ToString();
 		//UPDATE THE UI
-
-        /*UnityThread.executeInUpdate(() =>
+        UnityThread.executeInUpdate(() =>
         {
+			if (difference == 0) return;
 
-            //Create a new row
-            GameObject newRow = Instantiate(ExpenseRow);
+            difference *= -1;
+            budgetTracking.Add((type, difference));
+
+            UI_Money.text = balance.ToString();
+
+			//Create a new row
+			GameObject newRow;
+
+            if (difference < 0)
+			{
+                newRow = Instantiate(ExpenseRow);
+			}
+			else
+			{
+                newRow = Instantiate(IncomeRow);
+            }
+           
             //change the rows rect transform y position
             newRow.GetComponent<RectTransform>().anchoredPosition = new Vector2(400, ExpenseRowCount * -50 + 25);
             ExpenseRowCount++;
@@ -198,9 +210,12 @@ public class GameView : MonoBehaviour
             //set the row to be a child of the content
             newRow.transform.SetParent(ExpenseContent.transform, false);
             Debug.Log(typeText.text);
-            Debug.Log("Row count: " + ExpenseRowCount);
 
-        });*/
+            // update height
+            RectTransform rt = ExpenseContent.GetComponent(typeof(RectTransform)) as RectTransform;
+			rt.sizeDelta = new Vector2(0,rt.sizeDelta.y + 50);
+
+        });
     }
 
 	private void HandleHappiness(double happiness)
