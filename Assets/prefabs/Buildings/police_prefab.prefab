@@ -28,7 +28,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6399728808837600598}
   m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 19.309835, y: 0.6914873, z: 2.6984534}
+  m_LocalPosition: {x: 24.518864, y: 0.65630054, z: -0.68156147}
   m_LocalScale: {x: 250, y: 250, z: 250}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -113,4 +113,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   BuildingSize: {x: 1, y: 1}
   rotationInMeshOnX: 0
-  rotationdirection: -1
+  rotationdirection: 2
