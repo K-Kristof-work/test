@@ -58,7 +58,7 @@ public class BuildingPlacer
 			{
 				for (int z = 0; z < gameData.gridHeight; z++)
 				{
-					if (gameData.grid[x][z].zoneType != ZoneType.Empty && gameData.grid[x][z].zoneType != ZoneType.Road && gameData.grid[x][z].zoneType != ZoneType.Water && gameData.grid[x][z].zoneType != ZoneType.IncomingRoad && gameData.grid[x][z].block == null )
+					if (gameData.grid[x][z].zone.zone_type != ZoneType.Empty && gameData.grid[x][z].zone.zone_type != ZoneType.Road && gameData.grid[x][z].zone.zone_type != ZoneType.Water && gameData.grid[x][z].zone.zone_type != ZoneType.IncomingRoad && gameData.grid[x][z].block == null )
 					{
 						// Check if there's a road in the vicinity
 						if (gameData.IsConnectedRoad(x - 1, z) || gameData.IsConnectedRoad(x + 1, z) || gameData.IsConnectedRoad(x, z - 1) || gameData.IsConnectedRoad(x, z + 1))
@@ -76,7 +76,7 @@ public class BuildingPlacer
 			// Choose a random buildable position
 			Vec2 randomPosition = buildablePositions[RandomRange(0, buildablePositions.Count)];
 
-			ZoneType selectedZonetype = gameData.grid[(int)randomPosition.x][(int)randomPosition.y].zoneType;
+			ZoneType selectedZonetype = gameData.grid[(int)randomPosition.x][(int)randomPosition.y].zone.zone_type;
 			BlockType blocktype;
 
 			if (selectedZonetype == ZoneType.Residential)
@@ -94,7 +94,7 @@ public class BuildingPlacer
 
 			// Place a building at the random position
 			
-			PlaceBuilding((int)randomPosition.x, (int)randomPosition.y, gameData.grid[(int)randomPosition.x][(int)randomPosition.y].zoneType, blocktype);
+			PlaceBuilding((int)randomPosition.x, (int)randomPosition.y, gameData.grid[(int)randomPosition.x][(int)randomPosition.y].zone.zone_type, blocktype);
 			gameData.DebugInUnity(this,"building placed at " + randomPosition.x + ", " + randomPosition.y + "+ current buildable positions: " + buildablePositions.Count);
 		}
 	}
@@ -205,7 +205,7 @@ public class BuildingPlacer
 						int adjustedX = x + (quadrant == 1 || quadrant == 3 ? -offsetX : offsetX);
 						int adjustedZ = z + (quadrant == 2 || quadrant == 3 ? -offsetZ : offsetZ);
 
-						if (adjustedX < 0 || adjustedZ < 0 || adjustedX >= gameData.gridWidth || adjustedZ >= gameData.gridHeight || gameData.grid[adjustedX][adjustedZ].zoneType != zoneType || gameData.grid[adjustedX][adjustedZ].block != null)
+						if (adjustedX < 0 || adjustedZ < 0 || adjustedX >= gameData.gridWidth || adjustedZ >= gameData.gridHeight || gameData.grid[adjustedX][adjustedZ].zone.zone_type != zoneType || gameData.grid[adjustedX][adjustedZ].block != null)
 						{
 							canPlace = false;
 							break;
@@ -244,7 +244,7 @@ public class BuildingPlacer
 			int newX = x + dx[dir];
 			int newZ = z + dz[dir];
 
-			if (newX >= 0 && newZ >= 0 && newX < gameData.gridWidth && newZ < gameData.gridHeight && gameData.grid[newX][newZ].zoneType == ZoneType.Road)
+			if (newX >= 0 && newZ >= 0 && newX < gameData.gridWidth && newZ < gameData.gridHeight && gameData.grid[newX][newZ].zone.zone_type == ZoneType.Road)
 			{
 				return dir;
 			}
@@ -265,7 +265,7 @@ public class BuildingPlacer
 					int adjustedX = x + (quadrant == 1 || quadrant == 3 ? -offsetX : offsetX);
 					int adjustedZ = z + (quadrant == 2 || quadrant == 3 ? -offsetZ : offsetZ);
 
-					if (adjustedX < 0 || adjustedZ < 0 || adjustedX >= gameData.gridWidth || adjustedZ >= gameData.gridHeight || gameData.grid[adjustedX][adjustedZ].zoneType != zoneType || gameData.grid[adjustedX][adjustedZ].block != null)
+					if (adjustedX < 0 || adjustedZ < 0 || adjustedX >= gameData.gridWidth || adjustedZ >= gameData.gridHeight || gameData.grid[adjustedX][adjustedZ].zone.zone_type != zoneType || gameData.grid[adjustedX][adjustedZ].block != null)
 					{
 						canPlace = false;
 						break;

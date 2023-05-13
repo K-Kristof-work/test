@@ -9,8 +9,8 @@ namespace Assets.Model.Data
     public class Field
     {
         public Vec2 pos; // top left corner
-        public int zoneId;
-        public ZoneType zoneType;
+        public ZoneData zone;
+       // public ZoneType zoneType;
         public Block block;
         public int tax;
         public bool IsConnectedToIncomingRoad = false;

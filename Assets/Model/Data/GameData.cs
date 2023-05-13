@@ -7,18 +7,19 @@ using System.Threading.Tasks;
 
 namespace Assets.Model.Data
 {
-    public class GameData
-    {
-        public int balance;
-        public int loans;
-        public List<List<Field>> grid;
-        public int gridWidth;
+	public class GameData
+	{
+		public int balance;
+		public int loans;
+		public List<List<Field>> grid;
+		public int gridWidth;
 		public int gridHeight;
-        public List<Citizen> citizens;
-        public Time time;
+		public List<Citizen> citizens;
+		public Time time;
 		public BuildingPlacer buildingPlacer;
 		public Dictionary<ZoneType, List<Vec2>> availableBuildingSizes;
 		public CityLogic cityLogic;
+		public List<ZoneData> zones; // 0 is empty, -1 is road, -2 is water, -3 is incoming road
 
 		private int nextZone = 1;
 
@@ -35,7 +36,7 @@ namespace Assets.Model.Data
 		public GameData()
 		{
 			availableBuildingSizes = new Dictionary<ZoneType, List<Vec2>>();
-			availableBuildingSizes.Add(ZoneType.Residential, new List<Vec2> { new Vec2(1, 1), new Vec2(2, 2), new Vec2(3,3), new Vec2(1,2) });
+			availableBuildingSizes.Add(ZoneType.Residential, new List<Vec2> { new Vec2(1, 1), new Vec2(2, 2), new Vec2(3, 3), new Vec2(1, 2) });
 			availableBuildingSizes.Add(ZoneType.Commercial, new List<Vec2> { new Vec2(1, 1) });
 			availableBuildingSizes.Add(ZoneType.Industrial, new List<Vec2> { new Vec2(1, 1) });
 			buildingPlacer = new BuildingPlacer(this, availableBuildingSizes);
@@ -46,6 +47,12 @@ namespace Assets.Model.Data
 			time = new Time();
 			time.date = DateTime.Now;
 			time.speed = 1;
+			zones = new List<ZoneData>();
+		}
+
+		public ZoneData GetZoneDataById(int id)
+		{
+			return zones.Find(x => x.zone_id == id);
 		}
 
 		public void SetUpGrid(int _gridWith, int _gridHeight)
@@ -55,6 +62,10 @@ namespace Assets.Model.Data
 
 			grid = new List<List<Field>>();
 
+			zones.Add(new ZoneData(0, ZoneType.Empty, 0));
+			zones.Add(new ZoneData(-3, ZoneType.IncomingRoad, 0));
+			zones.Add(new ZoneData(-2, ZoneType.Water, 0));
+			zones.Add(new ZoneData(-1, ZoneType.Road, 0));
 
 			if (gridHeight < 10 || gridWidth < 10)
             {
@@ -70,7 +81,7 @@ namespace Assets.Model.Data
 					Field cell = new Field
 					{
 						pos = new Vec2((uint)i, (uint)j),
-						zoneType = ZoneType.Empty // Set the default zone type
+						zone = GetZoneDataById(0) // Set the default zone type
 					};
 
 					grid[i].Add(cell);
@@ -79,7 +90,9 @@ namespace Assets.Model.Data
 			}
 
 			//PlaceIncomingRoad();
-		    PlaceIncomingRoadCenter();
+			zones.Add(new ZoneData(0, ZoneType.Empty, 0));
+
+			PlaceIncomingRoadCenter();
 
 			PlaceRandomTrees();
 
@@ -145,32 +158,38 @@ namespace Assets.Model.Data
 		{
 			if (!isFieldValid(x, z)) return;
 			
-			if (_zoneType == ZoneType.Water || _zoneType == ZoneType.IncomingRoad)
+			if (_zoneType == ZoneType.Water)
 			{
-				grid[x][z].zoneType = _zoneType;
+				
+				grid[x][z].zone = GetZoneDataById(-2);
+				grid[x][z].zone.zone_type = ZoneType.Water;
+				OnZoneTypeChanged?.Invoke(x, z, _zoneType);
+			}else if(_zoneType == ZoneType.IncomingRoad)
+			{
+				grid[x][z].zone = GetZoneDataById(-3);
+				grid[x][z].zone.zone_type = ZoneType.IncomingRoad;
 				OnZoneTypeChanged?.Invoke(x, z, _zoneType);
 			}
 
-			if (grid[x][z].zoneType == _zoneType ||
-				(grid[x][z].zoneType == ZoneType.Residential && _zoneType == ZoneType.Empty) ||
-				(grid[x][z].zoneType == ZoneType.Commercial && _zoneType == ZoneType.Empty) ||
-				(grid[x][z].zoneType == ZoneType.Industrial && _zoneType == ZoneType.Empty) ||
-				(grid[x][z].zoneType == ZoneType.Road && _zoneType != ZoneType.Empty) ||
-				grid[x][z].zoneType == ZoneType.IncomingRoad ||
-				grid[x][z].zoneType == ZoneType.Water ||
+			if (grid[x][z].zone.zone_type == _zoneType ||
+				(grid[x][z].zone.zone_type == ZoneType.Residential && _zoneType == ZoneType.Empty) ||
+				(grid[x][z].zone.zone_type == ZoneType.Commercial && _zoneType == ZoneType.Empty) ||
+				(grid[x][z].zone.zone_type == ZoneType.Industrial && _zoneType == ZoneType.Empty) ||
+				(grid[x][z].zone.zone_type == ZoneType.Road && _zoneType != ZoneType.Empty) ||
+				grid[x][z].zone.zone_type == ZoneType.IncomingRoad ||
+				grid[x][z].zone.zone_type == ZoneType.Water ||
 				grid[x][z].block != null)
             {
 				return;
 			}
 
 
-			grid[x][z].zoneType = _zoneType;
+			//grid[x][z].zone.zone_type = _zoneType;
 
 			// Set zoneid and clear overlap zones
-			UpdateZoneId(x, z, _zoneType, _zoneId);
+			UpdateZone(x, z, _zoneType, _zoneId);
 
-			//raise zonetype change event
-			OnZoneTypeChanged?.Invoke(x, z, _zoneType);
+
 
 			if(_zoneType == ZoneType.Road)
 			{
@@ -191,7 +210,7 @@ namespace Assets.Model.Data
 			{
 				for (int z = (int)start.y; z <= (int)end.y; z++)
 				{
-					if (x >= 0 && x < this.gridWidth && z >= 0 && z < this.gridHeight && this.grid[x][z].zoneId > 0)
+					if (x >= 0 && x < this.gridWidth && z >= 0 && z < this.gridHeight && this.grid[x][z].zone.zone_id > 0)
 					{
 						// todo fire popup event
 						return;
@@ -217,11 +236,11 @@ namespace Assets.Model.Data
 			{
 				for (int j = 0; j < this.gridHeight; j++)
 				{
-					if (this.grid[i][j].zoneId == id)
+					if (this.grid[i][j].zone.zone_id == id)
 					{
-						this.grid[i][j].zoneId = 0;
+						DebugInUnity(this, "zone deleted at " + i + " " + j);
 
-						if(grid[i][j].zoneType == ZoneType.Residential || grid[i][j].zoneType == ZoneType.Commercial || grid[i][j].zoneType == ZoneType.Industrial)
+						if(grid[i][j].zone.zone_type == ZoneType.Residential || grid[i][j].zone.zone_type == ZoneType.Commercial || grid[i][j].zone.zone_type == ZoneType.Industrial)
                         {
 							
 							if(this.grid[i][j].block != null &&
@@ -230,9 +249,11 @@ namespace Assets.Model.Data
 								this.grid[i][j].block = null;
 							}
 
-							this.grid[i][j].zoneType = ZoneType.Empty;
+							this.grid[i][j].zone = GetZoneDataById(0);
 							OnZoneTypeChanged?.Invoke(i, j, ZoneType.Empty);
 						}
+
+						this.grid[i][j].zone = GetZoneDataById(0);
 					}
 				}
 			}
@@ -246,11 +267,11 @@ namespace Assets.Model.Data
 			{
 				for (int j = 0; j < this.gridHeight; j++)
 				{
-					if (this.grid[i][j].zoneId == id)
+					if (this.grid[i][j].zone.zone_id == id)
 					{
-						if (grid[i][j].zoneType == ZoneType.Residential || grid[i][j].zoneType == ZoneType.Commercial || grid[i][j].zoneType == ZoneType.Industrial)
+						if (grid[i][j].zone.zone_type == ZoneType.Residential || grid[i][j].zone.zone_type == ZoneType.Commercial || grid[i][j].zone.zone_type == ZoneType.Industrial)
 						{
-							return this.grid[i][j].zoneType;
+							return this.grid[i][j].zone.zone_type;
 						}
 					}
 				}
@@ -259,24 +280,45 @@ namespace Assets.Model.Data
 			return ZoneType.Empty;
 		}
 
-		private void UpdateZoneId(int x, int z, ZoneType _zoneType, int _zoneId)
+		private void UpdateZone(int x, int z, ZoneType _zoneType, int _zoneId)
         {
 			if (_zoneType == ZoneType.Residential || _zoneType == ZoneType.Commercial || _zoneType == ZoneType.Industrial)
 			{
-				grid[x][z].zoneId = _zoneId;
+				//check if _zoneId is already used in zones.zoneid
+				if(!zones.Contains(zones.Find(z => z.zone_id == _zoneId)))
+				{
+					//make a new zonedata for this zoneid
+					ZoneData zone = new ZoneData(_zoneId, _zoneType, 0);
+					zones.Add(zone);
+				}
+				ZoneData zd = zones.Find(z => z.zone_id == _zoneId);
+
+				if (zd.zone_type != _zoneType)
+					DebugInUnity(this, "ERROR: zonetype missmatch");
+
+				zd.zone_capacity += 1;
+
+				grid[x][z].zone = zd;
 				nextZone = _zoneId + 1;
 			}
-			else if(_zoneType != ZoneType.Road)
+			else if(_zoneType == ZoneType.Road)
 			{
-				grid[x][z].zoneId = 0;
+				grid[x][z].zone = GetZoneDataById(-1);
 			}
+			else
+			{
+				grid[x][z].zone = GetZoneDataById(0);
+			}
+
+			//raise zonetype change event
+			OnZoneTypeChanged?.Invoke(x, z, _zoneType);
 		}
 
 		public bool IsRoad(int x, int z)
 		{
 			if (isFieldValid(x, z))
 			{
-				return (grid[x][z].zoneType == ZoneType.Road || grid[x][z].zoneType == ZoneType.IncomingRoad);
+				return (grid[x][z].zone.zone_type == ZoneType.Road || grid[x][z].zone.zone_type == ZoneType.IncomingRoad);
 			}
 
 			return false;
@@ -288,7 +330,7 @@ namespace Assets.Model.Data
 
 			if (!isFieldValid(x, z)) return;
 
-			if (ZoneType.Road != grid[x][z].zoneType || grid[x][z].IsConnectedToIncomingRoad) return;
+			if (ZoneType.Road != grid[x][z].zone.zone_type || grid[x][z].IsConnectedToIncomingRoad) return;
 
 			//check if any of the 4 adjacent cells are road with connection
 			if (IsConnectedRoad(x - 1, z) || IsConnectedRoad(x + 1, z) || IsConnectedRoad(x, z - 1) || IsConnectedRoad(x, z + 1))
@@ -316,7 +358,7 @@ namespace Assets.Model.Data
 				return false;
 			if (grid[x][z].IsConnectedToIncomingRoad)
 				return true;
-			if (grid[x][z].zoneType == ZoneType.IncomingRoad)
+			if (grid[x][z].zone.zone_type == ZoneType.IncomingRoad)
 				return true;
 			return false;
 		}
@@ -366,7 +408,7 @@ namespace Assets.Model.Data
 
 		public int getZoneId(int x, int z)
         {
-			return grid[x][z].zoneId;
+			return grid[x][z].zone.zone_id;
         }
 
 		/*public int getOperatingCost()

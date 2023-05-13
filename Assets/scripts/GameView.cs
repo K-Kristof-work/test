@@ -329,6 +329,8 @@ public class GameView : MonoBehaviour
 			// Store the road mesh game object in the GridCell.Building variable
 			grid[x][z].Building = roadMeshObject;
 
+			HandleDebug(this, " RoadMesh created");
+
 			UpdateRoadMesh(x, z);
 			updateRoadsAround(x, z);
 		}
@@ -356,7 +358,7 @@ public class GameView : MonoBehaviour
 	{
 		if (x == 0)
 		{
-			if (gameData.grid[x][z + 1].zoneType == ZoneType.IncomingRoad)
+			if (gameData.grid[x][z + 1].zone is not null && gameData.grid[x][z + 1].zone.zone_type == ZoneType.IncomingRoad)
 			{
 				grid[x][z].Building.transform.rotation = Quaternion.Euler(-90,
 																	  grid[x][z].Building.transform.rotation.y - 90,
@@ -371,7 +373,7 @@ public class GameView : MonoBehaviour
 		}
 		else if (z == 0)
 		{
-			if (gameData.grid[x + 1][z].zoneType == ZoneType.IncomingRoad)
+			if (gameData.grid[x + 1][z].zone is not null && gameData.grid[x + 1][z].zone.zone_type == ZoneType.IncomingRoad)
 			{
 				grid[x][z].Building.transform.rotation = Quaternion.Euler(-90,
 																	  grid[x][z].Building.transform.rotation.y + 90,
@@ -386,7 +388,7 @@ public class GameView : MonoBehaviour
 		}
 		else if (z == gridWidth - 1)
 		{
-			if (gameData.grid[x + 1][z].zoneType == ZoneType.IncomingRoad)
+			if (gameData.grid[x + 1][z].zone is not null && gameData.grid[x + 1][z].zone.zone_type == ZoneType.IncomingRoad)
 			{
 				grid[x][z].Building.transform.rotation = Quaternion.Euler(-90,
 																	  grid[x][z].Building.transform.rotation.y,
@@ -401,7 +403,7 @@ public class GameView : MonoBehaviour
 		}
 		else
 		{
-			if (gameData.grid[x][z + 1].zoneType == ZoneType.IncomingRoad)
+			if (gameData.grid[x][z + 1].zone is not null && gameData.grid[x][z + 1].zone.zone_type == ZoneType.IncomingRoad)
 			{
 				grid[x][z].Building.transform.rotation = Quaternion.Euler(-90,
 																	  grid[x][z].Building.transform.rotation.y,
@@ -492,7 +494,7 @@ public class GameView : MonoBehaviour
 	{
 		if (!CheckGrid(x, z)) return;
 
-		if (gameData.grid[x][z].zoneType == ZoneType.Road && !isroadupdating)
+		if (gameData.grid[x][z].zone.zone_type == ZoneType.Road && !isroadupdating)
 		{
 			isroadupdating = true;
 			updateRoadsAround(x, z);
@@ -540,6 +542,10 @@ public class GameView : MonoBehaviour
 			}
 
 			// Set the road mesh
+
+			//write all of the cell data out with the handledebug
+			HandleDebug(this,"x: " + x + " z: " + z + " roadMask: " + roadMask + " rotationY: " + rotationY);
+
 			MeshRenderer meshrenderer = cell.Building.GetComponent<MeshRenderer>();
 
 			MeshFilter roadMeshFilter = meshrenderer.GetComponent<MeshFilter>();
@@ -582,7 +588,7 @@ public class GameView : MonoBehaviour
 	{
 		if (CheckGrid(x, z))
 		{
-			return (gameData.grid[x][z].zoneType == ZoneType.Road || gameData.grid[x][z].zoneType == ZoneType.IncomingRoad);
+			return (gameData.grid[x][z].zone.zone_type == ZoneType.Road || gameData.grid[x][z].zone.zone_type == ZoneType.IncomingRoad);
 		}
 
 		return false;
@@ -710,7 +716,7 @@ public class GameView : MonoBehaviour
 			int newX = x + dx[dir];
 			int newZ = z + dz[dir];
 
-			if (newX >= 0 && newZ >= 0 && newX < GridWidth && newZ < GridHeight && gameData.grid[newX][newZ].zoneType == ZoneType.Road)
+			if (newX >= 0 && newZ >= 0 && newX < GridWidth && newZ < GridHeight && gameData.grid[newX][newZ].zone.zone_type == ZoneType.Road)
 			{
 				return dir;
 			}
@@ -739,7 +745,7 @@ public class GameView : MonoBehaviour
 						int adjustedX = x + (quadrant == 1 || quadrant == 3 ? -offsetX : offsetX);
 						int adjustedZ = z + (quadrant == 2 || quadrant == 3 ? -offsetZ : offsetZ);
 
-						if (adjustedX < 0 || adjustedZ < 0 || adjustedX >= GridWidth || adjustedZ >= GridHeight || gameData.grid[adjustedX][adjustedZ].zoneType != gameData.grid[x][z].zoneType || grid[adjustedX][adjustedZ].Building != null)
+						if (adjustedX < 0 || adjustedZ < 0 || adjustedX >= GridWidth || adjustedZ >= GridHeight || gameData.grid[adjustedX][adjustedZ].zone.zone_type != gameData.grid[x][z].zone.zone_type || grid[adjustedX][adjustedZ].Building != null)
 						{
 							canPlace = false;
 							break;

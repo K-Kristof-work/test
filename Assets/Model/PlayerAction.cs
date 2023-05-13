@@ -24,9 +24,10 @@ namespace Assets.Model
 
         public void SelectZone(int x, int z)
         {
-            int id = gameData.grid[x][z].zoneId;
 
-            if (id == 0) return;
+            int id = gameData.grid[x][z].zone.zone_id;
+
+            if (id == 0 || id == -1) return;
 
             // Find top left buttom right corners
             int tx = -1, tz = -1, bx = -1, bz = -1;
@@ -35,7 +36,7 @@ namespace Assets.Model
             {
                 for (int j = 0; j < gameData.gridHeight; j++)
                 {
-                    if(gameData.grid[i][j].zoneId == id)
+                    if(gameData.grid[i][j].zone.zone_id == id)
                     {
                         bx = i;
                         bz = j;
