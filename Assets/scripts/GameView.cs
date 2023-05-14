@@ -657,7 +657,7 @@ public class GameView : MonoBehaviour
 
 		float buildingPosY = buildingPrefab.transform.position.y;
 		int chosenQuadrant = -1;
-		Vector3 centerPosition = GetCenterPosition(positions, (int)block.blockSize.x, (int)block.blockSize.y, buildingPosY, ref chosenQuadrant);
+		Vector3 centerPosition = GetCenterPosition(positions, buildingPosY, ref chosenQuadrant);
 
 		HandleDebug(this, "prefab center position calculated");
 
@@ -677,24 +677,9 @@ public class GameView : MonoBehaviour
 			if (affectedX != x || affectedZ != z)
 			{
 				grid[affectedX][affectedZ].Building = buildingInstance;
+				HandleDebug(this, "cell  in position " + x + ", " + z + " have been allocated for the building");
 			}
 		}
-		/*
-		for (int offsetX = 0; offsetX < block.blockSize.x; offsetX++)
-		{
-			for (int offsetZ = 0; offsetZ < block.blockSize.y; offsetZ++)
-			{
-				if (offsetX == 0 && offsetZ == 0) continue; // Skip the original grid cell
-
-				int affectedX = x + (chosenQuadrant == 1 || chosenQuadrant == 3 ? -offsetX : offsetX);
-				int affectedZ = z + (chosenQuadrant == 2 || chosenQuadrant == 3 ? -offsetZ : offsetZ);
-
-				if (affectedX >= 0 && affectedZ >= 0 && affectedX < GridWidth && affectedZ < GridHeight)
-				{
-					grid[affectedX][affectedZ].Building = buildingInstance;
-				}
-			}
-		}*/
 
 		HandleDebug(this, "other cells have been allocated for the building");
 
@@ -726,50 +711,27 @@ public class GameView : MonoBehaviour
 	}
 
 
-	private Vector3 GetCenterPosition(List<Vec2> positions, int buildingSizeX, int buildingSizeZ, float buildingPosY, ref int chosenQuadrant)
+	private Vector3 GetCenterPosition(List<Vec2> positions, float buildingPosY, ref int chosenQuadrant)
 	{
-		int maxSize = Mathf.Max(buildingSizeX, buildingSizeZ);
+		float sumX = 0;
+		float sumZ = 0;
 
 		foreach (Vec2 position in positions)
 		{
-			int x = (int)position.x;
-			int z = (int)position.y;
-
-			for (int quadrant = 0; quadrant < 6; quadrant++)
-			{
-				bool canPlace = true;
-				for (int offsetX = 0; offsetX < maxSize; offsetX++)
-				{
-					for (int offsetZ = 0; offsetZ < maxSize; offsetZ++)
-					{
-						int adjustedX = x + (quadrant == 1 || quadrant == 3 ? -offsetX : offsetX);
-						int adjustedZ = z + (quadrant == 2 || quadrant == 3 ? -offsetZ : offsetZ);
-
-						if (adjustedX < 0 || adjustedZ < 0 || adjustedX >= GridWidth || adjustedZ >= GridHeight || gameData.grid[adjustedX][adjustedZ].zone.zone_type != gameData.grid[x][z].zone.zone_type || grid[adjustedX][adjustedZ].Building != null)
-						{
-							canPlace = false;
-							break;
-						}
-					}
-					if (!canPlace) break;
-				}
-
-				if (canPlace)
-				{
-					float xOffset = ((buildingSizeX - 1) / 2f) * (quadrant == 1 || quadrant == 3 ? -1 : 1);
-					float zOffset = ((buildingSizeZ - 1) / 2f) * (quadrant == 2 || quadrant == 3 ? -1 : 1);
-					chosenQuadrant = quadrant;
-					return grid[x][z].Position + new Vector3(xOffset, buildingPosY / 10f, zOffset);
-				}
-			}
+			sumX += position.x;
+			sumZ += position.y;
 		}
 
-		// Default position if no valid center position is found
-		Vec2 firstPosition = positions[0];
-		int firstX = (int)firstPosition.x;
-		int firstZ = (int)firstPosition.y;
-		return new Vector3(grid[firstX][firstZ].Position.x, buildingPosY, grid[firstX][firstZ].Position.z);
+		float avgX = sumX / positions.Count;
+		float avgZ = sumZ / positions.Count;
+
+		// Get y coordinate (height) from the first position in the list
+		int firstX = (int)positions[0].x;
+		int firstZ = (int)positions[0].y;
+
+		return new Vector3(avgX, buildingPosY/10f, avgZ);
 	}
+
 
 	public void PlaceBuildingByUser(Vector3 worldPosition, BlockType type)
 	{

@@ -407,5 +407,12 @@ namespace Assets.Model
                 data.time.speed = 1;
             }
         }
-    }
+
+        public int SetZoneTimerInterval(ZoneData zone)
+        { 
+            return 1000;
+            //the logic for the timer interval
+        }
+
+	}
 }

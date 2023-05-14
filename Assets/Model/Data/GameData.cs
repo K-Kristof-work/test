@@ -36,9 +36,9 @@ namespace Assets.Model.Data
 		public GameData()
 		{
 			availableBuildingSizes = new Dictionary<ZoneType, List<Vec2>>();
-			availableBuildingSizes.Add(ZoneType.Residential, new List<Vec2> { new Vec2(1, 1), new Vec2(2, 2), new Vec2(3, 3), new Vec2(1, 2) });
+			availableBuildingSizes.Add(ZoneType.Residential, new List<Vec2> { new Vec2(1, 1), new Vec2(2, 2), new Vec2(3, 3)});
 			availableBuildingSizes.Add(ZoneType.Commercial, new List<Vec2> { new Vec2(1, 1) });
-			availableBuildingSizes.Add(ZoneType.Industrial, new List<Vec2> { new Vec2(1, 1) });
+			availableBuildingSizes.Add(ZoneType.Industrial, new List<Vec2> { new Vec2(1, 1), new Vec2(2, 2), new Vec2(3, 3) });
 			buildingPlacer = new BuildingPlacer(this, availableBuildingSizes);
 			citizens = new List<Citizen>();
 			cityLogic = new CityLogic(this);
@@ -62,10 +62,10 @@ namespace Assets.Model.Data
 
 			grid = new List<List<Field>>();
 
-			zones.Add(new ZoneData(0, ZoneType.Empty, 0));
-			zones.Add(new ZoneData(-3, ZoneType.IncomingRoad, 0));
-			zones.Add(new ZoneData(-2, ZoneType.Water, 0));
-			zones.Add(new ZoneData(-1, ZoneType.Road, 0));
+			zones.Add(new ZoneData(0, ZoneType.Empty, 0, buildingPlacer, this));
+			zones.Add(new ZoneData(-3, ZoneType.IncomingRoad, 0, buildingPlacer, this));
+			zones.Add(new ZoneData(-2, ZoneType.Water, 0, buildingPlacer, this));
+			zones.Add(new ZoneData(-1, ZoneType.Road, 0,buildingPlacer,this));
 
 			if (gridHeight < 10 || gridWidth < 10)
             {
@@ -90,7 +90,7 @@ namespace Assets.Model.Data
 			}
 
 			//PlaceIncomingRoad();
-			zones.Add(new ZoneData(0, ZoneType.Empty, 0));
+			zones.Add(new ZoneData(0, ZoneType.Empty, 0, buildingPlacer, this));
 
 			PlaceIncomingRoadCenter();
 
@@ -163,11 +163,13 @@ namespace Assets.Model.Data
 				
 				grid[x][z].zone = GetZoneDataById(-2);
 				grid[x][z].zone.zone_type = ZoneType.Water;
+				grid[x][z].zone.AddField(grid[x][z]);
 				OnZoneTypeChanged?.Invoke(x, z, _zoneType);
 			}else if(_zoneType == ZoneType.IncomingRoad)
 			{
 				grid[x][z].zone = GetZoneDataById(-3);
 				grid[x][z].zone.zone_type = ZoneType.IncomingRoad;
+				grid[x][z].zone.AddField(grid[x][z]);
 				OnZoneTypeChanged?.Invoke(x, z, _zoneType);
 			}
 
@@ -257,6 +259,8 @@ namespace Assets.Model.Data
 					}
 				}
 			}
+
+			zones.Remove(GetZoneDataById(id));
 		}
 
 		public ZoneType GetZoneType(int id)
@@ -288,7 +292,7 @@ namespace Assets.Model.Data
 				if(!zones.Contains(zones.Find(z => z.zone_id == _zoneId)))
 				{
 					//make a new zonedata for this zoneid
-					ZoneData zone = new ZoneData(_zoneId, _zoneType, 0);
+					ZoneData zone = new ZoneData(_zoneId, _zoneType, 0, buildingPlacer, this);
 					zones.Add(zone);
 				}
 				ZoneData zd = zones.Find(z => z.zone_id == _zoneId);
@@ -297,6 +301,7 @@ namespace Assets.Model.Data
 					DebugInUnity(this, "ERROR: zonetype missmatch");
 
 				zd.zone_capacity += 1;
+				zd.AddField(grid[x][z]);
 
 				grid[x][z].zone = zd;
 				nextZone = _zoneId + 1;
@@ -383,6 +388,10 @@ namespace Assets.Model.Data
 		public void OnApplicationExit()
 		{
 			buildingPlacer.ExitTimeEvent();
+			foreach (ZoneData zd in zones)
+			{
+				zd.ExitTimeEvent();
+			}
 		}
 
 		public List<Block> GetBuildings()
