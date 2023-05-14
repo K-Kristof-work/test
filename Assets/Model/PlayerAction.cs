@@ -12,7 +12,7 @@ namespace Assets.Model
         private GameData gameData;
 
         public delegate void ZoneSelectEventHandler(int id, int tx, int tz, int bx, int bz);
-        public delegate void ZoneInfoEventHandler(ZoneType zoneType);
+        public delegate void ZoneInfoEventHandler(ZoneType zoneType, int fullness, int capacity, int taxes, int lvl, int happiness);
 
         public event ZoneSelectEventHandler OnZoneSelected;
         public event ZoneInfoEventHandler OnZoneInfo;
@@ -47,10 +47,32 @@ namespace Assets.Model
 			OnZoneSelected?.Invoke(id, minX, minZ, maxX, maxZ);
 		}
 
+		public void UpgradeZone(int id)
+		{
+            gameData.GetZoneDataById(id).zone_level++;
+			ZoneInfo(id);
+        }
 
-		public void ZoneInfo(int id)
+		public void IncreaseTax(int id)
+		{
+            gameData.GetZoneDataById(id).zone_tax++;
+            ZoneInfo(id);
+        }
+
+        public void DecreaseTax(int id)
         {
-            OnZoneInfo?.Invoke(gameData.GetZoneType(id));
+            gameData.GetZoneDataById(id).zone_tax--;
+            ZoneInfo(id);
+        }
+
+        public void ZoneInfo(int id)
+        {
+			ZoneData zd = gameData.GetZoneDataById(id);
+
+			if(zd != null)
+			{
+				OnZoneInfo?.Invoke(gameData.GetZoneType(id), zd.zone_population, zd.zone_capacity, zd.zone_tax, zd.zone_level, zd.zone_happiness);
+			}
         }
     }
 }
