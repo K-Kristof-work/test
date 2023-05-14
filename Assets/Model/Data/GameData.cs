@@ -392,10 +392,13 @@ namespace Assets.Model.Data
 			{
 				foreach (Field field in row)
 				{
-					if (!buildings.Contains(field.block))
+					if(field.block != null)
 					{
-						buildings.Add(field.block);
-					}
+                        if (!buildings.Contains(field.block))
+                        {
+                            buildings.Add(field.block);
+                        }
+                    }					
 				}
 			}
 			return buildings;

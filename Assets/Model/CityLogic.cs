@@ -23,7 +23,7 @@ namespace Assets.Model
 
         private double safetyRadius = 2.0;
 
-        private int season = 0;
+        private int season = -1;
 
         private double happinessFromLowCommute = 0;
         private double happinessFromTax = 0;
@@ -51,15 +51,16 @@ namespace Assets.Model
         public CityLogic(GameData gd)
         {
             data = gd;
-            Timer quickTimer = new Timer(50);
-            quickTimer.Elapsed += FastUpdate;
-            quickTimer.AutoReset = true;
-            quickTimer.Enabled = true;
+            Timer timer = new Timer(1000);
+            timer.Elapsed += Update;
+            timer.AutoReset = true;
+            timer.Enabled = true;
 
-            Timer slowTimer = new Timer(1000);
-            slowTimer.Elapsed += SlowUpdate;
-            slowTimer.AutoReset = true;
-            slowTimer.Enabled = true;
+            Timer seasonTimer = new Timer(50);
+            seasonTimer.Elapsed += SeasonUpdate;
+            seasonTimer.AutoReset = true;
+            seasonTimer.Enabled = true;
+
             //Init();
             //No idea how to call the first update of the balance
         }
@@ -70,17 +71,19 @@ namespace Assets.Model
             OnMoneyChanged?.Invoke(data.balance, 0, "Init");
         }*/
 
-        public void FastUpdate(object source, ElapsedEventArgs e)
+
+        public void SeasonUpdate(object source, ElapsedEventArgs e)
         {
             UpdateTime();
             OnTimeChanged?.Invoke(data.time);
-        }
 
-        public void SlowUpdate(object source, ElapsedEventArgs e)
-        {
-            //Every quarter of a year, get taxes, pay pension and maintenance costs
+            if (season == -1)
+            {
+                season = data.time.getSeason();
+            }
             if (season != data.time.getSeason())
             {
+                data.DebugInUnity(this, "SeasonChange");
                 data.DebugInUnity(this, "1");
                 GetTaxes();
                 data.DebugInUnity(this, "2");
@@ -91,27 +94,40 @@ namespace Assets.Model
                 //if its not winter, grow the forests
                 if (data.time.getSeason() != 3)
                 {
-                    data.DebugInUnity(this, "5");
                     GrowForests();
+                    data.DebugInUnity(this, "5");
                 }
-            }
-            //Every year, update citizen age and kill the elderly
-            if (season == 3 && data.time.getSeason() == 0)
-            {
-                data.DebugInUnity(this, "6");
-                UpdateCitizenAge();
-                data.DebugInUnity(this, "7");
-                KillTheElderly();
+                if (season == 3 && data.time.getSeason() == 0)
+                {
+                    UpdateCitizenAge();
+                    data.DebugInUnity(this, "6");
+                    KillTheElderly();
+                    data.DebugInUnity(this, "7");
+                }
+
+                data.DebugInUnity(this, "before " + season);
+
+                season = data.time.getSeason();
+
+                data.DebugInUnity(this, "after " + season);
+
+                data.DebugInUnity(this, "8");
 
             }
-            data.DebugInUnity(this, "8");
-            EducateCitizens();
-            data.DebugInUnity(this, "9");
-            UpdateCitizenHappiness();
-            data.DebugInUnity(this, "10");
-            UpdatePowerConnectivity();
+        }
 
+        public void Update(object source, ElapsedEventArgs e)
+        {
+            /*data.DebugInUnity(this, "FirstSeason " + season + "DataSeason: " + data.time.getSeason());
+
+            data.DebugInUnity(this, "SecondSeasonOne" + season);
             season = data.time.getSeason();
+            data.DebugInUnity(this, "SecondSeasonTwo" + season);*/
+
+            EducateCitizens();
+            UpdateCitizenHappiness();
+            UpdatePowerConnectivity();
+            
         }
 
         private void UpdateTime()
@@ -139,7 +155,7 @@ namespace Assets.Model
         private void GetTaxes()
         {
             int taxes = 0;
-            data.DebugInUnity(this, "bruw");
+            data.DebugInUnity(this, "GetTaxes");
             data.DebugInUnity(this, "num of citizen" + data.citizens.Count);
             foreach (Citizen citizen in data.citizens)
             {
@@ -172,24 +188,26 @@ namespace Assets.Model
         private void PayMaintenanceCosts()
         {
             int maintenanceCosts = 0;
-            data.DebugInUnity(this, "paying maintenance costs");
+            data.DebugInUnity(this, "Maintenance");
             data.DebugInUnity(this, "num of buildings" + data.GetBuildings().Count);
-            foreach (List<Field> row in data.grid)
+            foreach (Block block in data.GetBuildings())
             {
-                foreach (Field field in row)
-                {
-
-                }
+                maintenanceCosts += block.operating_cost;
             }
+            data.balance -= maintenanceCosts;
             OnMoneyChanged?.Invoke(data.balance, maintenanceCosts, "MaintinenceCosts");
         }
 
         private void GrowForests()
         {
+            data.DebugInUnity(this, "building count" + data.GetBuildings().Count.ToString());
             foreach (Block block in data.GetBuildings())
             {
+                data.DebugInUnity(this, "blocktype" + block.type.ToString());
+                data.DebugInUnity(this, "uno");
                 if (block.type == BlockType.Forest && block.lvl < 3)
                 {
+                    data.DebugInUnity(this, "dos");
                     block.building_progress++;
                     if (block.building_progress == 10)
                     {
@@ -197,7 +215,9 @@ namespace Assets.Model
                         block.building_progress = 0;
                     }
                 }
+                data.DebugInUnity(this, "tres");
             }
+
             data.DebugInUnity(this, "growing forests");
         }
 
