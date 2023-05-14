@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.18028334, g: 0.2257134, b: 0.30692226, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028331, g: 0.2257133, b: 0.3069217, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -7128,16 +7128,16 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: 
-        m_Mode: 1
+      - m_Target: {fileID: 1039642953}
+        m_TargetAssemblyTypeName: FloatingBuildings, Assembly-CSharp
+        m_MethodName: OnBuildingPlacerButtonClicked
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: University
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &598549580
@@ -12288,12 +12288,14 @@ MonoBehaviour:
   - {fileID: 7409569521258979581, guid: c55dd90dacf0cfd4babd53f2f77971e1, type: 3}
   SchoolBuildingPrefabs:
   - {fileID: 6792741884445454080, guid: f6f643271969f83429c4a693af2b9c9a, type: 3}
-  UniversityBuildingPrefabs: []
+  UniversityBuildingPrefabs:
+  - {fileID: 5123974430126005521, guid: e222053cf87340c41b4ba6c430059c08, type: 3}
   UI_Time: {fileID: 203798135}
   UI_Money: {fileID: 1029051741}
   UI_Happiness: {fileID: 952768466}
   ExpenseContent: {fileID: 1533658736}
   ExpenseRow: {fileID: 2907497744283867882, guid: ae9710e3a4ce5a24687b8f952b396d0a, type: 3}
+  IncomeRow: {fileID: 0}
   ExpenseRowCount: 0
   SpeedObject: {fileID: 1786953186}
   PauseButtonImage: {fileID: 21300000, guid: 66a48cf36f4e87c43963d29b3886ef22, type: 3}
@@ -12404,7 +12406,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PoliceFloatingObject: {fileID: 6399728808837600598, guid: 2505b8f8904aac24c9b805d99ddb6230, type: 3}
-  UniversityFloatingObject: {fileID: 0}
+  UniversityFloatingObject: {fileID: 5123974430126005521, guid: d42cf6dbc273bbe46ae71a00dfd1a5c9, type: 3}
   HighschoolFloatingObject: {fileID: 6792741884445454080, guid: e2d59ae336b0f564dabd7cae5a144597, type: 3}
   StadiumFloatingObject: {fileID: 7409569521258979581, guid: 109631c75174a7d499a80ae3da3b19be, type: 3}
 --- !u!114 &1039642954
@@ -19634,7 +19636,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1638858690}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1039642954}
+        m_TargetAssemblyTypeName: GridZoneSelection, Assembly-CSharp
+        m_MethodName: UpgradeZoneLevel
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1638858690
 MonoBehaviour:
   m_ObjectHideFlags: 0

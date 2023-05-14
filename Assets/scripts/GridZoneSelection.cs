@@ -42,13 +42,13 @@ public class GridZoneSelection : MonoBehaviour
         try
         {
             playerAction.OnZoneSelected -= HandleZoneSelected;
-        }catch(Exception){}
+        } catch (Exception) { }
 
         try
         {
             playerAction.OnZoneInfo -= HandleZoneInfo;
         }
-        catch(Exception){}
+        catch (Exception) { }
     }
 
     // Update is called once per frame
@@ -105,13 +105,23 @@ public class GridZoneSelection : MonoBehaviour
 
     public void DeleteZoneSelected()
     {
-        if(this.selection_id > 0)
+        if (this.selection_id > 0)
         {
             gameData.DeleteZone(this.selection_id);
             selectionBox.SetVisible(false);
             IsZoneSelected = false;
             sidebar.Close();
         }
+    }
+
+
+
+    public void UpgradeZoneLevel()
+    {
+        if (this.selection_id > 0)  
+        {
+			gameData.GetZoneDataById(this.selection_id).zone_level++;
+		}
     }
 
     private void HandleZoneInfo(ZoneType zoneType)

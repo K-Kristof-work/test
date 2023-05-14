@@ -10,7 +10,6 @@ using System.Timers;
 public class BuildingPlacer
 {
 	private GameData gameData;
-	private Timer timer;
 	private int buildInterval;
 	private int checkingFrequency;
 	private int counter;
@@ -26,78 +25,8 @@ public class BuildingPlacer
 		this.buildablePositions = new List<Vec2>();
 		this.availableBuildingSizes = _availableBuildingSizes;
 
-		timer = new Timer(this.buildInterval);
-		timer.Elapsed += OnTimedEvent;
-		timer.AutoReset = true;
-		timer.Enabled = true;
 	}
 
-	private void OnTimedEvent(object source, ElapsedEventArgs e)
-	{
-		//try { PlaceBuildingsOverTime(); } 
-		//catch (Exception ex){
-			//gameData.DebugInUnity(this,"An error occurred: " + ex.Message);
-		//}
-		
-	}
-
-	public void ExitTimeEvent()
-	{
-		timer.Stop();
-		timer.Dispose();
-	}
-
-
-	private void PlaceBuildingsOverTime()
-	{
-		if (checkingFrequency == counter)
-		{
-			buildablePositions = new List<Vec2>();
-			counter = 0;
-			for (int x = 0; x < gameData.gridWidth; x++)
-			{
-				for (int z = 0; z < gameData.gridHeight; z++)
-				{
-					if (gameData.grid[x][z].zone.zone_type != ZoneType.Empty && gameData.grid[x][z].zone.zone_type != ZoneType.Road && gameData.grid[x][z].zone.zone_type != ZoneType.Water && gameData.grid[x][z].zone.zone_type != ZoneType.IncomingRoad && gameData.grid[x][z].block == null )
-					{
-						// Check if there's a road in the vicinity
-						if (gameData.IsConnectedRoad(x - 1, z) || gameData.IsConnectedRoad(x + 1, z) || gameData.IsConnectedRoad(x, z - 1) || gameData.IsConnectedRoad(x, z + 1))
-						{
-							buildablePositions.Add(new Vec2((uint)x, (uint)z));
-						}
-					}
-				}
-			}
-		}
-		counter++;
-
-		if (buildablePositions.Count > 0)
-		{
-			// Choose a random buildable position
-			Vec2 randomPosition = buildablePositions[RandomRange(0, buildablePositions.Count)];
-
-			ZoneType selectedZonetype = gameData.grid[(int)randomPosition.x][(int)randomPosition.y].zone.zone_type;
-			BlockType blocktype;
-
-			if (selectedZonetype == ZoneType.Residential)
-			{
-				blocktype = BlockType.House;
-			}
-			else if (selectedZonetype == ZoneType.Commercial)
-			{
-				blocktype = BlockType.Shop;
-			}
-			else
-			{
-				blocktype = BlockType.Factory;
-			}
-
-			// Place a building at the random position
-			
-			PlaceBuilding((int)randomPosition.x, (int)randomPosition.y, gameData.grid[(int)randomPosition.x][(int)randomPosition.y].zone.zone_type, blocktype);
-			gameData.DebugInUnity(this,"building placed at " + randomPosition.x + ", " + randomPosition.y + "+ current buildable positions: " + buildablePositions.Count);
-		}
-	}
 
 	private int RandomRange(int min, int max)
 	{
@@ -105,7 +34,7 @@ public class BuildingPlacer
 		return random.Next(min, max);
 	}
 
-	public void PlaceBuilding(int x, int z, ZoneType zoneType, BlockType blocktype)
+	public void PlaceBuilding(int x, int z, ZoneType zoneType, BlockType blocktype, int level)
 	{
 		// Check if a building is already placed
 		if (gameData.grid[x][z].block != null) return;
@@ -118,7 +47,7 @@ public class BuildingPlacer
 		// Get a random building prefab of the appropriate size for the zone type
 		List<Vec2> suitableSizes = availableBuildingSizes[zoneType].Where(block =>
 		{
-			return block.x <= maxSize && block.y <= maxSize;
+			return block.x <= maxSize && block.y <= maxSize && block.x <= level && block.y <= level ;
 		}).ToList();
 		Random rand = new Random();
 		Vec2 buildingPrefab = suitableSizes[rand.Next(0, suitableSizes.Count)];
@@ -294,7 +223,7 @@ public class BuildingPlacer
 			case BlockType.School:
 				return new Vec2(2, 2);
 			case BlockType.University:
-				return new Vec2(1, 1);
+				return new Vec2(2, 2);
 			case BlockType.PowerPlant:
 				return new Vec2(1, 1);
 			default:

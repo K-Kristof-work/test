@@ -115,7 +115,7 @@ public class ZoneData
 
 			// Place a building at the random position
 
-			bp.PlaceBuilding((int)randomPosition.x, (int)randomPosition.y, zone_type, blocktype);
+			bp.PlaceBuilding((int)randomPosition.x, (int)randomPosition.y, zone_type, blocktype, zone_level);
 			gameData.DebugInUnity(this, "building placed at " + randomPosition.x + ", " + randomPosition.y + "+ current buildable positions: " + buildablePositions.Count);
 		}
 
@@ -131,8 +131,11 @@ public class ZoneData
 
 	public void ExitTimeEvent()
 	{
-		timer.Stop();
-		timer.Dispose();
+		if(timer!= null) {
+			timer.Stop();
+			timer.Dispose();
+		}
+
 	}
 
 
