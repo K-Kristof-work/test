@@ -34,10 +34,10 @@ public class BuildingPlacer
 
 	private void OnTimedEvent(object source, ElapsedEventArgs e)
 	{
-		try { PlaceBuildingsOverTime(); } 
-		catch (Exception ex){
-			gameData.DebugInUnity(this,"An error occurred: " + ex.Message);
-		}
+		//try { PlaceBuildingsOverTime(); } 
+		//catch (Exception ex){
+			//gameData.DebugInUnity(this,"An error occurred: " + ex.Message);
+		//}
 		
 	}
 

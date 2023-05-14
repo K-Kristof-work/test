@@ -7,10 +7,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
 using System;
+using System.Timers;
 
 public class ZoneData
 {
-    public int zone_id;
+	private Timer timer;
+	public int zone_id;
     public string zone_name;
     public ZoneType zone_type;
     public int zone_level;
@@ -42,9 +44,28 @@ public class ZoneData
         this.bp = _bp;
 		this.gameData = gm;
 		zone_fields= new List<Field>();
+
+		if(zone_type == ZoneType.Residential || zone_type == ZoneType.Commercial || zone_type == ZoneType.Industrial)
+		{
+			timer = new Timer(1);
+			timer.Elapsed += OnTimedEvent;
+			timer.AutoReset = true;
+			timer.Enabled = true;
+		}
+		
 	}
 
-    public void AddField(Field field)
+	private void OnTimedEvent(object source, ElapsedEventArgs e)
+	{
+		try { PlaceBuildingsOverTimeInZone(); }
+		catch (Exception ex)
+		{
+			gameData.DebugInUnity(this, "An error occurred: " + ex.Message);
+		}
+
+	}
+
+	public void AddField(Field field)
     {
 		zone_fields.Add(field);
 	}
@@ -97,12 +118,21 @@ public class ZoneData
 			bp.PlaceBuilding((int)randomPosition.x, (int)randomPosition.y, zone_type, blocktype);
 			gameData.DebugInUnity(this, "building placed at " + randomPosition.x + ", " + randomPosition.y + "+ current buildable positions: " + buildablePositions.Count);
 		}
+
+		timer.Interval = gameData.cityLogic.SetZoneTimerInterval(this);
+
 	}
 
 	private int RandomRange(int min, int max)
 	{
 		Random random = new Random();
 		return random.Next(min, max);
+	}
+
+	public void ExitTimeEvent()
+	{
+		timer.Stop();
+		timer.Dispose();
 	}
 
 
