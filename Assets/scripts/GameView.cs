@@ -47,6 +47,8 @@ public class GameView : MonoBehaviour
     public TextMeshProUGUI UI_Money;
     public TextMeshProUGUI UI_Happiness;
 
+	public GameObject HappinessIcon;
+
     public GameObject ExpenseContent;
     public GameObject ExpenseRow;
     public GameObject IncomeRow;
@@ -220,8 +222,26 @@ public class GameView : MonoBehaviour
 
 	private void HandleHappiness(double happiness)
 	{
-
-	}
+        Debug.Log("Happiness: " + happiness);
+        happiness *= 100;
+        UI_Happiness.text = happiness.ToString("0.00") + "%";
+        UnityThread.executeInUpdate(() =>
+        {
+            UI_Happiness.text = happiness.ToString("0.00") + "%";
+            if (happiness > 70)
+            {
+                HappinessIcon.GetComponent<Image>().sprite = HappyFace;
+            }
+            else if (happiness > 40)
+            {
+                HappinessIcon.GetComponent<Image>().sprite = NeutralFace;
+            }
+            else
+            {
+                HappinessIcon.GetComponent<Image>().sprite = SadFace;
+            }
+        });
+    }
 
 	private void OnApplicationQuit()
 	{

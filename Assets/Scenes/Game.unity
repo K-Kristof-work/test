@@ -12210,6 +12210,7 @@ GameObject:
   - component: {fileID: 1039642954}
   - component: {fileID: 1039642952}
   - component: {fileID: 1039642953}
+  - component: {fileID: 1039642955}
   m_Layer: 0
   m_Name: GameView
   m_TagString: Untagged
@@ -12292,8 +12293,10 @@ MonoBehaviour:
   UI_Time: {fileID: 203798135}
   UI_Money: {fileID: 1029051741}
   UI_Happiness: {fileID: 952768466}
+  HappinessIcon: {fileID: 1881817222}
   ExpenseContent: {fileID: 1533658736}
   ExpenseRow: {fileID: 2907497744283867882, guid: ae9710e3a4ce5a24687b8f952b396d0a, type: 3}
+  IncomeRow: {fileID: 0}
   ExpenseRowCount: 0
   SpeedObject: {fileID: 1786953186}
   PauseButtonImage: {fileID: 21300000, guid: 66a48cf36f4e87c43963d29b3886ef22, type: 3}
@@ -12423,6 +12426,23 @@ MonoBehaviour:
   sidebar: {fileID: 1645258418}
   IsZoneSelected: 0
   selection_id: 0
+--- !u!114 &1039642955
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1039642947}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 67a25c88b4d39834185a2c88880c84c9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  prefab_cylinder: {fileID: 5967791351818794213, guid: 6675dd447f1114749bb7b005a019b49a, type: 3}
+  prefab_meteor: {fileID: 160260, guid: becedaa36441f6448abcf34c66eb61e3, type: 3}
+  MeteoritButton: {fileID: 1706355677}
+  NormalColor: {r: 0, g: 0, b: 0, a: 0}
+  SelectedColor: {r: 0, g: 0, b: 0, a: 0}
 --- !u!1 &1062738750
 GameObject:
   m_ObjectHideFlags: 0
