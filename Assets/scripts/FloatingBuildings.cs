@@ -47,14 +47,18 @@ public class FloatingBuildings : MonoBehaviour
 			{
 				Vector3 mousePosition = mouseRay.GetPoint(rayDistance);
 				Vec2 offset = gameView.GetBuildingPlacerSizeForBuildingType(blockType);
-				if(offset.x == 2 || offset.y == 2)
+				if (offset.x == 2 || offset.y == 2)
 				{
 					mousePosition.x += 0.5f;
 					mousePosition.z += 0.5f;
 				}
 				gameView.HandleDebug(this, mousePosition.ToString());
+				// Adjust the Y position by half of the prefab's height
+				float prefabHeight = floatingObject.GetComponent<MeshRenderer>().bounds.size.y;
+				mousePosition.y += prefabHeight / 2;
 				floatingObject.transform.position = mousePosition;
 			}
+
 
 			// if clicked, destroy the floating object
 			if (Input.GetMouseButtonDown(0))

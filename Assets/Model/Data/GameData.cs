@@ -387,7 +387,6 @@ namespace Assets.Model.Data
 
 		public void OnApplicationExit()
 		{
-			buildingPlacer.ExitTimeEvent();
 			foreach (ZoneData zd in zones)
 			{
 				zd.ExitTimeEvent();
