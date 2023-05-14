@@ -44,6 +44,16 @@ public class Sidebar : MonoBehaviour
         title.SetText(titleList[(int)panel]);
     }
 
+    public void SetDetails(SidebarPanel panel, int fullness, int capacity, int taxes, int level, int happiness)
+    {
+        SidebarContent sc = contentList[(int)panel];
+        sc.fullness.SetText(fullness.ToString() + '%');
+        sc.capacity.SetText(capacity.ToString());
+        sc.taxes.SetText(taxes.ToString() + '%');
+        sc.level.SetText(level.ToString());
+        sc.happiness.SetText(happiness.ToString() + '%');
+    }
+
     private void DisplayContent(SidebarPanel panel)
     {
         foreach (var item in contentList)

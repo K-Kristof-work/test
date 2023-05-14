@@ -114,28 +114,46 @@ public class GridZoneSelection : MonoBehaviour
         }
     }
 
+    public void IncreaseTax()
+    {
+        if (this.selection_id > 0)
+        {
+            playerAction.IncreaseTax(this.selection_id);
+        }
+    }
+
+    public void DecreaseTax()
+    {
+        if (this.selection_id > 0)
+        {
+            playerAction.DecreaseTax(this.selection_id);
+        }
+    }
 
 
     public void UpgradeZoneLevel()
     {
         if (this.selection_id > 0)  
         {
-			gameData.GetZoneDataById(this.selection_id).zone_level++;
+            playerAction.UpgradeZone(this.selection_id);
 		}
     }
 
-    private void HandleZoneInfo(ZoneType zoneType)
+    private void HandleZoneInfo(ZoneType zoneType, int fullness, int capacity, int taxes, int lvl, int happiness)
     {
         switch (zoneType)
         {
             case ZoneType.Commercial:
                 sidebar.Open(SidebarPanel.CommercialZone);
+                sidebar.SetDetails(SidebarPanel.CommercialZone, fullness, capacity, taxes, lvl, happiness);
                 break;
             case ZoneType.Residential:
                 sidebar.Open(SidebarPanel.ResidentialZone);
+                sidebar.SetDetails(SidebarPanel.ResidentialZone, fullness, capacity, taxes, lvl, happiness);
                 break;
             case ZoneType.Industrial:
                 sidebar.Open(SidebarPanel.IndustrialZone);
+                sidebar.SetDetails(SidebarPanel.IndustrialZone, fullness, capacity, taxes, lvl, happiness);
                 break;
         }
     }
