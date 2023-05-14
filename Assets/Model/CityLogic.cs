@@ -7,6 +7,7 @@ using Assets.Model.Data;
 using System.Timers;
 using static Assets.Model.Data.GameData;
 using System.Diagnostics;
+using UnityEngine;
 
 namespace Assets.Model
 {
@@ -14,7 +15,7 @@ namespace Assets.Model
     {
         private double industryRadius = 2.0;
         private double forestRadius = 2.0;
-        private double homeToWorkRadius = 1.0;
+        private double homeToWorkRadius = 100000.0;
         private double highSchoolRadius = 2.0;
         private double universityRadius = 2.0;
         private double standardCitizenHapiness = 1.0;
@@ -35,7 +36,9 @@ namespace Assets.Model
 
         private double happinessReward = 1;
 
-        public delegate void TimeEventHandler(Time time);
+        private int bekoltozesELoszor = 500;
+
+        public delegate void TimeEventHandler(Assets.Model.Data.Time time);
         public delegate void MoneyEventHandler(int balance, int difference, string type);
         //public delegate void IncomeSpendingEventHandler(int money);
         //public delegate void HappinessEventHandler(double commute, double tax, double industry, double forest, double safety, double debt, double ratio);
@@ -47,16 +50,19 @@ namespace Assets.Model
         //public event HappinessEventHandler OnHappinessChanged;
         public event OnHappinessChangedEventHandler OnHappinessChanged;
 
+        private Timer timer;
+        private Timer seasonTimer;
+
         private GameData data;
         public CityLogic(GameData gd)
         {
             data = gd;
-            Timer timer = new Timer(1000);
+            timer = new Timer(1000);
             timer.Elapsed += Update;
             timer.AutoReset = true;
             timer.Enabled = true;
 
-            Timer seasonTimer = new Timer(50);
+            seasonTimer = new Timer(50);
             seasonTimer.Elapsed += SeasonUpdate;
             seasonTimer.AutoReset = true;
             seasonTimer.Enabled = true;
@@ -127,7 +133,100 @@ namespace Assets.Model
             EducateCitizens();
             UpdateCitizenHappiness();
             UpdatePowerConnectivity();
+            data.DebugInUnity(this, "9");
+            UpdateCitizens();
+            data.DebugInUnity(this, "10");
             
+        }
+
+        public void ExitTimeEvent()
+        {
+            timer.Stop();
+            timer.Dispose();
+            seasonTimer.Stop();
+            seasonTimer.Dispose();
+        }
+
+        private void UpdateCitizens()
+        {
+            //if the happiness is above 30% a new citizen will move in
+            Citizen citizen = new Citizen();
+            //the citizen will take a random home
+            foreach (List<Field> row in data.grid)
+            {
+                foreach (Field field in row)
+                {
+                    if(field.block == null)
+                    {
+                        continue;
+                    }
+                    data.DebugInUnity(this, "11");
+                    Block block = field.block;
+                    data.DebugInUnity(this, "12");
+                    data.DebugInUnity(this, "block.citizen.Count" + block.citizens.Count);
+                    data.DebugInUnity(this, "block.lvl" + block.lvl);
+                    if (block.citizens.Count <= block.lvl * 10 && block.type == BlockType.House)
+                    {
+                        data.DebugInUnity(this, "13");
+                        citizen.home = field;
+                        block.citizens.Add(citizen);
+                        data.citizens.Add(citizen);
+                        data.DebugInUnity(this, "Citizen moved in");
+
+                        FindAJob(citizen);
+                        data.DebugInUnity(this, "14");
+                        return;
+                    }
+                }
+            }
+        }
+
+        private void FindAJob(Citizen citizen)
+        {
+            foreach (List<Field> row in data.grid)
+            {
+                foreach (Field field in row)
+                {
+                    //If the field has an industry or shop building on it and it is close enough to the home of the citizen
+
+                    if (field.block == null)
+                    {
+                        continue;
+                    }
+                    data.DebugInUnity(this, "15");
+                    data.DebugInUnity(this, "fild blocktype" + field.block.type.ToString());
+                    data.DebugInUnity(this, "Field.distanceFrom2Field(citizen.home, field)" + Field.distanceFrom2Field(citizen.home, field));
+                    if ((field.block.type == BlockType.Factory || field.block.type == BlockType.Shop) && Field.distanceFrom2Field(citizen.home, field) <= homeToWorkRadius)
+                    {
+                        data.DebugInUnity(this, "16");
+                        citizen.work = field;
+                        data.DebugInUnity(this, "17");
+                        field.block.citizens.Add(citizen);
+                        data.DebugInUnity(this, "18");
+                        data.DebugInUnity(this, "Citizen found a job");
+
+                        SetSalary(citizen, field);
+                        return;
+                    }
+                }
+            }
+        }
+
+        private void SetSalary(Citizen citizen, Field field)
+        {
+            int degreeMultiplier = 1;
+            //if the citizen has a bsc degree
+            if (citizen.diploma)
+            {
+                degreeMultiplier = 5;
+            }else if (citizen.bsc)
+            {
+                degreeMultiplier = 3;
+            }
+            //depending on the level of the building, the salary will be higher
+            citizen.salary = field.block.lvl * 100 * degreeMultiplier;
+            data.DebugInUnity(this, "19");
+            data.DebugInUnity(this, "citizen salary was set" + citizen.salary);
         }
 
         private void UpdateTime()
@@ -161,8 +260,8 @@ namespace Assets.Model
             {
                 if (citizen.age < 65)
                 {
-                    //data.balance += (int)(citizen.salary * (data.residencialTax * 0.01));
-                    //citizen.paidTaxes += (int)(citizen.salary * (data.residencialTax * 0.01));
+                    data.balance += (int)(citizen.salary * citizen.work.zone.zone_tax * 0.01);
+                    citizen.paidTaxes = (int)(citizen.salary * citizen.work.zone.zone_tax * 0.01);
                 }
             }
             //jsut for testing
@@ -314,7 +413,7 @@ namespace Assets.Model
                     happinessFromWorkRatio -= happinessReward;
                     citizen.happiness -= happinessReward;
                 }
-                data.DebugInUnity(this, "citizen happiness: " + citizen.happiness);
+                //data.DebugInUnity(this, "citizen happiness: " + citizen.happiness);
             }
 
             double avgHappiness = 0;
@@ -325,6 +424,7 @@ namespace Assets.Model
             }
             avgHappiness /= data.citizens.Count;
             //use the sigmoid function to calculate the happiness
+            data.happiness = 1 / (1 + Math.Exp(-avgHappiness));
             OnHappinessChanged?.Invoke(1 / (1 + Math.Exp(-avgHappiness)));
         }
 
@@ -366,7 +466,7 @@ namespace Assets.Model
                 if (citizen.age >= 65)
                 {
                     //Theres a 1 in 1000 chance that a citizen dies
-                    Random rnd = new Random();
+                    System.Random rnd = new System.Random();
                     if (rnd.Next(0, 1000) == 0)
                     {
                         data.citizens.Remove(citizen);
