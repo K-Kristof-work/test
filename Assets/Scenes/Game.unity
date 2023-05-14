@@ -10791,8 +10791,8 @@ MonoBehaviour:
   prefab_cylinder: {fileID: 5967791351818794213, guid: 6675dd447f1114749bb7b005a019b49a, type: 3}
   prefab_meteor: {fileID: 160260, guid: becedaa36441f6448abcf34c66eb61e3, type: 3}
   MeteoritButton: {fileID: 1706355677}
-  NormalColor: {r: 0, g: 0, b: 0, a: 0}
-  SelectedColor: {r: 0, g: 0, b: 0, a: 0}
+  NormalColor: {r: 1, g: 1, b: 1, a: 1}
+  SelectedColor: {r: 0.5411765, g: 0.90588236, b: 0.5411765, a: 1}
 --- !u!1 &1062738750
 GameObject:
   m_ObjectHideFlags: 0
