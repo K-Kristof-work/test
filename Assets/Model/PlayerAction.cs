@@ -22,38 +22,33 @@ namespace Assets.Model
             gameData = gd;
         }
 
-        public void SelectZone(int x, int z)
-        {
+		public void SelectZone(int x, int z)
+		{
+			int id = gameData.grid[x][z].zone.zone_id;
 
-            int id = gameData.grid[x][z].zone.zone_id;
+			if (id == 0 || id == -1) return;
 
-            if (id == 0 || id == -1) return;
+			int minX = x, minZ = z, maxX = x, maxZ = z;
 
-            // Find top left buttom right corners
-            int tx = -1, tz = -1, bx = -1, bz = -1;
+			for (int i = 0; i < gameData.gridWidth; i++)
+			{
+				for (int j = 0; j < gameData.gridHeight; j++)
+				{
+					if (gameData.grid[i][j].zone.zone_id == id)
+					{
+						if (i < minX) minX = i;
+						if (i > maxX) maxX = i;
+						if (j < minZ) minZ = j;
+						if (j > maxZ) maxZ = j;
+					}
+				}
+			}
 
-            for(int i = 0; i < gameData.gridWidth; i++)
-            {
-                for (int j = 0; j < gameData.gridHeight; j++)
-                {
-                    if(gameData.grid[i][j].zone.zone_id == id)
-                    {
-                        bx = i;
-                        bz = j;
+			OnZoneSelected?.Invoke(id, minX, minZ, maxX, maxZ);
+		}
 
-                        if (tx == -1)
-                        {
-                            tx = i;
-                            tz = j;
-                        }
-                    }                   
-                }
-            }
 
-            OnZoneSelected?.Invoke(id, tx, tz, bx, bz);
-        }
-
-        public void ZoneInfo(int id)
+		public void ZoneInfo(int id)
         {
             OnZoneInfo?.Invoke(gameData.GetZoneType(id));
         }

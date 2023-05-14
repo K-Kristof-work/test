@@ -105,7 +105,7 @@ public class BuildingPlacer
 		return random.Next(min, max);
 	}
 
-	private void PlaceBuilding(int x, int z, ZoneType zoneType, BlockType blocktype)
+	public void PlaceBuilding(int x, int z, ZoneType zoneType, BlockType blocktype)
 	{
 		// Check if a building is already placed
 		if (gameData.grid[x][z].block != null) return;
