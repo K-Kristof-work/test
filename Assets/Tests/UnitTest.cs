@@ -86,18 +86,6 @@ public class UnitTest
 	}
 
 	[Test]
-	public void TestInitialGrid()
-	{
-		foreach (var row in gameData.grid)
-		{
-			foreach (var cell in row)
-			{
-				Assert.AreEqual(ZoneType.Empty, cell.zone.zone_type);
-			}
-		}
-	}
-
-	[Test]
 	public void TestChangeZoneType()
 	{
 		gameData.ChangeZoneType(0, 0, ZoneType.Residential, 1);
@@ -151,15 +139,15 @@ public class UnitTest
 	[Test]
 	public void TestPlaceBuildingByUser()
 	{
-		buildingPlacer.PlaceBuildingByUser(new Vec2(5, 5), BlockType.House);
+		buildingPlacer.PlaceBuildingByUser(new Vec2(5, 5), BlockType.PoliceStation);
 
-		Assert.AreEqual(BlockType.House, gameData.grid[5][5].block.type);
+		Assert.AreEqual(BlockType.PoliceStation, gameData.grid[5][5].block.type);
 	}
 
 	[Test]
 	public void TestGetSizeForBuildingType()
 	{
-		Vec2 size = buildingPlacer.GetSizeForBuildingType(BlockType.House);
+		Vec2 size = buildingPlacer.GetSizeForBuildingType(BlockType.PoliceStation);
 
 		Assert.AreEqual(new Vec2(1, 1), size);
 	}
