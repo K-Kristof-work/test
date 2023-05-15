@@ -15,7 +15,7 @@ namespace Assets.Model.Data
         public bool isPowered;
         public double powerConsumption;
         public int building_cost;
-        public Citizen[] citizens;
+        public List<Citizen> citizens = new();
         public Vec2 blockSize;
         public Vec2 midPosition;
 

@@ -10387,6 +10387,9 @@ MonoBehaviour:
   FloatingObject: {fileID: 0}
   debugBanList:
   - GameData
+  - GameView
+  - ZoneData
+  - BuildingPlacer
 --- !u!4 &1039642949
 Transform:
   m_ObjectHideFlags: 0

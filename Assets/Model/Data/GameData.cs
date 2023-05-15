@@ -16,6 +16,7 @@ namespace Assets.Model.Data
 		public int gridHeight;
 		public List<Citizen> citizens;
 		public Time time;
+		public double happiness;
 		public BuildingPlacer buildingPlacer;
 		public Dictionary<ZoneType, List<Vec2>> availableBuildingSizes;
 		public CityLogic cityLogic;
@@ -392,6 +393,7 @@ namespace Assets.Model.Data
 			{
 				zd.ExitTimeEvent();
 			}
+			cityLogic.ExitTimeEvent();
 		}
 
 		public List<Block> GetBuildings()

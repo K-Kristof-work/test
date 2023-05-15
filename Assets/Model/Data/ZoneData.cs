@@ -39,6 +39,7 @@ public class ZoneData
 		this.zone_population = 0;
 		this.zone_employment = 0;
 		this.zone_happiness = 100;
+		this.zone_tax = 20;
 		this.zone_capacity = zone_capacity;
 		this.zone_buildings = new List<Block>();
         this.bp = _bp;
