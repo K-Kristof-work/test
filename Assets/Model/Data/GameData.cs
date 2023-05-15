@@ -37,7 +37,7 @@ namespace Assets.Model.Data
 		{
 			availableBuildingSizes = new Dictionary<ZoneType, List<Vec2>>();
 			availableBuildingSizes.Add(ZoneType.Residential, new List<Vec2> { new Vec2(1, 1), new Vec2(2, 2), new Vec2(3, 3)});
-			availableBuildingSizes.Add(ZoneType.Commercial, new List<Vec2> { new Vec2(1, 1) });
+			availableBuildingSizes.Add(ZoneType.Commercial, new List<Vec2> { new Vec2(1, 1), new Vec2(2, 2), new Vec2(3, 3) });
 			availableBuildingSizes.Add(ZoneType.Industrial, new List<Vec2> { new Vec2(1, 1), new Vec2(2, 2), new Vec2(3, 3) });
 			buildingPlacer = new BuildingPlacer(this, availableBuildingSizes);
 			citizens = new List<Citizen>();
@@ -260,6 +260,7 @@ namespace Assets.Model.Data
 				}
 			}
 
+			GetZoneDataById(id).ExitTimeEvent();
 			zones.Remove(GetZoneDataById(id));
 		}
 

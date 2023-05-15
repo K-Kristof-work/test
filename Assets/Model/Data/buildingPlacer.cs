@@ -50,6 +50,7 @@ public class BuildingPlacer
 			return block.x <= maxSize && block.y <= maxSize && block.x <= level && block.y <= level ;
 		}).ToList();
 		Random rand = new Random();
+
 		Vec2 buildingPrefab = suitableSizes[rand.Next(0, suitableSizes.Count)];
 
 		gameData.DebugInUnity(this,"random building selected for " + blocktype + " in position " + x + ", " + z);
