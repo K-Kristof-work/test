@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028334, g: 0.2257134, b: 0.30692226, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -10371,6 +10371,7 @@ MonoBehaviour:
   UI_Time: {fileID: 203798135}
   UI_Money: {fileID: 1029051741}
   UI_Happiness: {fileID: 952768466}
+  UI_Population: {fileID: 952768466}
   HappinessIcon: {fileID: 1881817222}
   ExpenseContent: {fileID: 115361294}
   ExpenseRow: {fileID: 2907497744283867882, guid: ae9710e3a4ce5a24687b8f952b396d0a, type: 3}

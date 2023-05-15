@@ -43,12 +43,14 @@ namespace Assets.Model
         //public delegate void IncomeSpendingEventHandler(int money);
         //public delegate void HappinessEventHandler(double commute, double tax, double industry, double forest, double safety, double debt, double ratio);
         public delegate void OnHappinessChangedEventHandler(double happiness);
+        public delegate void OnCitizenAddedEventHandler(int count);
 
         public event TimeEventHandler OnTimeChanged;
         public event MoneyEventHandler OnMoneyChanged;
         //public event IncomeSpendingEventHandler OnIncome;
         //public event HappinessEventHandler OnHappinessChanged;
         public event OnHappinessChangedEventHandler OnHappinessChanged;
+        public event OnCitizenAddedEventHandler OnCitizenChanged;
 
         private Timer timer;
         private Timer seasonTimer;
@@ -174,11 +176,15 @@ namespace Assets.Model
                         data.DebugInUnity(this, "Citizen moved in");
 
                         FindAJob(citizen);
+
+                        OnCitizenChanged?.Invoke(data.citizens.Count);
                         data.DebugInUnity(this, "14");
                         return;
                     }
                 }
             }
+
+
         }
 
         private void FindAJob(Citizen citizen)
