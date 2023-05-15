@@ -46,6 +46,7 @@ public class GameView : MonoBehaviour
     public TextMeshProUGUI UI_Time;
     public TextMeshProUGUI UI_Money;
     public TextMeshProUGUI UI_Happiness;
+	public TextMeshProUGUI UI_Population;
 
 	public GameObject HappinessIcon;
 
@@ -154,6 +155,7 @@ public class GameView : MonoBehaviour
         gameData.cityLogic.OnTimeChanged += HandleTime;
         gameData.cityLogic.OnMoneyChanged += HandleMoney;
 		gameData.cityLogic.OnHappinessChanged += HandleHappiness;
+		gameData.cityLogic.OnCitizenChanged += HandlePopulation;
         gameData.OnDebug += HandleDebug;
 
 		UnityThread.initUnityThread();
@@ -167,6 +169,15 @@ public class GameView : MonoBehaviour
 		//StartCoroutine(PlaceBuildingsOverTime());
 
 	}
+
+
+	private void HandlePopulation(int count)
+	{
+        UnityThread.executeInUpdate(() =>
+        {
+            UI_Population.text = count.ToString();
+        });
+    }
 
     private void HandleTime(Assets.Model.Data.Time time)
     {
