@@ -9395,7 +9395,7 @@ MonoBehaviour:
   extraMotionFactor: 2
   zoomSpeed: 10
   minZoom: 0
-  maxZoom: 20
+  maxZoom: 25
   rotationSpeed: 2
   minXRotation: 20
   maxXRotation: 80
