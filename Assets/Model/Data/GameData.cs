@@ -40,7 +40,7 @@ namespace Assets.Model.Data
 			availableBuildingSizes.Add(ZoneType.Residential, new List<Vec2> { new Vec2(1, 1), new Vec2(2, 2), new Vec2(3, 3)});
 			availableBuildingSizes.Add(ZoneType.Commercial, new List<Vec2> { new Vec2(1, 1), new Vec2(2, 2), new Vec2(3, 3) });
 			availableBuildingSizes.Add(ZoneType.Industrial, new List<Vec2> { new Vec2(1, 1), new Vec2(2, 2), new Vec2(3, 3) });
-			buildingPlacer = new BuildingPlacer(this, availableBuildingSizes);
+            buildingPlacer = new BuildingPlacer(this, availableBuildingSizes);
 			citizens = new List<Citizen>();
 			cityLogic = new CityLogic(this);
 			loans = 0;
@@ -138,7 +138,14 @@ namespace Assets.Model.Data
 
 		public void PlaceRandomTrees()
 		{
-			int howmany = 0;
+			int howmany = 50;
+
+			Random r = new Random();
+			while(howmany > 0)
+			{
+                buildingPlacer.PlaceForest(r.Next(gridWidth), r.Next(gridHeight), r.Next(7));
+                howmany--;
+			}
 		}
 
 		public void PlaceIncomingRoadCenter()
@@ -377,7 +384,11 @@ namespace Assets.Model.Data
 			OnBuildingPlaced?.Invoke(positions, buildingInstance);
 			if (buildingInstance.type != BlockType.House && buildingInstance.type != BlockType.Factory && buildingInstance.type!= BlockType.Shop )
 			{
-				cityLogic.BuildingPlacedByUser(buildingInstance);	
+				if (buildingInstance.start == false)
+				{
+                    cityLogic.BuildingPlacedByUser(buildingInstance);
+                }
+
             }
 		}
 

@@ -13,6 +13,7 @@ namespace Assets.Model.Data
         public int building_progress; // 1-10
         public int operating_cost;
         public bool isPowered;
+        public bool start = false; // placed at game start (example forests)
         public double powerConsumption;
         public int building_cost;
         public List<Citizen> citizens = new();
@@ -103,7 +104,7 @@ namespace Assets.Model.Data
                     break;
 
                 case BlockType.Forest:
-                    lvl = 0;
+                    lvl = 1;
                     operating_cost = 0;
                     isPowered = false;
                     powerConsumption = 0;

@@ -18,6 +18,7 @@ public class FloatingBuildings : MonoBehaviour
     public GameObject UniversityFloatingObject;
     public GameObject HighschoolFloatingObject;
     public GameObject StadiumFloatingObject;
+    public GameObject ForestFloatingObject;
 
     void Start()
     {
@@ -30,7 +31,8 @@ public class FloatingBuildings : MonoBehaviour
 			{BlockType.PoliceStation,  PoliceFloatingObject},
 			{BlockType.University, UniversityFloatingObject},
 			{BlockType.Stadium, StadiumFloatingObject},
-			{BlockType.School, HighschoolFloatingObject}
+			{BlockType.School, HighschoolFloatingObject},
+			{BlockType.Forest, ForestFloatingObject }
 		};
 	}
 
@@ -54,8 +56,12 @@ public class FloatingBuildings : MonoBehaviour
 				}
 				gameView.HandleDebug(this, mousePosition.ToString());
 				// Adjust the Y position by half of the prefab's height
-				float prefabHeight = floatingObject.GetComponent<MeshRenderer>().bounds.size.y;
-				mousePosition.y += prefabHeight / 2;
+				if(floatingObject.GetComponent<MeshRenderer>() != null)
+				{
+                    float prefabHeight = floatingObject.GetComponent<MeshRenderer>().bounds.size.y;
+                    mousePosition.y += prefabHeight / 2;
+                }
+
 				floatingObject.transform.position = mousePosition;
 			}
 

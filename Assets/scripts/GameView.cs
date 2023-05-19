@@ -42,6 +42,7 @@ public class GameView : MonoBehaviour
 	public List<GameObject> StadiumBuildingPrefabs;
 	public List<GameObject> SchoolBuildingPrefabs;
 	public List<GameObject> UniversityBuildingPrefabs;
+	public List<GameObject> ForestBuildingPrefabs;
 
     public TextMeshProUGUI UI_Time;
     public TextMeshProUGUI UI_Money;
@@ -145,6 +146,7 @@ public class GameView : MonoBehaviour
 			{BlockType.Stadium, StadiumBuildingPrefabs},
 			{BlockType.School, SchoolBuildingPrefabs},
 			{BlockType.University, UniversityBuildingPrefabs},
+			{BlockType.Forest, ForestBuildingPrefabs }
 
 		};
 
@@ -222,7 +224,6 @@ public class GameView : MonoBehaviour
 
             //set the row to be a child of the content
             newRow.transform.SetParent(ExpenseContent.transform, false);
-            Debug.Log(typeText.text);
 
             // update height
             RectTransform rt = ExpenseContent.GetComponent(typeof(RectTransform)) as RectTransform;
@@ -233,7 +234,7 @@ public class GameView : MonoBehaviour
 
 	private void HandleHappiness(double happiness)
 	{
-        Debug.Log("Happiness: " + happiness);
+        //Debug.Log("Happiness: " + happiness);
         happiness *= 100;
         UI_Happiness.text = happiness.ToString("0.00") + "%";
         UnityThread.executeInUpdate(() =>
@@ -643,7 +644,6 @@ public class GameView : MonoBehaviour
 
 	private void Placebuilding(List<Vec2> positions, Block block)
 	{
-
 		HandleDebug(this, "building placment starting in view");
 
 		int x = (int)positions[0].x;
@@ -659,14 +659,26 @@ public class GameView : MonoBehaviour
 		if (suitablePrefabs.Count == 0)
 		{
 			HandleDebug(this, "no suitable prefab found");
-			return;
+            return;
 		}
 		GameObject buildingPrefab = suitablePrefabs[Random.Range(0, suitablePrefabs.Count)];
 
+		// forest
+		if(block.type == BlockType.Forest && block.lvl > 0)
+		{
+			if(suitablePrefabs[block.lvl - 1] == null)
+			{
+                HandleDebug(this, "no suitable prefab found for forest");
+                return;
+            }
+
+			buildingPrefab = suitablePrefabs[block.lvl - 1];
+        }
+
 		HandleDebug(this, "random prefab selected");
 
-		// Get road direction
-		int roadDirection = GetRoadDirection(x, z);
+        // Get road direction
+        int roadDirection = GetRoadDirection(x, z);
 
 
 		// Set building rotation to face the road
@@ -683,6 +695,14 @@ public class GameView : MonoBehaviour
 		{
 			buildingRotation = buildingPrefab.transform.rotation;
 		}
+
+        // forest
+        if (block.type == BlockType.Forest)
+		{
+			buildingRotation = new Quaternion();
+			buildingRotation.eulerAngles = new Vector3(0, Random.Range(0, 4) * 90, 0);
+
+        }
 
 		HandleDebug(this, "prefab looks at the road");
 
