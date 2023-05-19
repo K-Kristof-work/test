@@ -42,6 +42,7 @@ public class GameView : MonoBehaviour
 	public List<GameObject> StadiumBuildingPrefabs;
 	public List<GameObject> SchoolBuildingPrefabs;
 	public List<GameObject> UniversityBuildingPrefabs;
+	public List<GameObject> ForestBuildingPrefabs;
 
     public TextMeshProUGUI UI_Time;
     public TextMeshProUGUI UI_Money;
@@ -145,6 +146,7 @@ public class GameView : MonoBehaviour
 			{BlockType.Stadium, StadiumBuildingPrefabs},
 			{BlockType.School, SchoolBuildingPrefabs},
 			{BlockType.University, UniversityBuildingPrefabs},
+			{BlockType.Forest, ForestBuildingPrefabs }
 
 		};
 
