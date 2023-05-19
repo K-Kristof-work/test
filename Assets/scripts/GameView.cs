@@ -663,11 +663,12 @@ public class GameView : MonoBehaviour
 		}
 		GameObject buildingPrefab = suitablePrefabs[Random.Range(0, suitablePrefabs.Count)];
 
-		if(block.lvl > 0)
+		// forest
+		if(block.type == BlockType.Forest && block.lvl > 0)
 		{
 			if(suitablePrefabs[block.lvl - 1] == null)
 			{
-                HandleDebug(this, "no suitable prefab found for level");
+                HandleDebug(this, "no suitable prefab found for forest");
                 return;
             }
 
@@ -694,6 +695,14 @@ public class GameView : MonoBehaviour
 		{
 			buildingRotation = buildingPrefab.transform.rotation;
 		}
+
+        // forest
+        if (block.type == BlockType.Forest)
+		{
+			buildingRotation = new Quaternion();
+			buildingRotation.eulerAngles = new Vector3(0, Random.Range(0, 4) * 90, 0);
+
+        }
 
 		HandleDebug(this, "prefab looks at the road");
 
