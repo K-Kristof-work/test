@@ -224,7 +224,6 @@ public class GameView : MonoBehaviour
 
             //set the row to be a child of the content
             newRow.transform.SetParent(ExpenseContent.transform, false);
-            Debug.Log(typeText.text);
 
             // update height
             RectTransform rt = ExpenseContent.GetComponent(typeof(RectTransform)) as RectTransform;
@@ -235,7 +234,7 @@ public class GameView : MonoBehaviour
 
 	private void HandleHappiness(double happiness)
 	{
-        Debug.Log("Happiness: " + happiness);
+        //Debug.Log("Happiness: " + happiness);
         happiness *= 100;
         UI_Happiness.text = happiness.ToString("0.00") + "%";
         UnityThread.executeInUpdate(() =>
@@ -645,7 +644,6 @@ public class GameView : MonoBehaviour
 
 	private void Placebuilding(List<Vec2> positions, Block block)
 	{
-
 		HandleDebug(this, "building placment starting in view");
 
 		int x = (int)positions[0].x;
@@ -661,14 +659,25 @@ public class GameView : MonoBehaviour
 		if (suitablePrefabs.Count == 0)
 		{
 			HandleDebug(this, "no suitable prefab found");
-			return;
+            return;
 		}
 		GameObject buildingPrefab = suitablePrefabs[Random.Range(0, suitablePrefabs.Count)];
 
+		if(block.lvl > 0)
+		{
+			if(suitablePrefabs[block.lvl - 1] == null)
+			{
+                HandleDebug(this, "no suitable prefab found for level");
+                return;
+            }
+
+			buildingPrefab = suitablePrefabs[block.lvl - 1];
+        }
+
 		HandleDebug(this, "random prefab selected");
 
-		// Get road direction
-		int roadDirection = GetRoadDirection(x, z);
+        // Get road direction
+        int roadDirection = GetRoadDirection(x, z);
 
 
 		// Set building rotation to face the road

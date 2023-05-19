@@ -10370,6 +10370,11 @@ MonoBehaviour:
   - {fileID: 5123974430126005521, guid: e222053cf87340c41b4ba6c430059c08, type: 3}
   ForestBuildingPrefabs:
   - {fileID: 8459145666646185263, guid: a0d0ccac071bf674fbab35b63b2283a0, type: 3}
+  - {fileID: 8459145666646185263, guid: aab8b67777e85884398c61d9608ddeb2, type: 3}
+  - {fileID: 8459145666646185263, guid: 01742805ceee59942a9a9a4bbfd7752a, type: 3}
+  - {fileID: 8459145666646185263, guid: 07ba6973b202a9b4ca6f1e76c8273238, type: 3}
+  - {fileID: 8459145666646185263, guid: dc976326316332e4ea507c4ea375faee, type: 3}
+  - {fileID: 8459145666646185263, guid: d5b58cd1825796b468aad039433a2ca8, type: 3}
   UI_Time: {fileID: 203798135}
   UI_Money: {fileID: 1029051741}
   UI_Happiness: {fileID: 952768466}
@@ -10390,7 +10395,6 @@ MonoBehaviour:
   FloatingObject: {fileID: 0}
   debugBanList:
   - GameData
-  - GameView
   - ZoneData
   - BuildingPlacer
   - CityLogic

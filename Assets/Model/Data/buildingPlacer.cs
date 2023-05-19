@@ -34,7 +34,24 @@ public class BuildingPlacer
 		return random.Next(min, max);
 	}
 
-	public void PlaceBuilding(int x, int z, ZoneType zoneType, BlockType blocktype, int level)
+    public void PlaceForest(int x, int z, int level)
+    {
+        // Check if a building is already placed
+        if (gameData.grid[x][z].block != null) return;
+
+        Block buildingInstance = new Block()
+        {
+            type = BlockType.Forest,
+            blockSize = new Vec2((uint)1, (uint)1)
+        };
+        buildingInstance.setDefaultValues();
+		buildingInstance.lvl = level;
+        gameData.grid[x][z].block = buildingInstance;
+
+        gameData.BuildingPlaced(new List<Vec2> { new Vec2((uint)x, (uint)z)}, buildingInstance);
+    }
+
+    public void PlaceBuilding(int x, int z, ZoneType zoneType, BlockType blocktype, int level)
 	{
 		// Check if a building is already placed
 		if (gameData.grid[x][z].block != null) return;

@@ -103,7 +103,7 @@ namespace Assets.Model.Data
                     break;
 
                 case BlockType.Forest:
-                    lvl = 0;
+                    lvl = 1;
                     operating_cost = 0;
                     isPowered = false;
                     powerConsumption = 0;
