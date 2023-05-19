@@ -10397,8 +10397,8 @@ MonoBehaviour:
   - GameData
   - ZoneData
   - BuildingPlacer
-  - CityLogic
   - GameView
+  - CityLogic
 --- !u!4 &1039642949
 Transform:
   m_ObjectHideFlags: 0

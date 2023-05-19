@@ -46,6 +46,7 @@ public class BuildingPlacer
         };
         buildingInstance.setDefaultValues();
 		buildingInstance.lvl = level;
+		buildingInstance.start = true;
         gameData.grid[x][z].block = buildingInstance;
 
         gameData.BuildingPlaced(new List<Vec2> { new Vec2((uint)x, (uint)z)}, buildingInstance);

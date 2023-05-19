@@ -384,7 +384,11 @@ namespace Assets.Model.Data
 			OnBuildingPlaced?.Invoke(positions, buildingInstance);
 			if (buildingInstance.type != BlockType.House && buildingInstance.type != BlockType.Factory && buildingInstance.type!= BlockType.Shop )
 			{
-				cityLogic.BuildingPlacedByUser(buildingInstance);	
+				if (buildingInstance.start == false)
+				{
+                    cityLogic.BuildingPlacedByUser(buildingInstance);
+                }
+
             }
 		}
 
